@@ -40,17 +40,33 @@ function validacion(){
     const fecha_sol = new Date(document.getElementById('fecha_sol').value);
     const fecha_sol_str = document.getElementById('fecha_sol').value;
 
-    const solicitudes_pendientes = 0
+    const solicitudes_pendientes = 0;
 
     const fecha_actual = new Date();
     const diffTime = (fecha_sol - fecha_actual);
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
 
-    console.log("Diferencia de dias: " + diffDays)
+    console.log("Diferencia de dias: " + diffDays);
 
 
+    console.log("fes: " + verifica_fecha_festiva("2023-03-20"))
+
+    // Validamos que no seleccionen mas dias
+    if(dias_sol > 6){
+        
+        swal({
+            title: 'Información',
+            text: 'No puede seleccionar más 6 dias.',
+            icon: 'error',
+    
+            buttons: {
+                OK: "OK"
+            },
+        })
+
+    }
     // Validadmos que tenga una fecha seleccionada
-    if(fecha_sol_str.length == 0){
+    else if(fecha_sol_str.length == 0){
         // console.log("fecha nula")
 
         swal({
@@ -68,9 +84,23 @@ function validacion(){
     else if(diffDays < 15){
 
         swal({
-            title: 'Fecha invalida',
+            title: 'Fecha inválida',
             text: 'La fecha seleccionada debe ser mayor a la fecha actual y 15 dias de acticipacion.',
             icon: 'error',
+    
+            buttons: {
+                OK: "OK"
+            },
+        })
+
+    }
+    // Validamos que la fecha seleccionado no sea una fecha festiva oficial
+    else if(verifica_fecha_festiva()){
+
+        swal({
+            title: 'Fecha inválida',
+            text: 'La fecha seleccionada es una fecha festiva. Selecciona una diferente.',
+            icon: 'warning',
     
             buttons: {
                 OK: "OK"
@@ -141,8 +171,14 @@ function validacion(){
             switch (value) {
 
                 case "Si":
+
+                    // Activamos campo de numero para que se pueda mandar por post
+                    document.getElementById('dias_sol').disabled = false;
+
+                    // Enviamos los datos por POST
                     document.getElementById('form').submit();
                     console.log('Se envio la solictud');
+
 
                     // swal({
                     //     title: 'Confirmación',
@@ -163,24 +199,135 @@ function validacion(){
     }
 }
 
-function post(){
+function verifica_fecha_festiva(){
 
-    console.log(document.getElementById('token').innerText)
+    // const fecha = "2023-02-06";
+    const n = parseInt(document.getElementById("n").innerText);
+    const fecha = document.getElementById('fecha_sol').value.trim();
+    let i;
+    let j = false;
 
-    var xhr = new XMLHttpRequest();
-    xhr.open("POST", "/registra_solicitud/", true);
-    xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.send(JSON.stringify({
-        fecha_sol: '2023-01-01',
-        dias_sol: 6
-    }));
+    console.log("Verificacion de fecha festiva")
+    // console.log("Fecha de entrada: " + fecha)
+    // console.log("Tamaño de la fecha de entrada: "+ fecha.length)
 
-
-    xhr.onload = function() {
-    console.log("Hola")
-    console.log(this.responseText);
-    var data = JSON.parse(this.responseText);
-    console.log(data);
+    for(i = 1; i <= n; i++){
+        f = document.getElementById(i.toString()).innerText.trim()
+        if (f === fecha){
+            console.log("Encontramos fecha festiva: " + f);
+            j = true;
+        } 
     }
 
+    // console.log(j)
+
+    return j
+    
 }
+
+function confirmacionAprobar(id){
+
+    // const solicitud = document.querySelector("#go");
+    // const url = "aprobarSolicitud/" + solicitud.dataset.id.toString();
+
+    const url = "aprobarSolicitud/" + id.toString();
+    console.log(url);
+
+    swal({
+        title: 'Confirmación',
+        text: 'Esta seguro de Aprobar la solicitud?',
+        icon: 'success',
+
+        buttons: {
+            No: "No",
+            Si: "Si"
+        },
+    })
+
+    .then((value) => {
+        switch (value) {
+
+            case "Si":
+                window.location.href = url;
+                console.log('Se confirmo la Aprobación de la solictud ' + id);
+
+                break;
+
+            case "No":
+                console.log('No se confirmo la Aprobación de la solicitud ' + id);
+                break;
+
+        }
+    })
+
+}
+
+function confirmacionRechazar(id){
+
+    // const solicitud = document.querySelector("#go");
+    // const url = "aprobarSolicitud/" + solicitud.dataset.id.toString();
+
+    const url = "rechazarSolicitud/" + id.toString();
+    console.log(url);
+
+    swal({
+        title: 'Confirmación',
+        text: 'Esta seguro de Rechazar la solicitud?',
+        icon: 'success',
+
+        buttons: {
+            No: "No",
+            Si: "Si"
+        },
+    })
+
+    .then((value) => {
+        switch (value) {
+
+            case "Si":
+                window.location.href = url;
+                console.log('Se confirmo el Rechazo de la solictud ' + id);
+
+                break;
+
+            case "No":
+                console.log('No se confirmo el Rechazo de la solicitud ' + id);
+                break;
+
+        }
+    })
+}
+
+function prueba(a){
+
+    console.log(typeof(a))
+    console.log(a)
+    
+    const b = a.replace('[','').replace(']','').split(',');
+    
+    console.log(typeof(b))
+    console.log(b)
+
+}
+
+// function post(){
+
+//     console.log(document.getElementById('token').innerText)
+
+//     var xhr = new XMLHttpRequest();
+//     xhr.open("POST", "/registra_solicitud/", true);
+//     xhr.setRequestHeader('Content-Type', 'application/json');
+//     xhr.send(JSON.stringify({
+//         fecha_sol: '2023-01-01',
+//         dias_sol: 6
+//     }));
+
+
+//     xhr.onload = function() {
+//     console.log("Hola")
+//     console.log(this.responseText);
+//     var data = JSON.parse(this.responseText);
+//     console.log(data);
+//     }
+
+// }

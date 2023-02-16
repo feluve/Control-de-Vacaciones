@@ -1,6 +1,6 @@
 from django.shortcuts import render,  redirect
 from datetime import date, timedelta, datetime
-from vacaciones.models import Solicitud_Vacaciones, Perfil
+from vacaciones.models import Solicitud_Vacaciones, Perfil, Dias_Festivos_Oficiales
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout, login
 from django.contrib.auth.models import User
@@ -39,21 +39,30 @@ def vacaciones(request):
         fecha_vigencia_dias_vacaciones, '%Y-%m-%d').date()
 
     # Consultas a DB
+    # Todas las Solicitudes
+    todas_solicitudes = Solicitud_Vacaciones.objects.all()
 
+    # Solicitudes enviadas
     solicitudes_enviadas = Solicitud_Vacaciones.objects.filter(
-        usuario=request.user.username)
+        usuario=request.user)
 
+    # Solicitudes pendientes
     solicitudes_enviadas_pendientes = Solicitud_Vacaciones.objects.filter(
-        estado="Pendiente")
+        estado="Pendiente", usuario=request.user)
 
+    # Solicitudes recibidas
     solicitudes_recibidas = Solicitud_Vacaciones.objects.filter(
         jefe__startswith=f"{request.user.first_name} {request.user.last_name}").order_by('-id')
+
+    # Dias festivos oficiales
+    lista_dias_festivos = Dias_Festivos_Oficiales.objects.all().order_by('id')
+    # print(lista_dias_festivos)
 
     # Verificamos si el usuario tiene una solictud pendiente
     if len(solicitudes_enviadas_pendientes) > 0:
         print(
             f"[-] Tienes {len(solicitudes_enviadas_pendientes)} solictudes pendientes")
-        disabled = ""
+        disabled = "disabled"
     else:
         print("[+] No tienes solicitudes pendientes")
         disabled = ""
@@ -61,12 +70,16 @@ def vacaciones(request):
     context = {
         "fecha_anticipacion": fecha_anticipacion,
         "fecha_vigencia_dias_vacaciones": fecha_vigencia_dias_vacaciones,
+        "todas_solicitudes": todas_solicitudes,
         "solicitudes_enviadas": solicitudes_enviadas,
         "solicitudes_recibidas": solicitudes_recibidas,
+        "todas_solicitudes_count": len(todas_solicitudes),
         "solicitudes_enviadas_count": len(solicitudes_enviadas),
         "solicitudes_recibidas_count": len(solicitudes_recibidas),
         "usuario_rol": request.user.perfil.rol,
-        "disabled": disabled
+        "disabled": disabled,
+        "lista_dias_festivos": lista_dias_festivos,
+        "n_lista_dias_festivos": len(lista_dias_festivos)
     }
 
     return render(request, "vacaciones.html", context)
@@ -132,8 +145,8 @@ def salir(request):
 
     return redirect('/')
 
-
 # -----------------------------------------------------------------
+
 
 def calculo_vacaciones(fecha_solicitud, dias_solicitados):
     # Verificamos si hay domingos

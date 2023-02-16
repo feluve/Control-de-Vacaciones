@@ -33,7 +33,8 @@ class Perfil(models.Model):
         ('Gerente', 'Gerente'),
         ('RH', 'RH'),
         ('Direccion', 'Direccion'),
-        ('Dueño', 'Dueño')
+        ('Dueño', 'Dueño'),
+        ('admin', 'admin')
     ]
 
     usuario = models.OneToOneField(
@@ -81,6 +82,7 @@ class Solicitud_Vacaciones(models.Model):
         ('Pendiente', 'Pendiente'),
         ('Rechazada', 'Rechazada'),
         ('Aprobada', 'Aprobada'),
+        ('Cancelada', 'Cancelada')
     ]
 
     JEFES = [
@@ -128,6 +130,6 @@ class Dias_Festivos_Oficiales(models.Model):
         return self.nombre
 
     class Meta:
-        verbose_name = 'Dia Festivo oficial'
+        verbose_name = 'Dia festivo oficial'
         verbose_name_plural = 'Dias festivos oficiales'
         ordering = ['-id']

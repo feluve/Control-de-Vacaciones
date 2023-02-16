@@ -1,0 +1,53 @@
+/* Estilos de CSS */
+
+.campo_largo {
+  color: white;
+  min-width: 200px;
+  text-align: center;
+}
+
+.campo_corto {
+  color: white;
+  min-width: 30px;
+  text-align: center;
+}
+
+.campo {
+  color: white;
+  min-width: 100px;
+  text-align: center;
+}
+
+.registro_corto {
+  min-width: 30px;
+  text-align: center;
+}
+
+.registro {
+  min-width: 140px;
+  text-align: center;
+  background-color: orange;
+}
+
+.opcciones {
+  text-align: center;
+}
+
+input[type="number"] {
+  width: 50px;
+  text-align: center;
+  /* padding: 12px 20px; */
+  /* margin: 8px 0; */
+  /* box-sizing: border-box; */
+}
+
+input[type="date"] {
+  /* width: 50px; */
+  /* text-align: center; */
+  /* background-color: red; */
+  height: 40px;
+}
+
+.titulos {
+  text-align: center;
+}
