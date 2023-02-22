@@ -7,6 +7,7 @@ from django.template.loader import render_to_string
 
 def enviar_correo_simple(subject, msg, para):
     try:
+        print("[py<] Enviando correo...")
         # Eco al servidor de correo
         # print("Peticion eco al servidor de correo...")
         mailServer = smtplib.SMTP('smtp.gmail.com', 587)
@@ -30,40 +31,32 @@ def enviar_correo_simple(subject, msg, para):
         print(e)
 
 
-def send_email_simple_Plantilla():
+def enviar_correo_plantilla(correo_contenido, id_solicitud, to):
     try:
-        # print("Peticion eco al servidor de correo...")
-        # mailServer = smtplib.SMTP('smtp.hostinger.com', 465)
-        # print(mailServer.ehlo())
-        # mailServer.starttls()
-        # print(mailServer.ehlo())
-        # mailServer.login('info@cegmex.com.mx', 'Info123?')
-        # print("Servidor acepta eco...")
+        print("[py<] Enviando correo...")
 
-        print("Peticion eco al servidor de correo...")
+        # print("Peticion eco al servidor de correo...")
         mailServer = smtplib.SMTP('smtp.gmail.com', 587)
-        print(mailServer.ehlo())
+        # print(mailServer.ehlo())
         mailServer.starttls()
-        print(mailServer.ehlo())
+        # print(mailServer.ehlo())
         mailServer.login('feluve22@gmail.com', 'qzhpyygiaqmhatrw')
-        print("Servidor acepta eco...")
+        # print("Servidor acepta eco...")
 
         mensaje = MIMEMultipart()
         mensaje['From'] = "feluve22@gmail.com"
-        mensaje['To'] = "feluve@gmail.com"
-        mensaje['Subject'] = "Tienes un correo"
+        mensaje['To'] = to
+        # mensaje['Cc'] = ""
+        mensaje['Subject'] = "Solicitud de vacaciones # " + id_solicitud
 
-        contenido = render_to_string('send_email.html')
-        mensaje.attach(MIMEText(contenido, 'html'))
+        # contenido = render_to_string('send_email.html')
+        mensaje.attach(MIMEText(correo_contenido, 'html'))
 
         mailServer.sendmail("feluve22@gmail.com",
-                            "feluve22@gmail.com", mensaje.as_string())
+                            to, mensaje.as_string())
 
-        print("Correo enviado correctamente")
+        print("[>py][+] Notificación por correo enviado correctamente")
 
     except Exception as e:
+        print("[>py][+]Ocurrio un excepccion")
         print(e)
-
-
-# enviar_correo_simple("Solicitud de vacaciones",
-#                      "Esta es una solicitud de vacaciones.", "vacaciones@cegmex.com.mx")

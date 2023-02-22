@@ -47,7 +47,7 @@ class Perfil(models.Model):
                             blank=True, choices=AREAS)
     dias_vacaciones_disp = models.PositiveSmallIntegerField(
         null=True, blank=True)
-    vigencia_dias_vacaciones_disp = models.DateField(null=True, blank=True)
+    vigencia_dias_vacaciones = models.DateField(null=True, blank=True)
     jefe = models.CharField(max_length=50, null=True,
                             blank=True, choices=JEFES)
     rol = models.CharField(max_length=50, null=True,

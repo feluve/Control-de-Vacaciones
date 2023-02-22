@@ -1,5 +1,9 @@
 /* Estilos de CSS */
 
+body {
+  font-family: "Rajdhani", sans-serif;
+}
+
 .campo_largo {
   color: white;
   min-width: 200px;

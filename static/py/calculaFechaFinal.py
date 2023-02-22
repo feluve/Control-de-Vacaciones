@@ -1,7 +1,11 @@
 from datetime import date, timedelta, datetime
+from vacaciones.models import Dias_Festivos_Oficiales
 
 
 def calcula_fecha_final(fecha_solicitud, dias_solicitados):
+
+    print("[py] Calculando fecha final...")
+
     domingos = 0
 
     fecha_solicitud_obj = datetime.strptime(fecha_solicitud, '%Y-%m-%d').date()
@@ -14,27 +18,25 @@ def calcula_fecha_final(fecha_solicitud, dias_solicitados):
 
     # ------------------
 
-    dias_festivos = 0
-
-    agno = str(date.today().year)
-
     # lista_dias_festivos = [
-    #     agno+('-01-01'),
-    #     agno+('-02-06'),
-    #     agno+('-02-24'),
-    #     agno+('-04-05'),
-    #     agno+('-04-06'),
-    #     agno+('-04-07')
+    #     "2023-01-01",
+    #     "2023-02-06",
+    #     "2023-02-08",
+    #     "2023-04-05",
+    #     "2023-04-06",
+    #     "2023-04-07",
     # ]
 
-    lista_dias_festivos = [
-        "2023-01-01",
-        "2023-02-06",
-        "2023-02-08",
-        "2023-04-05",
-        "2023-04-06",
-        "2023-04-07",
-    ]
+    dias_festivos = 0
+
+    # Obtenemos lista de dias festivos registrados
+    lista_dias_festivos_query = Dias_Festivos_Oficiales.objects.values(
+        'dia_festivo')
+
+    lista_dias_festivos = []
+    for i in range(len(lista_dias_festivos_query)):
+        lista_dias_festivos.append(
+            str(lista_dias_festivos_query[i]['dia_festivo']))
 
     for dia_s in range(dias_solicitados + domingos):
         fecha_solicitud_obj = datetime.strptime(
@@ -64,6 +66,5 @@ def calcula_fecha_final(fecha_solicitud, dias_solicitados):
 
     return fecha_final, domingos, dias_festivos
 
-
-fecha_final = calcula_fecha_final("2023-02-26", 2)[0]
-print(f"Fecha final: {fecha_final}")
+# fecha_final = calcula_fecha_final("2023-02-26", 2)[0]
+# print(f"Fecha final: {fecha_final}")

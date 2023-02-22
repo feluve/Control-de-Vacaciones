@@ -17,6 +17,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <!-- Mi estilo css -->
     <link rel="stylesheet" href={% static 'css/estilo.css' %}>
+    <!-- Funete de Google -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
 
     <title>Vacaciones CEGMEX</title>
 </head>
@@ -71,7 +75,7 @@
                     <div class="card mb-4">
                         <div class="card-body">
                             <div class="row">
-                                <div class="col-sm-2">
+                                <div class="col-sm-3">
                                     <p class="mb-0 fw-bold">Correo:</p>
                                 </div>
                                 <div class="col-sm-9">
@@ -111,7 +115,8 @@
                                     <p class="mb-0 fw-bold">Fecha de Ingreso:</p>
                                 </div>
                                 <div class="col-sm-9">
-                                    <p class="text-muted mb-0">{{user.perfil.fecha_ingreso}}</p>
+                                    <!-- <p class="text-muted mb-0">{{user.perfil.fecha_ingreso}}</p> -->
+                                    <p class="text-muted mb-0">{{user.perfil.fecha_ingreso|date:'d-M-Y'}}</p>
                                 </div>
                             </div>
                             <hr />
@@ -120,7 +125,7 @@
                                     <p class="mb-0 fw-bold">D&iacute;as dosponibles de vacaciones:</p>
                                 </div>
                                 <div class="col-sm-9">
-                                    <p class="text-muted mb-0" id="dias_disp">{{user.perfil.dias_vacaciones_disp}}</p>
+                                    <p class="text-muted mb-0" id="dias_disp">{{dias_disponibles}}</p>
                                 </div>
                             </div>
                             <hr />
@@ -129,13 +134,13 @@
                                     <p class="mb-0 fw-bold">Vigencia:</p>
                                 </div>
                                 <div class="col-sm-9">
-                                    <p class="text-muted mb-0">{{fecha_vigencia_dias_vacaciones}}</p>
+                                    <p class="text-muted mb-0">{{fecha_vigencia_obj|date:'d-M-Y'}}</p>
                                 </div>
                             </div>
                             <hr />
                             <div class="row">
 
-                                <div class="col-sm-12 text-center">
+                                <div class="col-sm-12">
                                     <p class="mb-0 fw-bold fs-5">Solicitar Vacaciones</p>
                                 </div>
 
@@ -144,56 +149,47 @@
                                     <form action="/registra_solicitud/" method="POST" id="form">
                                         {% csrf_token %}
 
-                                        <div class="col-sm-12 py-3 text-center">
+                                        <div class="col-sm-12 py-3">
                                             <label class="mb-0 px-3">D&iacute;as a solicitar:</label>
 
-                                            <!-- <input type="button" value="-" onclick="resta_dias()" class="btn btn-primary px-3"> -->
-                                            <button type="button" value="-" onclick="resta_dias()" class="btn btn-primary px-3" {{disabled}}> <i class="fa fa-minus-circle"></i> </button>
+                                            <button type="button" id="-" value="-" onclick="resta_dias()" class="btn btn-primary px-3" data-dias_min_sol={{ dias_min_sol}} {{disabled}}> <i
+                                                    class="fa fa-minus-circle"></i></button>
 
-                                            <input class="mx-3" type="number" id="dias_sol" name="dias_sol" min="1" max="6" value="1" disabled />
-                                            <!-- <input type="button" value="+" onclick="suma_dias()" class="btn btn-primary px-3"> -->
-                                            <button type="button" value="+" onclick="suma_dias()" class="btn btn-primary px-3" {{disabled}}> <i class="fa fa-plus-circle"></i> </button>
+                                            <input class="mx-3" type="number" id="num_dias_sol" name="dias_sol" min="1" max="10" value="0" disabled />
+
+                                            <button type="button" id="+" value="+" onclick="suma_dias()" class="btn btn-primary px-3" data-dias_max_sol={{ dias_max_sol}} {{disabled}}> <i
+                                                    class="fa fa-plus-circle"></i></button>
                                         </div>
 
-                                        <div class="col-sm-12 py-3 text-center">
+                                        <div class="col-sm-12 py-3" onclick="muestra_calendario()">
                                             <label class="mx-1">Seleccione Fecha: </label>
+
                                             <input class="" type="date" id="fecha_sol" name="fecha_sol" min={{ fecha_anticipacion }} max={{ fecha_vigencia }} value={{ fecha_anticipacion }} required
                                                 {{disabled}} />
 
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="currentColor" class="bi bi-calendar2-plus mt-4" viewBox="0 0 30 30" class="svg">
-                                                <path
-                                                    d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM2 2a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1H2z" />
-                                                <path
-                                                    d="M2.5 4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5H3a.5.5 0 0 1-.5-.5V4zM8 8a.5.5 0 0 1 .5.5V10H10a.5.5 0 0 1 0 1H8.5v1.5a.5.5 0 0 1-1 0V11H6a.5.5 0 0 1 0-1h1.5V8.5A.5.5 0 0 1 8 8z" />
-                                            </svg>
+                                            <button type="button" id="calendario" onclick="muestra_calendario()" class="btn btn-primary px-2 m-1" {{disabled}}> <i class="fa fa-calendar-check-o"></i>
+                                            </button>
 
                                         </div>
 
+                                        <!-- <label> {{ fecha_anticipacion }} </label>
+                                        <br>
+                                        <label> {{ fecha_vigencia }} </label> -->
+
                                         <div class="col-sm-12 py-3 text-center">
-                                            <!-- <input type="button" onclick="validacion()" class="btn btn-primary" id="btnEnviar" value="Enviar solicitud" <i class="fa fa-send"></i> {{disabled}}> -->
-                                            <button type="button" onclick="validacion()" class="btn btn-primary" id="btnEnviar" {{disabled}}> Enviar solicitud <i class="fa fa-send"></i>
+                                            <!-- <input type="button" onclick="validaciones()" class="btn btn-primary" id="btnEnviar" value="Enviar solicitud" <i class="fa fa-send"></i> {{disabled}}> -->
+                                            <button type="button"
+                                                onclick="validaciones('{{ lista_dias_festivos_str|escapejs }}', '{{ lista_nombres_festivos_str|escapejs }}, {{ dias_max_sol|escapejs }}')"
+                                                class="btn btn-primary" id="btnEnviar" {{disabled}}> Enviar solicitud <i class="fa fa-send"></i>
                                             </button>
                                         </div>
 
                                     </form>
 
-                                    <!-- Esto se ejecuta de forma oculta -->
-                                    {% for d in lista_dias_festivos %}
-                                    <h4 hidden id={{ forloop.counter }}>{{ d.dia_festivo|date:'Y-m-d'}} </h4>
-                                    {% endfor %}
-
-                                    <p hidden id="n">{{ n_lista_dias_festivos }}</p>
-
+                                    <!-- <button onclick="format_fecha('2023-02-20')"> Prueba</button> -->
                                 </div>
 
-                                <!-- <a hre type="hiden" value="Confirmar"> -->
-                                <!-- <a id="tag" href="/hola">Confirmar</a> -->
-
-                                <!-- <button id="go" onclick="prueba('{{a}}')" data-id="50">Confirmar</button> -->
-                                <!-- <label> {{ a }}</label> -->
-
                             </div>
-
                         </div>
                     </div>
                 </div>
@@ -437,10 +433,14 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
         crossorigin="anonymous"></script>
 
-    <script type="text/javascript" src="{% static 'js/validacion.js'%}">
+    <script type="text/javascript" src="{% static 'js/funciones.js'%}">
     </script>
 
+    <script>
 
+
+
+    </script>
 
 </body>
 {% endif %}
