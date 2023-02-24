@@ -19,9 +19,13 @@ import environ
 
 # Create your views here.
 
-
 @login_required()
 def vacaciones(request):
+
+    # cambiamos contraseña del usuario
+    # user = request.user
+    # user.set_password('1234')
+    # user.save()
 
     # cursos = Cursos.objects.all()
     # cursos = Cursos.objects.all()[:5]
@@ -154,8 +158,6 @@ def vacaciones(request):
         lista_nombres_festivos_str.append(str(
             lista_dias_festivos.values('nombre')[i]['nombre']))
 
-    # Solicitudes Aprobadas
-
     context = {
         "fecha_anticipacion": fecha_anticipacion,
         "fecha_vigencia": str(fecha_vigencia_obj),
@@ -182,6 +184,7 @@ def registra_solicitud(request):
 
     fecha_solicitud = request.POST["fecha_sol"]
     dias_solicitados = int(request.POST["dias_sol"])
+    comentario_solicitud = request.POST["comentario_solicitud"]
 
     fecha_final = calcula_fecha_final(fecha_solicitud, dias_solicitados)[0]
     domingos = calcula_fecha_final(fecha_solicitud, dias_solicitados)[1]
@@ -196,61 +199,61 @@ def registra_solicitud(request):
         jefe=request.user.perfil.jefe,
         domingos=domingos,
         dias_festivos=dias_festivos,
-        estado='Pendiente'
+        estado='Pendiente',
+        comentario_solicitud=comentario_solicitud
     )
 
     solicitud.save()
     print(f"[+] Solicitud Registrada para el usuario {request.user.username}")
 
     id_ultima_solicitud = Solicitud_Vacaciones.objects.latest('id').id
-    print(f"Ultimo id: {id_ultima_solicitud}")
+    # print(f"Ultimo id: {id_ultima_solicitud}")
 
-    # Notificamos por correo
-    if (True):
-        # msg = f"{request.user.first_name} {request.user.last_name}:\n Solicita {dias_solicitados} dia(s) de vacaciones, el {fecha_solicitud} al {fecha_final}. \n En espera de aceptación de {request.user.perfil.jefe}."
-        # enviar_correo_simple(f"Solicitud de vacaciones # {id_ultima_solicitud}", msg,
-        #                      "vacaciones@cegmex.com.mx")
+    # Consulta cuel es el jefe del usuario
+    # jefe_usuario = request.user.perfil.jefe
+    # print(f"Nombre del jefe: {jefe_usuario.split(' ')[0]}")
+    # correo_jefe = User.objects.get(
+    #     first_name=request.user.perfil.jefe.split(' ')[0]).email
+    # print(f"Correo del jefe: {correo_jefe}")
 
-        fecha_solicitud_obj = datetime.strptime(
-            fecha_solicitud, '%Y-%M-%d').date()
-        fecha_solicitud_srt = f"{fecha_solicitud_obj.day}-{mes_formato(fecha_solicitud_obj.month)}-{fecha_solicitud_obj.year}"
-
-        fecha_final_obj = datetime.strptime(fecha_final, '%Y-%M-%d').date()
-        fecha_final_srt = f"{fecha_final_obj.day}-{mes_formato(fecha_final_obj.month)}-{fecha_final_obj.year}"
+    # Notificamos por correo del registro de la solicitud
+    if (os.environ.get('NOTIFICACIONES')):
 
         context_correo = {
             'usuario': request.user.username,
             'nombre': f"{request.user.first_name} {request.user.last_name}",
             'dias': dias_solicitados,
-            # 'fecha_inicio': fecha_solicitud,
-            # 'fecha_fin': fecha_final,
-            'fecha_inicio': fecha_solicitud_srt,
-            'fecha_fin': fecha_final_srt,
+            'fecha_inicio': fecha_str_format(fecha_solicitud),
+            'fecha_fin': fecha_str_format(fecha_final),
             'jefe': request.user.perfil.jefe,
             'domingos': domingos,
             'dias_festivos': dias_festivos,
-            'estado': 'Pendiente'
+            'estado': 'Pendiente',
+            'comentario_solicitud': comentario_solicitud
         }
 
-        to = "feluve22@gmail.com"
+        correo_jefe = User.objects.get(
+            first_name=request.user.perfil.jefe.split(' ')[0]).email
+
+        to = []
+        if correo_jefe != None:
+            to = [request.user.email, correo_jefe]
+        else:
+            to = [request.user.email]
+
+        cc = [os.environ.get('EMAIL_CC')]
+        subject = f"Registro de solicitud # {id_ultima_solicitud}"
 
         correo_contenido = render_to_string(
-            'correo2.html', context_correo, request=request)
-        enviar_correo_plantilla(correo_contenido, str(
-            id_ultima_solicitud), to)
+            'correo_resgitro_solicitud.html', context_correo, request=request)
+        enviar_correo_plantilla(correo_contenido, subject, to, cc)
 
     return redirect('/')
 
 
-def mes_formato(mes):
-    meses = ["Ene", "Feb", "Mar", "Abr", "May", "Jun",
-             "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"]
-    return meses[int(mes)-1]
+def aprobarSolicitud(request, id, comentario):
 
-
-def aprobarSolicitud(request, id):
-
-    # Objenemos solicitud a aprobar
+    # Obtenemos solicitud a aprobar
     solicitud = Solicitud_Vacaciones.objects.get(id=id)
 
     dias_aprobados = solicitud.dias
@@ -261,45 +264,81 @@ def aprobarSolicitud(request, id):
 
     dias_actuales = dias_actuales - dias_aprobados
 
+    # Actualizamos dias disponibles
     Perfil.objects.filter(usuario=User.objects.get(username=usuario).pk).update(
         dias_vacaciones_disp=dias_actuales)
 
-    # ----------------------------------
-    print("")
-    print(solicitud.usuario)
-    print("")
-    # ----------------------------------
-
     solicitud.estado = "Aprobada"
+    solicitud.comentario_jefe = comentario
     solicitud.save()
 
-    # context_correo = {
-    #     'usuario': request.user.username,
-    #     'nombre': f"{request.user.first_name} {request.user.last_name}",
-    #     'dias': dias_solicitados,
-    #     # 'fecha_inicio': fecha_solicitud,
-    #     # 'fecha_fin': fecha_final,
-    #     'fecha_inicio': fecha_solicitud_srt,
-    #     'fecha_fin': fecha_final_srt,
-    #     'jefe': request.user.perfil.jefe,
-    #     'domingos': domingos,
-    #     'dias_festivos': dias_festivos,
-    #     'estado': 'Pendiente'
-    # }
+    # Notificamos por correo de la aprobacion de la solicitud
+    if (os.environ.get('NOTIFICACIONES')):
 
-    # correo_contenido = render_to_string(
-    #     'correo2.html', context_correo, request=request)
-    # enviar_correo_plantilla(correo_contenido, str(
-    #     id_ultima_solicitud), "feluve22@gmail.com, feluve@live.com.mx")
+        context_correo = {
+            'nombre': solicitud.nombre,
+            'dias': solicitud.dias,
+            'fecha_inicio': fecha_obj_str_format(solicitud.fecha_inicio),
+            'fecha_fin': fecha_obj_str_format(solicitud.fecha_fin),
+            'jefe': solicitud.jefe,
+            'comentario_jefe': solicitud.comentario_jefe,
+            'estado': solicitud.estado
+        }
+
+        correo_jefe = User.objects.get(
+            first_name=request.user.perfil.jefe.split(' ')[0]).email
+
+        to = []
+        if correo_jefe != None:
+            to = [request.user.email, correo_jefe]
+        else:
+            to = [request.user.email]
+
+        cc = [os.environ.get('EMAIL_CC')]
+        subject = f"Solicitud {solicitud.estado}"
+
+        correo_contenido = render_to_string(
+            'correo_estado_solicitud.html', context_correo, request=request)
+        enviar_correo_plantilla(correo_contenido, subject, to, cc)
 
     return redirect('/')
 
 
-def rechazarSolicitud(request, id):
+def rechazarSolicitud(request, id, comentario):
 
     solicitud = Solicitud_Vacaciones.objects.get(id=id)
     solicitud.estado = "Rechazada"
+    solicitud.comentario_jefe = comentario
     solicitud.save()
+
+    # Notificamos por correo de la aprobacion de la solicitud
+    if (os.environ.get('NOTIFICACIONES')):
+
+        context_correo = {
+            'nombre': solicitud.nombre,
+            'dias': solicitud.dias,
+            'fecha_inicio': fecha_obj_str_format(solicitud.fecha_inicio),
+            'fecha_fin': fecha_obj_str_format(solicitud.fecha_fin),
+            'jefe': solicitud.jefe,
+            'comentario_jefe': solicitud.comentario_jefe,
+            'estado': solicitud.estado
+        }
+
+        correo_jefe = User.objects.get(
+            first_name=request.user.perfil.jefe.split(' ')[0]).email
+
+        to = []
+        if correo_jefe != None:
+            to = [request.user.email, correo_jefe]
+        else:
+            to = [request.user.email]
+
+        cc = [os.environ.get('EMAIL_CC')]
+        subject = f"Solicitud {solicitud.estado}"
+
+        correo_contenido = render_to_string(
+            'correo_estado_solicitud.html', context_correo, request=request)
+        enviar_correo_plantilla(correo_contenido, subject, to, cc)
 
     return redirect('/')
 
@@ -311,3 +350,40 @@ def salir(request):
     return redirect('/')
 
 # -----------------------------------------------------------------
+
+# Funciones adicionales
+
+# funcion que recibe el numero del mes y lo convierte en nombre del mes
+
+
+def mes_formato(mes):
+    meses = {
+        1: "Enero",
+        2: "Febrero",
+        3: "Marzo",
+        4: "Abril",
+        5: "Mayo",
+        6: "Junio",
+        7: "Julio",
+        8: "Agosto",
+        9: "Septiembre",
+        10: "Octubre",
+        11: "Noviembre",
+        12: "Diciembre"
+    }
+    return meses[mes]
+
+# funcion que reciba un fecha en cadena y la conveirte en formato dias nombre mes año
+
+
+def fecha_str_format(fecha):
+    fecha_obj = datetime.strptime(fecha, '%Y-%M-%d').date()
+    fecha_srt = f"{fecha_obj.day}-{mes_formato(fecha_obj.month)[:3]}-{fecha_obj.year}"
+    return fecha_srt
+
+# funcion que recibe una fecha en objeto date y la convierte en cadena en el formato dias nombre mes año
+
+
+def fecha_obj_str_format(fecha_obj):
+    fecha_srt = f"{fecha_obj.day}-{mes_formato(fecha_obj.month)[:3]}-{fecha_obj.year}"
+    return fecha_srt

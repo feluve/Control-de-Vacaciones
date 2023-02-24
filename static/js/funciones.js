@@ -1,11 +1,8 @@
-
-
 window.addEventListener("load", (event) => {
     console.log("Pagina cargada completamente.");
 
     document.getElementById("num_dias_sol").value = document.getElementById('-').getAttribute('data-dias_min_sol')
 });
-
 
 function resta_dias(){
 
@@ -272,82 +269,127 @@ function verifica_fecha_festiva(dias_festivos_str, nombres_festivos_str){
 
 function confirmacionAprobar(id){
     
-    // const solicitud = document.querySelector("#go");
-    // const url = "aprobarSolicitud/" + solicitud.dataset.id.toString();
-    
-    const url = "aprobarSolicitud/" + id.toString();
-    console.log(url);
-    
+  // const solicitud = document.querySelector("#go");
+// const url = "aprobarSolicitud/" + solicitud.dataset.id.toString();
+
+let comentario = "";
+
 swal({
-    title: 'Confirmación',
-    text: 'Esta seguro de Aprobar la solicitud?',
-    icon: 'success',
-    
-    buttons: {
-        No: "No",
-        Si: "Si"
-    },
-})
+    title: 'Comentario opccional',
+    icon: 'info',
+    content: {
+        element: "input",
+        attributes: {
+          placeholder: "Deja un comentario",
+        },
+      },
+  })
 
-.then((value) => {
-    switch (value) {
+  .then((value) => {
 
-        case "Si":
-            window.location.href = url;
-            console.log('Se confirmo la Aprobación de la solictud ' + id);
+    if (value  == "") {
+        value = "-";
+    } 
 
-            break;
+    // console.log(value);
 
-        case "No":
-            console.log('No se confirmo la Aprobación de la solicitud ' + id);
-            break;
+    const url = "aprobarSolicitud/" + id.toString() + "/" + value.toString();
+    // console.log(url);
 
-    }
-})
+    swal({
+        title: 'Confirmación',
+        text: 'Esta seguro de Aprobar la solicitud?',
+        icon: 'success',
 
+        buttons: {
+            No: "No",
+            Si: "Si"
+        },
+    })
+
+    .then((value) => {
+        switch (value) {
+
+            case "Si":
+                window.location.href = url;
+                // console.log('Se confirmo el Rechazo de la solictud ' + id);
+
+                break;
+
+            case "No":
+                // console.log('No se confirmo el Rechazo de la solicitud ' + id);
+                break;
+        }
+    })
+
+});
 
 }
+
 
 function confirmacionRechazar(id){
 
 // const solicitud = document.querySelector("#go");
 // const url = "aprobarSolicitud/" + solicitud.dataset.id.toString();
 
-const url = "rechazarSolicitud/" + id.toString();
-console.log(url);
+let comentario = "";
 
 swal({
-    title: 'Confirmación',
-    text: 'Esta seguro de Rechazar la solicitud?',
-    icon: 'success',
+    title: 'Comentario opccional',
+    icon: 'info',
+    content: {
+        element: "input",
+        attributes: {
+          placeholder: "Deja un comentario",
+        },
+      },
+  })
 
-    buttons: {
-        No: "No",
-        Si: "Si"
-    },
-})
+  .then((value) => {
 
-.then((value) => {
-    switch (value) {
+    if (value  == "") {
+        value = "-";
+    } 
 
-        case "Si":
-            window.location.href = url;
-            // console.log('Se confirmo el Rechazo de la solictud ' + id);
+    // console.log(value);
 
-            break;
+    const url = "rechazarSolicitud/" + id.toString() + "/" + value.toString();
+    // console.log(url);
 
-        case "No":
-            // console.log('No se confirmo el Rechazo de la solicitud ' + id);
-            break;
+    swal({
+        title: 'Confirmación',
+        text: 'Esta seguro de Rechazar la solicitud?',
+        icon: 'success',
 
-    }
-})
+        buttons: {
+            No: "No",
+            Si: "Si"
+        },
+    })
+
+    .then((value) => {
+        switch (value) {
+
+            case "Si":
+                window.location.href = url;
+                // console.log('Se confirmo el Rechazo de la solictud ' + id);
+
+                break;
+
+            case "No":
+                // console.log('No se confirmo el Rechazo de la solicitud ' + id);
+                break;
+        }
+    })
+
+});
+
 }
 
 
 function muestra_calendario(){
     // console.log("Muestra calendario")
-    document.getElementById('fecha_sol').click();
+    //document.getElementById('fecha_sol').click();
 }
 
 
@@ -376,7 +418,24 @@ function diferencia_dias(fecha1_str, fecha2_str){
     return diffDays
 }
 
+function mostrar_comentario(comentario){
 
+    // console.log("Mostrando comentario...")
+    // console.log(comentario)
+
+    // const comentario = document.getElementById('comentario').getAttribute('data-comentario')
+
+    swal({
+        title: 'Comentario',
+        text: comentario,
+        icon: 'info',
+
+        buttons: {
+            OK: "OK"
+        },
+    })
+
+}
 
 // function verifica_fecha_festiva(){
     

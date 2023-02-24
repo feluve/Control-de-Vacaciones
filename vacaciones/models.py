@@ -36,6 +36,10 @@ class Perfil(models.Model):
         ('Dueño', 'Dueño'),
         ('admin', 'admin')
     ]
+    SEMANA = [
+        ('Normal', 'Normal'),
+        ('Inglesa', 'Inglesa')
+    ]
 
     usuario = models.OneToOneField(
         User, on_delete=models.CASCADE, related_name='perfil')
@@ -52,6 +56,9 @@ class Perfil(models.Model):
                             blank=True, choices=JEFES)
     rol = models.CharField(max_length=50, null=True,
                            blank=True, choices=ROL, default="Empleado")
+    fecha_nacimiento = models.DateField(null=True, blank=True)
+    semana = models.CharField(max_length=50, null=True,
+                              blank=True, choices=SEMANA, default="Normal")
 
     def __str__(self):
         return self.rol
@@ -109,6 +116,9 @@ class Solicitud_Vacaciones(models.Model):
     dias_festivos = models.SmallIntegerField(blank=True, null=True)
     estado = models.CharField(
         max_length=50, choices=ESTADO)
+    comentario_solicitud = models.TextField(
+        max_length=1000, blank=True, null=True)
+    comentario_jefe = models.TextField(max_length=1000, blank=True, null=True)
 
     def __str__(self):
         return self.usuario

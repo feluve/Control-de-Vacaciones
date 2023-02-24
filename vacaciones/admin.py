@@ -12,7 +12,7 @@ from vacaciones.models import Solicitud_Vacaciones, Perfil, Dias_Festivos_Oficia
 @admin.register(Solicitud_Vacaciones)
 class AdminSolicitudVaciones(admin.ModelAdmin):
     list_display = ('id', 'usuario', 'nombre', 'dias', 'fecha',
-                    'fecha_inicio', 'fecha_fin', 'jefe', 'estado')
+                    'fecha_inicio', 'fecha_fin', 'jefe', 'estado', 'comentario_solicitud', 'comentario_jefe')
     # ordering = ('fecha',)
     search_fields = ('nombre', 'jefe', 'estado')
     list_editable = ('dias', 'jefe', 'estado')
@@ -25,11 +25,11 @@ class AdminSolicitudVaciones(admin.ModelAdmin):
 @admin.register(Perfil)
 class AdminPerfil(admin.ModelAdmin):
     list_display = ('usuario', 'fecha_ingreso', 'vigencia_dias_vacaciones', 'area',
-                    'dias_vacaciones_disp', 'jefe', 'rol')
+                    'dias_vacaciones_disp', 'jefe', 'fecha_nacimiento', 'rol')
     ordering = ('id',)
     search_fields = ('nombre', 'usuario', 'fecha_ingreso', 'jefe', 'rol')
     list_editable = ('fecha_ingreso', 'vigencia_dias_vacaciones', 'area',
-                     'dias_vacaciones_disp', 'jefe', 'rol')
+                     'dias_vacaciones_disp', 'jefe', 'fecha_nacimiento', 'rol')
     # list_display_links = ('usuario',)
     list_filter = ('usuario', 'jefe', 'rol', 'area')
     list_per_page = 20

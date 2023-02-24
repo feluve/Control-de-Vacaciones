@@ -4,56 +4,66 @@ from email.mime.multipart import MIMEMultipart
 
 from django.template.loader import render_to_string
 
+import os
+import environ
 
-def enviar_correo_simple(subject, msg, para):
+
+def enviar_correo_simple(subject, msg, to):
     try:
         print("[py<] Enviando correo...")
         # Eco al servidor de correo
         # print("Peticion eco al servidor de correo...")
-        mailServer = smtplib.SMTP('smtp.gmail.com', 587)
+        mailServer = smtplib.SMTP(os.environ.get(
+            "EMAIL_HOST"), os.environ.get("EMAIL_PORT"))
         # print(mailServer.ehlo())
         mailServer.starttls()
         # print(mailServer.ehlo())
-        mailServer.login('feluve22@gmail.com', 'afgdzyikzymhszjo')
+        mailServer.login(os.environ.get('EMAIL_USERNAME'),
+                         os.environ.get('EMAIL_PASSWORD'))
         # print("Servidor acepta eco...")
 
         mensaje = MIMEText(msg)
-        mensaje['From'] = "feluve22@gmail.com"
-        mensaje['To'] = para
+        mensaje['From'] = os.environ.get('EMAIL_USER')
+        mensaje['To'] = ', '.join(to)
         mensaje['Subject'] = subject
 
-        mailServer.sendmail(para,
-                            para, mensaje.as_string())
+        mailServer.sendmail(os.environ.get('EMAIL_USER'),
+                            to, mensaje.as_string())
 
-        print(f"[+] Correo {subject} enviado a {para} correctamente.")
+        print(f"[+] Correo {subject} enviado a {to} correctamente.")
 
     except Exception as e:
         print(e)
 
 
-def enviar_correo_plantilla(correo_contenido, id_solicitud, to):
+def enviar_correo_plantilla(correo_contenido, subject, to, cc):
     try:
         print("[py<] Enviando correo...")
 
         # print("Peticion eco al servidor de correo...")
-        mailServer = smtplib.SMTP('smtp.gmail.com', 587)
+        mailServer = smtplib.SMTP(os.environ.get(
+            "EMAIL_HOST"), os.environ.get("EMAIL_PORT"))
         # print(mailServer.ehlo())
         mailServer.starttls()
         # print(mailServer.ehlo())
-        mailServer.login('feluve22@gmail.com', 'qzhpyygiaqmhatrw')
+        mailServer.login(os.environ.get("EMAIL_USERNAME"),
+                         os.environ.get("EMAIL_PASSWORD"))
         # print("Servidor acepta eco...")
 
+        bcc = ['admin@cegmex.com.mx']
+
         mensaje = MIMEMultipart()
-        mensaje['From'] = "feluve22@gmail.com"
-        mensaje['To'] = to
-        # mensaje['Cc'] = ""
-        mensaje['Subject'] = "Solicitud de vacaciones # " + id_solicitud
+        mensaje['From'] = os.environ.get("EMAIL_USERNAME")
+        mensaje['To'] = ', '.join(to)
+        mensaje['Cc'] = ', '.join(cc)
+        mensaje['Bcc'] = ', '.join(bcc)
+        mensaje['Subject'] = subject
 
         # contenido = render_to_string('send_email.html')
         mensaje.attach(MIMEText(correo_contenido, 'html'))
 
-        mailServer.sendmail("feluve22@gmail.com",
-                            to, mensaje.as_string())
+        mailServer.sendmail(os.environ.get("EMAIL_USERNAME"),
+                            to + cc + bcc, mensaje.as_string())
 
         print("[>py][+] Notificación por correo enviado correctamente")
 
