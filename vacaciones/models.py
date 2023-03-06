@@ -4,6 +4,20 @@ from django.db.models.signals import post_save
 
 # Create your models here.
 
+
+# --------------------------------------------------------------------
+
+# class Jefes(models.Model):
+#     nombre = models.CharField(max_length=50, blank=True, null=True)
+
+#     def __str__(self):
+#         return self.nombre
+
+#     class Meta:
+#         verbose_name = 'Jefe'
+#         verbose_name_plural = 'Jefes'
+#         ordering = ['-id']
+
 # --------------------------------------------------------------------
 
 
@@ -59,6 +73,7 @@ class Perfil(models.Model):
     fecha_nacimiento = models.DateField(null=True, blank=True)
     semana = models.CharField(max_length=50, null=True,
                               blank=True, choices=SEMANA, default="Normal")
+    token = models.CharField(max_length=100, null=True, blank=True)
 
     def __str__(self):
         return self.rol

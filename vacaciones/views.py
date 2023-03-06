@@ -15,17 +15,11 @@ from django.template.loader import render_to_string
 
 import os
 import environ
+import uuid
 
-
-# Create your views here.
 
 @login_required()
 def vacaciones(request):
-
-    # cambiamos contraseña del usuario
-    # user = request.user
-    # user.set_password('1234')
-    # user.save()
 
     # cursos = Cursos.objects.all()
     # cursos = Cursos.objects.all()[:5]
@@ -328,6 +322,7 @@ def rechazarSolicitud(request, id, comentario):
             first_name=request.user.perfil.jefe.split(' ')[0]).email
 
         to = []
+
         if correo_jefe != None:
             to = [request.user.email, correo_jefe]
         else:
@@ -348,6 +343,173 @@ def salir(request):
     logout(request)
 
     return redirect('/')
+
+# -------------------------------------------------------------------------------------
+
+
+def olvide_contrasena(request):
+
+    # consulta a la base de datos para obtener todos nombres de usuario
+    usuarios = list(User.objects.all().values_list('username', flat=True))
+
+    context = {
+        'usuarios': usuarios,
+        'dominio': os.environ.get('DOMINIO')
+    }
+
+    return render(request, 'olvide_contrasena.html', context)
+
+
+def link_recuperacion(request, usuario):
+
+    # genera un token aleatorio
+    token = generar_token()
+
+    # imprime en consola el token
+    print("")
+    print(f"Token: {token}")
+    print("")
+
+    # realiza un update en el modelo perfil para actualizar el campo token
+    Perfil.objects.filter(usuario=User.objects.get(
+        username=usuario).pk).update(token=token)
+
+    # imrpime en consola
+    print("[+] Token actualizado con exito")
+
+    # Obtenermo el nombre completo del usuario
+    nombre = f'{User.objects.get(username=usuario).first_name} {User.objects.get(username=usuario).last_name}'
+
+    # Generamos el link de recuperacion
+    link = f'{os.environ.get("DOMINIO")}/contrasena_nueva/{usuario}/{token}'
+
+    # imprimir en consola link
+    print("")
+    print(f"Link: {link}")
+    print("")
+
+    context_correo = {
+        'nombre': nombre,
+        'link': link
+    }
+
+    # obtener el nombre de correo del usuario
+    correo_usuario = User.objects.get(username=usuario).email
+
+    to = []
+    if correo_usuario != None:
+        to = [correo_usuario]
+    else:
+        to = [correo_usuario]
+
+    cc = [os.environ.get('EMAIL_CC')]
+    subject = f"Recuperación de contraseña"
+
+    correo_contenido = render_to_string(
+        'correo_recuperacion.html', context_correo, request=request)
+    enviar_correo_plantilla(correo_contenido, subject, to, cc)
+
+    return redirect('/')
+
+
+def contrasena_nueva(request, usuario, token):
+
+    # token recibido por parametro
+    print(f"Token recibido: {token}")
+
+    # obtener de el modelo Perfil el token del usuario que se recibe por parametro
+    token_usuario = Perfil.objects.get(
+        usuario=User.objects.get(username=usuario).pk).token
+
+    # token del usuario
+    print(f"Token del usuario: {token_usuario}")
+
+    # si el token del usuario es igual al token que se recibe por parametro
+    if token_usuario == token:
+        # token valido
+        print("[+] Token valido")
+
+        context = {
+            'usuario': usuario,
+            'token': token
+        }
+
+        return render(request, 'contrasena_nueva.html', context)
+    else:
+        # token invalido
+        print("[-] Token invalido")
+
+        # redireccionar a la pagina qeu indique el token ya expiro
+
+        return redirect('/')
+
+
+def cambiar_contrasena(request, usuario, token, contrasena):
+
+    # imprimimos en consola el token que se recibe por parametro
+    print(f"Token recibido: {token}")
+
+    # consultamos del modelo Perfil el token del usuario que se recibe por parametro
+    token_usuario = Perfil.objects.get(
+        usuario=User.objects.get(username=usuario).pk).token
+
+    # imprimimos en consola el token del usuario
+    print(f"Token del usuario: {token_usuario}")
+
+    # si el token del usuario es igual al token que se recibe por parametro
+    if token_usuario == token:
+        # token valido
+        print("[+] Token valido")
+
+        # cambiar la contraseña del usuario
+        user = User.objects.get(username=usuario)
+        user.set_password(contrasena)
+        user.save()
+
+        # imprime en consola el usuario y la contraseña
+        print(f"Usuario: {usuario} - Contraseña: {contrasena}")
+        print("[+] Contraseña cambiada con exito")
+
+        # genra un nuevo token por seguridad
+        token_nuevo = generar_token()
+
+        # actializamos el modelo Perfil con el nuevo token
+        Perfil.objects.filter(usuario=User.objects.get(
+            username=usuario).pk).update(token=token_nuevo)
+
+        # enviamos un correo al usuario indicando que la contraseña fue cambiada con exito
+        # creando el contexto del correo
+
+        context_correo = {
+            'nombre': f'{user.first_name} {user.last_name}'
+        }
+
+        # obtener el nombre de correo del usuario
+        correo_usuario = User.objects.get(username=usuario).email
+
+        to = []
+        if correo_usuario != None:
+            to = [correo_usuario]
+        else:
+            to = [correo_usuario]
+
+        cc = [os.environ.get('EMAIL_CC')]
+        subject = f"Contraseña cambiada"
+
+        correo_contenido = render_to_string(
+            'correo_contrasena_cambiada.html', context_correo, request=request)
+        enviar_correo_plantilla(correo_contenido, subject, to, cc)
+
+        return redirect('/')
+
+    else:
+        # token invalido
+        print("[-] Token invalido o ya expiro")
+        print("[+] Contraseña no cambiada")
+
+        # retorna a la pagina de 404
+        return redirect('/')
+
 
 # -----------------------------------------------------------------
 
@@ -387,3 +549,10 @@ def fecha_str_format(fecha):
 def fecha_obj_str_format(fecha_obj):
     fecha_srt = f"{fecha_obj.day}-{mes_formato(fecha_obj.month)[:3]}-{fecha_obj.year}"
     return fecha_srt
+
+
+# funcion que genera una cadena aleatoria de 32 caracteres hexadecimales
+def generar_token():
+    # import secrets
+    import secrets
+    return secrets.token_hex(32)

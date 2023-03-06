@@ -50,7 +50,13 @@ def enviar_correo_plantilla(correo_contenido, subject, to, cc):
                          os.environ.get("EMAIL_PASSWORD"))
         # print("Servidor acepta eco...")
 
-        bcc = ['admin@cegmex.com.mx']
+        # bcc = ['admin@cegmex.com.mx']
+        # bcc = [os.environ.get("EMAIL_BCC").split(',')]
+        bcc = [os.environ.get("EMAIL_BCC")]
+
+        # print("")
+        # print("bcc: ", bcc)
+        # print("")
 
         mensaje = MIMEMultipart()
         mensaje['From'] = os.environ.get("EMAIL_USERNAME")

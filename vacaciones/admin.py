@@ -7,7 +7,19 @@ from vacaciones.models import Solicitud_Vacaciones, Perfil, Dias_Festivos_Oficia
 # admin.site.register(Solicitud_Vacaciones)
 # admin.site.register(Perfil)
 # admin.site.register(Dias_Festivos_Oficiales)
+# admin.site.register(Jefes)
 
+
+# @admin.register(Jefes())
+# class AdminJefes(admin.ModelAdmin):
+# list_display = ('nombre',)
+# ordering = ('nombre',)
+# search_fields = ('nombre',)
+# list_editable = ('nombre', )
+# list_display_links = ('nombre',)
+# list_filter = ('nombre',)
+# list_per_page = 20
+# exclude = ('nombre',)
 
 @admin.register(Solicitud_Vacaciones)
 class AdminSolicitudVaciones(admin.ModelAdmin):
@@ -24,12 +36,12 @@ class AdminSolicitudVaciones(admin.ModelAdmin):
 
 @admin.register(Perfil)
 class AdminPerfil(admin.ModelAdmin):
-    list_display = ('usuario', 'fecha_ingreso', 'vigencia_dias_vacaciones', 'area',
-                    'dias_vacaciones_disp', 'jefe', 'fecha_nacimiento', 'rol')
+    list_display = ('usuario', 'fecha_ingreso', 'vigencia_dias_vacaciones', 'jefe', 'area',
+                    'dias_vacaciones_disp', 'fecha_nacimiento', 'rol')
     ordering = ('id',)
     search_fields = ('nombre', 'usuario', 'fecha_ingreso', 'jefe', 'rol')
-    list_editable = ('fecha_ingreso', 'vigencia_dias_vacaciones', 'area',
-                     'dias_vacaciones_disp', 'jefe', 'fecha_nacimiento', 'rol')
+    list_editable = ('fecha_ingreso', 'vigencia_dias_vacaciones', 'jefe', 'area',
+                     'dias_vacaciones_disp', 'fecha_nacimiento', 'rol')
     # list_display_links = ('usuario',)
     list_filter = ('usuario', 'jefe', 'rol', 'area')
     list_per_page = 20

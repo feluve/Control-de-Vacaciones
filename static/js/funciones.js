@@ -4,6 +4,20 @@ window.addEventListener("load", (event) => {
     document.getElementById("num_dias_sol").value = document.getElementById('-').getAttribute('data-dias_min_sol')
 });
 
+prueba = function(){
+
+    var pass1 = "123"
+    
+    // separar el string en un array
+    var array = pass1.split("");
+
+    // convierte el array en hexadecimal y simale 1
+    array = array.map(function(x){return x.charCodeAt(0).toString(16)});
+    array = array.map(function(x){return parseInt(x, 16) + 1});
+
+    alert(array);   
+}
+
 function resta_dias(){
 
     const dias_min = parseInt(document.getElementById("-").getAttribute("data-dias_min_sol"));
