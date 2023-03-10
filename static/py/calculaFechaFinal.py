@@ -2,6 +2,7 @@ from datetime import date, timedelta, datetime
 from vacaciones.models import Dias_Festivos_Oficiales
 
 
+# funcion para calcular fecha final de vacaciones
 def calcula_fecha_final(fecha_solicitud, dias_solicitados):
 
     print("[py] Calculando fecha final...")

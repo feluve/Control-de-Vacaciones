@@ -2,21 +2,8 @@ window.addEventListener("load", (event) => {
     console.log("Pagina cargada completamente.");
 
     document.getElementById("num_dias_sol").value = document.getElementById('-').getAttribute('data-dias_min_sol')
+
 });
-
-prueba = function(){
-
-    var pass1 = "123"
-    
-    // separar el string en un array
-    var array = pass1.split("");
-
-    // convierte el array en hexadecimal y simale 1
-    array = array.map(function(x){return x.charCodeAt(0).toString(16)});
-    array = array.map(function(x){return parseInt(x, 16) + 1});
-
-    alert(array);   
-}
 
 function resta_dias(){
 
@@ -40,23 +27,7 @@ function suma_dias(){
     }
 }
 
-function verifica_domingo(fecha){
-
-    const fecha1 = new Date(fecha);
-    // console.log("Dia de la semana: " + fecha1.getDay());
-
-    if(fecha1.getDay() === 6){
-        console.log("Es domingo")  
-        return true
-    }
-    else{
-        console.log("No es domingo")
-        return false
-    }
-
-}
-
-function validaciones(dias_festivos_str, nombres_festivos_str, dias_max_sol){
+function validaciones(dias_festivos_str, nombres_festivos_str, dias_max_sol, semana, dominio){
 
     console.log("Realizando validaciones...");
 
@@ -81,13 +52,13 @@ function validaciones(dias_festivos_str, nombres_festivos_str, dias_max_sol){
 
     const solicitudes_pendientes = 0;
 
-
+    
     // Validamos que no seleccionen mas dias
     if(dias_sol > parseInt(dias_max_sol)){
         
         swal({
             title: 'Información',
-            text: 'No puede seleccionar más de 6 dias.',
+            text: 'No puede seleccionar más de' + dias_max_sol + ' dias.',
             icon: 'error',
     
             buttons: {
@@ -96,7 +67,7 @@ function validaciones(dias_festivos_str, nombres_festivos_str, dias_max_sol){
         })
 
     }
-    // Validadmos que tenga una fecha seleccionada
+    // Validamos que tenga una fecha seleccionada
     else if(fecha_sol_str.length == 0){
         // console.log("fecha nula")
 
@@ -125,7 +96,7 @@ function validaciones(dias_festivos_str, nombres_festivos_str, dias_max_sol){
         })
 
     }
-    // Validamos que la fecha seleccionado no sea mayor  a la fecha vencimientod de sus dias de vacacioens
+    // Validamos que la fecha seleccionado no sea mayor  a la fecha vencimiento de sus dias de vacacioens
     else if(diferencia_dias(fecha_vigencia_str, fecha_sol_str) < 0){
 
         swal({
@@ -153,21 +124,7 @@ function validaciones(dias_festivos_str, nombres_festivos_str, dias_max_sol){
         })
 
     }
-    // // Validamos que no tenga solicitudes pendinetes
-    // else if (solicitudes_pendientes > 0){
-
-    //     swal({
-    //         title: 'Información',
-    //         text: 'No puede hacer más solicitudes ya que tiene una pendiente por autorizar.',
-    //         icon: 'warning',
-    
-    //         buttons: {
-    //             OK: "OK"
-    //         },
-    //     })
-
-    // }
-    //Validamos que tiene dias disponibles suficientes
+    // Validamos que tiene dias disponibles suficientes
     else if(dias_sol > dias_disp ){
 
         swal({
@@ -181,8 +138,22 @@ function validaciones(dias_festivos_str, nombres_festivos_str, dias_max_sol){
         })
 
     }
-    //Validamos que la fecha seleccionado no se adomingo
-    else if (verifica_domingo(fecha_sol_obj)){
+    // Validamos que si es la semana Inglesa y fecha_sol_obj es sabado
+    else if(semana == "Inglesa" && fecha_sol_obj.getDay() == 5){
+
+        swal({
+            title: 'Información',
+            text: 'La fecha seleccionada es Sábado. Selecciona una feche entre Lunes y Viernes.',
+            icon: 'warning',
+
+            buttons: {
+                OK: "OK"
+            },
+        })
+
+    }
+    // Validamos que la fecha seleccionado no se domingo
+    else if (fecha_sol_obj.getDay() == 6){
 
         swal({
             title: 'Información',
@@ -196,14 +167,26 @@ function validaciones(dias_festivos_str, nombres_festivos_str, dias_max_sol){
         })
 
     }
-    //Confimamos el envio de la solicitud
+    // Confimamos el envio de la solicitud
     else{
 
-        // const fecha_format = fecha_sol.getDay + "-" + fecha_sol.getMonth + "-" + fecha_sol.getFullYear
-
+        const fecha_final = calcula_fecha_final(dias_festivos_str, nombres_festivos_str, semana);
+        
+        // si dias_sol es 1 
+        if(dias_sol == 1){
+            var fecha_final_str = fecha_sol_str
+            var text = 'Esta seguro de enviar la solicitud por '+ dias_sol +' dia en la fecha ' + format_fecha(fecha_sol_str) + ' ?';
+            
+        // si dias_sol es mayor a 1
+        } else {
+            // calcula fecha final y la conviente en string en formato año-mes-dia
+            var fecha_final_str = calcula_fecha_final(dias_festivos_str, nombres_festivos_str, semana);
+            var text = 'Esta seguro de enviar la solicitud por '+ dias_sol +' dias en la fecha ' + format_fecha(fecha_sol_str) + ' al ' + format_fecha(fecha_final_str) + ' ?';
+        }
+        
         swal({
             title: 'Confirmación',
-            text: 'Esta seguro de enviar la solicitud por '+ dias_sol +' dia(s) en la fecha ' + format_fecha(fecha_sol_str) + ' ?',
+            text: text,
             icon: 'success',
     
             buttons: {
@@ -221,16 +204,24 @@ function validaciones(dias_festivos_str, nombres_festivos_str, dias_max_sol){
                     document.getElementById('num_dias_sol').disabled = false;
 
                     // Enviamos los datos por POST
-                    document.getElementById('form').submit();
-                    console.log('Se envio la solictud');
+                    // document.getElementById('form').submit();
+                    // console.log('Se envio la solictud');
 
+                    let comentario = document.getElementById('comentario_solicitud').value;
 
-                    // swal({
-                    //     title: 'Confirmación',
-                    //     text: 'Solicitud envida correctamente.',
-                    //     icon: 'success',
-                    //     buttons: 'OK'
-                    // })
+                    // si el comentario esta vacio
+                    if(comentario.length == 0){
+                        comentario = '-';
+                    }
+
+                    // creamos una url con el dominio, dias_sol, fecha_sol_str, fecha_final_srt y comentario
+                    let url = dominio + '/registra_solicitud/' + dias_sol + '/' + fecha_sol_str + '/' + fecha_final_str + '/' + comentario;
+
+                    // imprimimos la url junto a url
+                    // console.log(url);
+
+                    // enlazamos a la url
+                    window.location.href = url;
 
                     break;
 
@@ -239,12 +230,10 @@ function validaciones(dias_festivos_str, nombres_festivos_str, dias_max_sol){
                     break;
                     
                 }
-            })
+        })
             
-        }
     }
-    
-
+}
     
 function verifica_fecha_festiva(dias_festivos_str, nombres_festivos_str){
 
@@ -407,6 +396,7 @@ function muestra_calendario(){
 }
 
 
+// Funcion para formatear fecha
 function format_fecha(fecha_srt) {
 
     const s = fecha_srt.split('-');
@@ -419,6 +409,7 @@ function format_fecha(fecha_srt) {
 
 }
 
+// Funcion para calcular la diferencia de dias entre dos fechas
 function diferencia_dias(fecha1_str, fecha2_str){
 
     const fecha1_obj = new Date(fecha1_str);
@@ -432,6 +423,7 @@ function diferencia_dias(fecha1_str, fecha2_str){
     return diffDays
 }
 
+// Funcion que muestra el comentario de la solicitud
 function mostrar_comentario(comentario){
 
     // console.log("Mostrando comentario...")
@@ -451,52 +443,440 @@ function mostrar_comentario(comentario){
 
 }
 
-// function verifica_fecha_festiva(){
+// crea una funcion que reciba la fecha de solicitud y calcula la fecha final
+function calcula_fecha_final(lista_dias_festivos_str, lista_nombres_festivos_str, semana){
+
+    console.log("Calculando fecha final...");
+
+    fecha_sol_str = document.getElementById('fecha_sol').value;
+    let fecha_sol_obj = new Date(fecha_sol_str);
+    let fecha_final_obj = new Date();
+    let fecha_estimada_obj = new Date();
+    let dias = parseInt(document.getElementById('num_dias_sol').value);
+
+    // crea un array que guarde los dias festivos en formato string eliminando los espacios y los caracteres '[', '] y comillas simples '
+    let dias_festivos = lista_dias_festivos_str.replace(/ /g, "").replace(/'/g, "").replace("[", "").replace("]", "").split(",");
+
+    // crea un array que guarde los nombres de los dias festivos en formato string eliminando los espacios y los caracteres '[', '] y comillas simples '
+    let nombres_festivos = lista_nombres_festivos_str.replace(/ /g, "").replace(/'/g, "").replace("[", "").replace("]", "").split(",");
+
+    // imprieme semana junto a semana
+    console.log("semana: " + semana);
+
+    // si dias es igual a 1 retorna la fecha final igual a la fecha de solicitud
+    if (dias == 1) {
+        fecha_final_obj = fecha_sol_obj;
+        console.log("fecha final: " + fecha_final_obj.toISOString().slice(0,10));
+        return fecha_final_obj.toISOString().slice(0,10);
+    }
+
+    let f_sabados = new Boolean(true) , f_domingos = new Boolean(true), f_festivos = new Boolean(true); 
+    let sabados = 0 , domingos = 0, festivos = 0;
+    let nombre_festivo = "";
+
+    // calcula la fecha estimda sumando los dias solicitados  a la fecha de solicitud menos 1 dia
+    fecha_estimada_obj = new Date(fecha_sol_obj.getTime() + ((dias - 1) * 24 * 60 * 60 * 1000));
+    // imprime la fecha estimada junto a la fecha estimada en formato string ano mes dia separados por guiones
+    console.log("Primer fecha estimada con los dias solicitados: " + fecha_estimada_obj.toISOString().slice(0,10));
+
+    // imprimir salto de linea
+    console.log("");
+
+
+    // --------------------- Primera estimacion de fecha estimada --------------------- //
+    // Buascamos sabados  
+
+    // si es semana Inglesa
+    if (semana == "Inglesa") {
+        // crea un ciclo for que verifique cuantos sabados hay entre la fecha de solicitud mas los dias solicitados
+        for (let i = 0; i < dias; i++) {
+            // crea una variable que guarde la fecha de solicitud mas los dias
+            let fecha = new Date(fecha_sol_obj.getTime() + (i * 24 * 60 * 60 * 1000));
+
+            // verifica si la fecha es sabado
+            if (fecha.getDay() == 5) {
+                // si es sabado suma 1 a la variable sabados
+                sabados += 1;
+            }
+        }
+    }
+
+    // Buscamos domingos
+    // crea un ciclo for que verifique cuantos domingos hay entre la fecha de solicitud mas los dias solicitados
+    for (let i = 0; i < dias + sabados; i++) {
+        // crea una variable que guarde la fecha de solicitud mas los dias
+        let fecha = new Date(fecha_sol_obj.getTime() + (i * 24 * 60 * 60 * 1000));
+
+        // verifica si la fecha es domingo
+        if (fecha.getDay() == 6) {
+            // si es domingo suma 1 a la variable domingos
+            domingos += 1;
+        }
+    }
+
+    // Buscamos dias festivos
+    // Verificamos si entre al fecha de solicitud y la fecha estimada mas los sabados y los domingos, hay dias festivos
+
+    // crea una variable que guarde los dias festivos
+    for (let i = 0; i < (dias + sabados +  domingos); i++) {
+        // crea una variable que guarde la fecha de solicitud mas los dias
+        let fecha = new Date(fecha_sol_obj.getTime() + (i * 24 * 60 * 60 * 1000));
+
+        // crea una variable que guarde la fecha de solicitud mas los dias en formato string año-mes-dia
+        let fecha_str = fecha.toISOString().slice(0,10);
+
+        // crea un ciclo for que recorra el arreglo dias_festivos
+        for (let j = 0; j < dias_festivos.length; j++) {
+            // verifica si la fecha de solicitud mas los dias es igual a algun dia festivo
+            if (fecha_str == dias_festivos[j]) {
+                    // si es igual suma 1 a la variable dias_festivos
+                    festivos += 1;
+
+                    // guarda el nombre del dia festivo
+                    nombre_festivo = nombres_festivos[j];
+
+                    // imprime el nombre del dia festivo
+                    console.log("Dia festivo: " + nombre_festivo);
+
+                    // imprime la fecha del dia festivo
+                    console.log("Fecha del dia festivo: " + dias_festivos[j]);
+                }
+            }
+    }
+
+    //actualizamos la fecha estiamada
+    fecha_estimada_obj = new Date(fecha_sol_obj.getTime() + ((dias - 1 + sabados + domingos + festivos) * 24 * 60 * 60 * 1000));
     
-//         // const fecha = "2023-02-06";
-//         const n = parseInt(document.getElementById("n").innerText);
-//         const fecha = document.getElementById('fecha_sol').value.trim();
-//         let i;
-//         let j = false;
+
+    // reverificacion de sabados, domingos y festivos
+    while (f_sabados || f_domingos || f_festivos) {
+
+        let k = 1;
+
+        // impimimos en consola el valor de k
+        console.log("Ciclo while: " + k);
+
+        // Nueva verificacion de sabados en la fecha estimdada
+        // si semana es Inglesa
+        if (semana == "Inglesa") {
+            // recalcumamos si la fecha estimada es sabado
+            if (fecha_estimada_obj.getDay() == 5) {
+                // si es sabado suma 1 a la variable sabados
+                sabados += 1;
+
+                f_sabados = true;
+                
+                //actualizamos la fecha estmada
+                fecha_estimada_obj = new Date(fecha_estimada_obj.getTime() + (1 * 24 * 60 * 60 * 1000));
+
+            }else {
+                f_sabados = false;
+
+                // imprime en consola no hay sabados
+                console.log("No hay sabados");
+            }
+        } else {
+            f_sabados = false;
+            // imprime en consola no hay sabados
+            console.log("No hay sabados");
+        }
+
+        // imprime en consola el valor de f_sabados
+        console.log("f_sabados: " + f_sabados);
+
+        // Nueva verificacion de domingos en la fecha estimada 
+        // recalcumamos si la fecha estimada es domingo
+        if (fecha_estimada_obj.getDay() == 6) {
+            // si es domingo suma 1 a la variable domingos
+            domingos += 1;
+            f_domingos = true;
+
+            //actualizamos la fecha estimada
+            fecha_estimada_obj = new Date(fecha_estimada_obj.getTime() + (1 * 24 * 60 * 60 * 1000));
+            
+        } else {
+            f_domingos = false;
+            // imprime en consola no hay domingos
+            console.log("No hay domingos");
+        }
+
+        // imprime en consola el valor de f_domingos
+        console.log("f_domingos: " + f_domingos);
+
+
+        // crea una variable que guarde la fecha estimada en formato string año-mes-dia
+        let fecha_estimada_str = fecha_estimada_obj.toISOString().slice(0,10);
+        
+        // crea un ciclo for que recorra el arreglo dias_festivos
+        for (let j = 0; j < dias_festivos.length; j++) {
+            // verifica si la fecha estimada es igual a algun dia festivo
+            if (fecha_estimada_str == dias_festivos[j]) {
+                // si es igual suma 1 a la variable dias_festivos
+                festivos += 1;
+                f_festivos = true;
+
+                //actualizamos la feestimada
+                fecha_estimada_obj = new Date(fecha_estimada_obj.getTime() + (1 * 24 * 60 * 60 * 1000));
+
+                // guarda el nombre del dia festivo
+                nombre_festivo = nombres_festivos[j];
+
+                // imprime el nombre del dia festivo
+                console.log("Dia festivo: " + nombre_festivo);
+
+            } else {
+                f_festivos = false;
+                // imprime en consola no hay festivos
+                console.log("No hay festivos");
+            }
+        }
+
+        // imprime en consola el valor de f_festivos
+        console.log("f_festivos: " + f_festivos);
+
+        // incrementamos el valor de k
+        k += 1;
+        break;
+
+    }
+
+    // imprimimos salimos del ciclo while
+    console.log("Salimos del ciclo while");
+
+    // imprime la cadena dias junto con dias
+    console.log("dias: " + dias);
+
+    // imrpime sabados
+    console.log("sabados: " + sabados);
+
+    // imprime domingos
+    console.log("domingos: " + domingos);
+
+    // imprime festivos
+    console.log("festivos: " + festivos);
+
+    // imprime el nombre festivo junto con nombre_festivo
+    console.log("nombre festivo: " + nombre_festivo);
     
-//         console.log("Verificacion de fecha festiva")
-//         // console.log("Fecha de entrada: " + fecha)
-//         // console.log("Tamaño de la fecha de entrada: "+ fecha.length)
+    // imprime la fecha estimada junto a la fecha estimada
+    console.log("fecha estimada primera estimacion: " + fecha_estimada_obj.toISOString().slice(0,10));
+
+    // imprimimos un salto de linea
+    console.log("");
+
+    // -------------------------Fin de primera estimacion-------------------------
+
+    // obtenemos la diferencia entre la fecha de solicitud y la fecha estimada convertida en dias
+    let diferencia = Math.round((fecha_estimada_obj.getTime() - fecha_sol_obj.getTime()) / (1000 * 60 * 60 * 24));
+
+    // imprimimos la diferencia de dias entre la fecha de solicitud y la fecha estimada
+    console.log();
+    console.log("diferencia de dias: " + diferencia);
+    console.log();
+
+
+    // --------------------- Segunda estimacion de fecha estimada --------------------- //
+
+    // borrado de variables sabados, domingos, festivos y nombre_festivo
+    sabados = 0;
+    domingos = 0;
+    festivos = 0;
+    nombre_festivo = "";
+
+    // Buascamos sabados  
+
+    // si es semana Inglesa
+    if (semana == "Inglesa") {
+        // crea un ciclo for que verifique cuantos sabados hay entre la fecha de solicitud mas los dias solicitados
+        for (let i = 0; i < diferencia; i++) {
+            // crea una variable que guarde la fecha de solicitud mas los dias
+            let fecha = new Date(fecha_sol_obj.getTime() + (i * 24 * 60 * 60 * 1000));
+
+            // verifica si la fecha es sabado
+            if (fecha.getDay() == 5) {
+                // si es sabado suma 1 a la variable sabados
+                sabados += 1;
+            }
+        }
+    }
+
+    // Buscamos domingos
+    // crea un ciclo for que verifique cuantos domingos hay entre la fecha de solicitud mas los dias solicitados
+    for (let i = 0; i < diferencia; i++) {
+        // crea una variable que guarde la fecha de solicitud mas los dias
+        let fecha = new Date(fecha_sol_obj.getTime() + (i * 24 * 60 * 60 * 1000));
+
+        // verifica si la fecha es domingo
+        if (fecha.getDay() == 6) {
+            // si es domingo suma 1 a la variable domingos
+            domingos += 1;
+        }
+    }
+
+    // Buscamos dias festivos
+    // Verificamos si entre al fecha de solicitud y la fecha estimada mas los sabados y los domingos, hay dias festivos
+
+    // crea una variable que guarde los dias festivos
+    for (let i = 0; i < (diferencia); i++) {
+        // crea una variable que guarde la fecha de solicitud mas los dias
+        let fecha = new Date(fecha_sol_obj.getTime() + (i * 24 * 60 * 60 * 1000));
+
+        // crea una variable que guarde la fecha de solicitud mas los dias en formato string año-mes-dia
+        let fecha_str = fecha.toISOString().slice(0,10);
+
+        // crea un ciclo for que recorra el arreglo dias_festivos
+        for (let j = 0; j < dias_festivos.length; j++) {
+            // verifica si la fecha de solicitud mas los dias es igual a algun dia festivo
+            if (fecha_str == dias_festivos[j]) {
+                    // si es igual suma 1 a la variable dias_festivos
+                    festivos += 1;
+
+                    // guarda el nombre del dia festivo
+                    nombre_festivo = nombres_festivos[j];
+
+                    // imprime el nombre del dia festivo
+                    console.log("Dia festivo: " + nombre_festivo);
+
+                    // imprime la fecha del dia festivo
+                    console.log("Fecha del dia festivo: " + dias_festivos[j]);
+                }
+            }
+    }
+
+    //actualizamos la fecha estiamada
+    fecha_estimada_obj = new Date(fecha_sol_obj.getTime() + ((dias - 1 + sabados + domingos + festivos) * 24 * 60 * 60 * 1000));
     
-//         for(i = 1; i <= n; i++){
-//     f = document.getElementById(i.toString()).innerText.trim()
-//     if (f === fecha){
-//             console.log("Encontramos fecha festiva: " + f);
-//             j = true;
-//         } 
-//     }
 
-//     // console.log(j)
+    // reverificacion de sabados, domingos y festivos
+    while (f_sabados || f_domingos || f_festivos) {
 
-//     return j
+        let k = 1;
 
-// }
+        // impimimos en consola el valor de k
+        console.log("Ciclo while: " + k);
+
+        // Nueva verificacion de sabados en la fecha estimdada
+        // si semana es Inglesa
+        if (semana == "Inglesa") {
+            // recalcumamos si la fecha estimada es sabado
+            if (fecha_estimada_obj.getDay() == 5) {
+                // si es sabado suma 1 a la variable sabados
+                sabados += 1;
+
+                f_sabados = true;
+                
+                //actualizamos la fecha estmada
+                fecha_estimada_obj = new Date(fecha_estimada_obj.getTime() + (1 * 24 * 60 * 60 * 1000));
+
+            }else {
+                f_sabados = false;
+
+                // imprime en consola no hay sabados
+                console.log("No hay sabados");
+            }
+        } else {
+            f_sabados = false;
+            // imprime en consola no hay sabados
+            console.log("No hay sabados");
+        }
+
+        // imprime en consola el valor de f_sabados
+        console.log("f_sabados: " + f_sabados);
+
+        // Nueva verificacion de domingos en la fecha estimada 
+        // recalcumamos si la fecha estimada es domingo
+        if (fecha_estimada_obj.getDay() == 6) {
+            // si es domingo suma 1 a la variable domingos
+            domingos += 1;
+            f_domingos = true;
+
+            //actualizamos la fecha estimada
+            fecha_estimada_obj = new Date(fecha_estimada_obj.getTime() + (1 * 24 * 60 * 60 * 1000));
+            
+        } else {
+            f_domingos = false;
+            // imprime en consola no hay domingos
+            console.log("No hay domingos");
+        }
+
+        // imprime en consola el valor de f_domingos
+        console.log("f_domingos: " + f_domingos);
 
 
+        // crea una variable que guarde la fecha estimada en formato string año-mes-dia
+        let fecha_estimada_str = fecha_estimada_obj.toISOString().slice(0,10);
+        
+        // crea un ciclo for que recorra el arreglo dias_festivos
+        for (let j = 0; j < dias_festivos.length; j++) {
+            // verifica si la fecha estimada es igual a algun dia festivo
+            if (fecha_estimada_str == dias_festivos[j]) {
+                // si es igual suma 1 a la variable dias_festivos
+                festivos += 1;
+                f_festivos = true;
 
-// function post(){
+                //actualizamos la feestimada
+                fecha_estimada_obj = new Date(fecha_estimada_obj.getTime() + (1 * 24 * 60 * 60 * 1000));
 
-//     console.log(document.getElementById('token').innerText)
+                // guarda el nombre del dia festivo
+                nombre_festivo = nombres_festivos[j];
 
-//     var xhr = new XMLHttpRequest();
-//     xhr.open("POST", "/registra_solicitud/", true);
-//     xhr.setRequestHeader('Content-Type', 'application/json');
-//     xhr.send(JSON.stringify({
-//         fecha_sol: '2023-01-01',
-//         dias_sol: 6
-//     }));
+                // imprime el nombre del dia festivo
+                console.log("Dia festivo: " + nombre_festivo);
 
+                // imprime la fecha del dia festivo
+                console.log("Fecha del dia festivo: " + fecha_str);
 
-//     xhr.onload = function() {
-//     console.log("Hola")
-//     console.log(this.responseText);
-//     var data = JSON.parse(this.responseText);
-//     console.log(data);
-//     }
+            } else {
+                f_festivos = false;
+                // imprime en consola no hay festivos
+                console.log("No hay festivos");
+            }
+        }
 
-// }
+        // imprime en consola el valor de f_festivos
+        console.log("f_festivos: " + f_festivos);
+
+        // incrementamos el valor de k
+        k += 1;
+        break;
+
+    }
+
+    // imprimimos salimos del ciclo while
+    console.log("Salimos del ciclo while");
+
+    // imprime la cadena dias junto con dias
+    console.log("dias: " + dias);
+
+    // imrpime sabados
+    console.log("sabados: " + sabados);
+
+    // imprime domingos
+    console.log("domingos: " + domingos);
+
+    // imprime festivos
+    console.log("festivos: " + festivos);
+
+    // imprime el nombre festivo junto con nombre_festivo
+    console.log("nombre festivo: " + nombre_festivo);
+    
+    // imprime la fecha estimada junto a la fecha estimada
+    console.log("fecha estimada segunda estimacion: " + fecha_estimada_obj.toISOString().slice(0,10));
+
+    // imprimimos un salto de linea
+    console.log("");
+
+    // -------------------------Fin de segunda estimacion-------------------------
+   
+    // imprime la cadena fecha solicitud junto con fecha_sol
+    console.log("fecha solicitud: " + fecha_sol_str);
+
+    fecha_final_obj = fecha_estimada_obj;
+
+    // imprime la fecha final junto a la fecha final
+    console.log("fecha final total: " + fecha_final_obj.toISOString().slice(0,10));
+
+    // retorna la fecha final en formato string año-mes-dia
+    return fecha_final_obj.toISOString().slice(0,10);
+
+}

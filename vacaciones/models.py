@@ -46,7 +46,7 @@ class Perfil(models.Model):
         ('Supervisor', 'Supervisor'),
         ('Gerente', 'Gerente'),
         ('RH', 'RH'),
-        ('Direccion', 'Direccion'),
+        ('Director', 'Director'),
         ('Dueño', 'Dueño'),
         ('admin', 'admin')
     ]

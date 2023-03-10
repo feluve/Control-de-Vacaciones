@@ -28,7 +28,7 @@
         {% csrf_token %}
 
         <div class="divider d-flex align-items-center my-4">
-            <p class="text-center fw-bold mx-3 mb-0">Contraseña nueva</p>
+            <p class="text-center fw-bold mx-3 mb-0">Crea una nueva contraseña</p>
         </div>
 
         <!-- User input -->
@@ -47,11 +47,20 @@
 
         <!-- Submit -->
         <div class="text-center text-lg-start mt-4 pt-2">
-            <input type="submit" value="Enviar" onclick="validaciones('{{ usuario }}', '{{ token }}', '{{ dominio }}')" class="btn btn-primary btn-lg"
+            <input type="submit" value="Confirmar" onclick="validaciones('{{ usuario }}', '{{ token }}', '{{ dominio }}')" class="btn btn-primary btn-lg"
                 style="padding-left: 5.5rem; padding-right: 5.5rem">
         </div>
 
     </div>
+
+    <footer style="position: absolute; bottom: 0; width: 100%;">
+        <div class="d-flex flex-column flex-md-row text-center text-md-start justify-content-between py-4 px-4 px-xl-5 bg-black">
+            <!-- Copyright -->
+            <div class="text-white mb-3 mb-md-0">
+                CEGMEX Copyright © 2023. All rights reserved.
+            </div>
+        </div>
+    </footer>
 
     <script type="text/javascript" src="{% static 'js/funciones1.js'%}"></script>
     <!-- Bootstrap -->

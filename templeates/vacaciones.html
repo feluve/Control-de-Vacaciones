@@ -7,7 +7,6 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"> -->
 
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD"
@@ -48,9 +47,6 @@
                     <nav aria-label="breadcrumb" class="bg-light rounded-3 p-3 mb-4">
                         <ol class="breadcrumb mb-0">
                             <h2 class="my-0">Solicitud de Vacaciones</h2>
-                            <!-- <li class="breadcrumb-item"><a href="#">Home</a></li> -->
-                            <!-- <li class="breadcrumb-item"><a href="#">User</a></li> -->
-                            <!-- <li class="breadcrumb-item active" aria-current="page">User Profile</li> -->
                         </ol>
                     </nav>
                 </div>
@@ -65,8 +61,6 @@
                             <p class="text-muted mb-1">{{user.perfil.rol}}</p>
                             <p class="text-muted mb-4"></p>
                             <div class="d-flex justify-content-center mb-2">
-                                <!-- <button type="button" class="btn btn-primary">Follow</button> -->
-                                <!-- <button type="button" class="btn btn-outline-primary ms-1">Message</button> -->
                             </div>
                         </div>
                     </div>
@@ -125,8 +119,16 @@
                                     <p class="mb-0 fw-bold">Fecha de Ingreso:</p>
                                 </div>
                                 <div class="col-sm-9">
-                                    <!-- <p class="text-muted mb-0">{{user.perfil.fecha_ingreso}}</p> -->
                                     <p class="text-muted mb-0">{{user.perfil.fecha_ingreso|date:'d-M-Y'}}</p>
+                                </div>
+                            </div>
+                            <hr />
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    <p class="mb-0 fw-bold">Semana de trabajo:</p>
+                                </div>
+                                <div class="col-sm-9">
+                                    <p class="text-muted mb-0">{{user.perfil.semana}}</p>
                                 </div>
                             </div>
                             <hr />
@@ -184,28 +186,20 @@
 
                                         <div class="col-sm-12 py-3">
                                             <label class="mx-1">Comentario: </label>
-
-                                            <!-- <textarea class="" id="" name="comentario_usuario" {{disabled}} /> -->
-
                                             <textarea id="comentario_solicitud" name="comentario_solicitud" placeholder="Observaciones" cols="40" rows="3" form="form" {{ disabled }}></textarea>
-                                            <!-- <input type="text" id="comentario_solicitud" name="comentario_solicitud"> -->
                                         </div>
 
-                                        <!-- <label> {{ fecha_anticipacion }} </label>
-                                        <br>
-                                        <label> {{ fecha_vigencia }} </label> -->
-
                                         <div class="col-sm-12 py-3 text-center">
-                                            <!-- <input type="button" onclick="validaciones()" class="btn btn-primary" id="btnEnviar" value="Enviar solicitud" <i class="fa fa-send"></i> {{disabled}}> -->
                                             <button type="button"
-                                                onclick="validaciones('{{ lista_dias_festivos_str|escapejs }}', '{{ lista_nombres_festivos_str|escapejs }}, {{ dias_max_sol|escapejs }}')"
+                                                onclick="validaciones('{{ lista_dias_festivos_str|escapejs }}', '{{ lista_nombres_festivos_str|escapejs }}', '{{ dias_max_sol|escapejs }}', '{{ user.perfil.semana }}', '{{ dominio }}')"
                                                 class="btn btn-primary" id="btnEnviar" {{disabled}}> Enviar solicitud <i class="fa fa-send"></i>
                                             </button>
                                         </div>
 
                                     </form>
 
-                                    <button onclick="prueba()"> Prueba</button>
+                                    <button onclick="calcula_fecha_final('{{ lista_dias_festivos_str|escapejs }}', '{{ lista_nombres_festivos_str|escapejs }}', '{{ user.perfil.semana }}')">
+                                        Prueba</button>
                                 </div>
 
                             </div>
@@ -333,7 +327,7 @@
                                         {% endif %}
 
                                         <!-- Tu Comenario -->
-                                        {% if s.comentario_jefe == "-" or s.comentario_jefe == "" %}
+                                        {% if s.comentario_jefe == "-" or s.comentario_jefe == None %}
                                         <td class="registro">-</td>
                                         {% else %}
                                         <td class="registro">
@@ -415,8 +409,6 @@
                                         <th class="campo">Coment. Solicitante</th>
                                         <th class="campo">Coment. Jefe</th>
                                         <th class="campo">Estatus</th>
-                                        <!-- <th class="campo_largo">Opcciones</th> -->
-                                        <!-- <th class="campo">Opccion 2</th> -->
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -467,14 +459,6 @@
                                         </td>
                                         {% endif%}
 
-                                        <!-- <td class="opcciones"> -->
-                                        <!-- <a href="rechazarSolicitud/{{s.id}}" class="btn btn-sm btn-block btn-danger mx-0 botones">Rechazar</a> -->
-                                        <!-- <a href="aprobarSolicitud/{{s.id}}" class="btn btn-sm btn-block btn-success mx-0 botones">Aprobar</a> -->
-
-                                        <!-- <button onclick="confirmacionAprobar('{{s.id}}')" class="btn btn-sm btn-block btn-success mx-0 botones">Aprobar</button> -->
-                                        <!-- <button onclick="confirmacionRechazar('{{s.id}}')" class="btn btn-sm btn-block btn-danger mx-0 botones">Rechazar</button> -->
-
-                                        <!-- </td> -->
                                     </tr>
                                     {% endfor %}
                                 </tbody>

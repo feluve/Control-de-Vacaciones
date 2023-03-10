@@ -33,10 +33,14 @@ def vacaciones(request):
     # cursos = Cursos.objects.all().filter(nombre__contains="e")
     # cursos = Cursos.objects.all().filter(nombre__startswith="E")
 
-    # Valores iniciales de dias
-    dias_min_sol = 1
-    dias_max_sol = 6
-    dias_anticipacion = 15
+    # obtiene el numero minimo de dias de vacaciones por solicitud de la variable de entorno en entero
+    dias_min_sol = int(os.environ.get('DIAS_MIN_SOLICITUD'))
+
+    # obtiene el numero maximo de dias de vacaciones por solicitud de la variable de entorno en entero
+    dias_max_sol = int(os.environ.get('DIAS_MAX_SOLICITUD'))
+
+    # obtiene el numero de dias de anticipacion para solicitar vacaciones de la variable de entorno en entero
+    dias_anticipacion = int(os.environ.get('DIAS_ANTICIPACION'))
 
     # Generamos fecha de acticipacion de solicitud de vacaciones
     fecha_anticipacion = str(date.today() + timedelta(days=dias_anticipacion))
@@ -174,13 +178,13 @@ def vacaciones(request):
     return render(request, "vacaciones.html", context)
 
 
-def registra_solicitud(request):
+def registra_solicitud(request, dias_solicitados, fecha_solicitud, fecha_final, comentario_solicitud):
 
-    fecha_solicitud = request.POST["fecha_sol"]
-    dias_solicitados = int(request.POST["dias_sol"])
-    comentario_solicitud = request.POST["comentario_solicitud"]
+    # fecha_solicitud = request.POST["fecha_sol"]
+    # dias_solicitados = int(request.POST["dias_sol"])
+    # comentario_solicitud = request.POST["comentario_solicitud"]
 
-    fecha_final = calcula_fecha_final(fecha_solicitud, dias_solicitados)[0]
+    # fecha_final = calcula_fecha_final(fecha_solicitud, dias_solicitados)[0]
     domingos = calcula_fecha_final(fecha_solicitud, dias_solicitados)[1]
     dias_festivos = calcula_fecha_final(fecha_solicitud, dias_solicitados)[2]
 
@@ -422,7 +426,7 @@ def contrasena_nueva(request, usuario, token):
         usuario=User.objects.get(username=usuario).pk).token
 
     # token del usuario
-    print(f"Token del usuario: {token_usuario}")
+    # print(f"Token del usuario: {token_usuario}")
 
     # si el token del usuario es igual al token que se recibe por parametro
     if token_usuario == token:
@@ -448,6 +452,15 @@ def cambiar_contrasena(request, usuario, token, contrasena):
 
     # imprimimos en consola el token que se recibe por parametro
     print(f"Token recibido: {token}")
+
+    # imprime en consola la contraseña que se recibe por parametro
+    print(f"Contraseña encriptada: {contrasena}")
+
+    # desencriptamos la contraseña
+    contrasena = desencriptar(contrasena)
+
+    # imprime en consola la contraseña desencriptada
+    # print(f"Contraseña desencriptada: {contrasena}")
 
     # consultamos del modelo Perfil el token del usuario que se recibe por parametro
     token_usuario = Perfil.objects.get(
@@ -556,3 +569,14 @@ def generar_token():
     # import secrets
     import secrets
     return secrets.token_hex(32)
+
+# funcion que desencripta una cadena de texto restandole 3 a cada caracter
+
+
+def desencriptar(cadena):
+    cadena_desencriptada = ""
+    for caracter in cadena:
+        caracter = ord(caracter) - 3
+        caracter = chr(caracter)
+        cadena_desencriptada += caracter
+    return cadena_desencriptada

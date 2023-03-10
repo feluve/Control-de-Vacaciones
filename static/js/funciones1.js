@@ -64,7 +64,7 @@ function validaciones(ususario, token, dominio){
         // sweet alert
         swal({
             title: 'Confirmación',
-            text: 'La contraseña sera cambiada.',
+            text: 'La contraseña será cambiada. Se te enviara un correo de confirmación.',
             icon: 'success',
 
             buttons: {
@@ -78,6 +78,15 @@ function validaciones(ususario, token, dominio){
             switch (value) {
 
                 case "Ok":
+
+                    // imprime la contraseña
+                    // console.log(pass1);
+
+                    // encripta la contraseña
+                    pass1 = encriptar(pass1);
+
+                    // imprime la contraseña encriptada
+                    // console.log(pass1);
 
                     // crea una variable con la url y usuario y pass1 separados un "/"
                     var url = dominio + "/cambiar_contrasena/" + ususario + "/" + token + "/" + pass1;
@@ -184,3 +193,42 @@ function buscar_usuario(usuarios, dominio){
     }
 
 }
+
+
+// funcion que encritpa la contraseña sumando 3 a cada caracter
+function encriptar(pass){
+    
+        // crea una variable que contendra la contraseña encriptada
+        var pass_encriptada = "";
+    
+        // recorre cada caracter de la contraseña
+        for(var i = 0; i < pass.length; i++){
+    
+            // obtiene el codigo ascii del caracter
+            var ascii = pass.charCodeAt(i);
+    
+            // suma 3 al codigo ascii
+            ascii += 3;
+    
+            // convierte el codigo ascii a caracter
+            var caracter = String.fromCharCode(ascii);
+    
+            // concatena el caracter encriptado a la variable pass_encriptada
+            pass_encriptada += caracter;
+        }
+
+        // imprime la contraseña encriptada
+        // console.log(pass_encriptada);
+
+        // convierte la contraseña encriptada a base64
+        // pass_encriptada = btoa(pass_encriptada);
+
+        // imprime la contraseña encriptada en base64
+        // console.log(pass_encriptada);
+    
+        // retorna la contraseña encriptada
+        return pass_encriptada;
+}
+
+
+
