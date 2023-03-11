@@ -166,7 +166,6 @@ def vacaciones(request):
         "todas_solicitudes_count": len(todas_solicitudes),
         "solicitudes_enviadas_count": len(solicitudes_enviadas),
         "solicitudes_recibidas_count": len(solicitudes_recibidas),
-        "usuario_rol": request.user.perfil.rol,
         "disabled": disabled,
         "lista_nombres_festivos_str": lista_nombres_festivos_str,
         "lista_dias_festivos_str": lista_dias_festivos_str,
@@ -178,6 +177,7 @@ def vacaciones(request):
     return render(request, "vacaciones.html", context)
 
 
+@login_required()
 def registra_solicitud(request, dias_solicitados, fecha_solicitud, fecha_final, comentario_solicitud):
 
     # fecha_solicitud = request.POST["fecha_sol"]
@@ -207,7 +207,7 @@ def registra_solicitud(request, dias_solicitados, fecha_solicitud, fecha_final, 
     id_ultima_solicitud = Solicitud_Vacaciones.objects.latest('id').id
     # print(f"Ultimo id: {id_ultima_solicitud}")
 
-    # Consulta cuel es el jefe del usuario
+    # Consulta cual es el nombre jefe del usuario
     # jefe_usuario = request.user.perfil.jefe
     # print(f"Nombre del jefe: {jefe_usuario.split(' ')[0]}")
     # correo_jefe = User.objects.get(
@@ -239,16 +239,16 @@ def registra_solicitud(request, dias_solicitados, fecha_solicitud, fecha_final, 
         else:
             to = [request.user.email]
 
-        cc = [os.environ.get('EMAIL_CC')]
         subject = f"Registro de solicitud # {id_ultima_solicitud}"
 
         correo_contenido = render_to_string(
             'correo_resgitro_solicitud.html', context_correo, request=request)
-        enviar_correo_plantilla(correo_contenido, subject, to, cc)
+        enviar_correo_plantilla(correo_contenido, subject, to, cc_flag=True)
 
     return redirect('/')
 
 
+@login_required()
 def aprobarSolicitud(request, id, comentario):
 
     # Obtenemos solicitud a aprobar
@@ -283,25 +283,25 @@ def aprobarSolicitud(request, id, comentario):
             'estado': solicitud.estado
         }
 
-        correo_jefe = User.objects.get(
-            first_name=request.user.perfil.jefe.split(' ')[0]).email
+        # obtenemos del modelo User el correo de la persona que realizo la solicitud
+        correo_usuario = User.objects.get(username=solicitud.usuario).email
 
         to = []
-        if correo_jefe != None:
-            to = [request.user.email, correo_jefe]
+        if correo_usuario != None:
+            to = [request.user.email, correo_usuario]
         else:
             to = [request.user.email]
 
-        cc = [os.environ.get('EMAIL_CC')]
-        subject = f"Solicitud {solicitud.estado}"
+        subject = f"Solicitud # {solicitud.id} {solicitud.estado}"
 
         correo_contenido = render_to_string(
             'correo_estado_solicitud.html', context_correo, request=request)
-        enviar_correo_plantilla(correo_contenido, subject, to, cc)
+        enviar_correo_plantilla(correo_contenido, subject, to, cc_flag=True)
 
     return redirect('/')
 
 
+@login_required()
 def rechazarSolicitud(request, id, comentario):
 
     solicitud = Solicitud_Vacaciones.objects.get(id=id)
@@ -322,22 +322,25 @@ def rechazarSolicitud(request, id, comentario):
             'estado': solicitud.estado
         }
 
-        correo_jefe = User.objects.get(
-            first_name=request.user.perfil.jefe.split(' ')[0]).email
+        # obtenemos del modelo User el correo de la persona que realizo la solicitud
+        correo_usuario = User.objects.get(username=solicitud.usuario).email
+
+        # imprimir correo
+        print(f"Correo del usuario: {correo_usuario}")
 
         to = []
 
-        if correo_jefe != None:
-            to = [request.user.email, correo_jefe]
+        if correo_usuario != None:
+            to = [request.user.email, correo_usuario]
         else:
             to = [request.user.email]
 
         cc = [os.environ.get('EMAIL_CC')]
-        subject = f"Solicitud {solicitud.estado}"
+        subject = f"Solicitud # {solicitud.id} {solicitud.estado}"
 
         correo_contenido = render_to_string(
             'correo_estado_solicitud.html', context_correo, request=request)
-        enviar_correo_plantilla(correo_contenido, subject, to, cc)
+        enviar_correo_plantilla(correo_contenido, subject, to, cc_flag=True)
 
     return redirect('/')
 
@@ -349,183 +352,6 @@ def salir(request):
     return redirect('/')
 
 # -------------------------------------------------------------------------------------
-
-
-def olvide_contrasena(request):
-
-    # consulta a la base de datos para obtener todos nombres de usuario
-    usuarios = list(User.objects.all().values_list('username', flat=True))
-
-    context = {
-        'usuarios': usuarios,
-        'dominio': os.environ.get('DOMINIO')
-    }
-
-    return render(request, 'olvide_contrasena.html', context)
-
-
-def link_recuperacion(request, usuario):
-
-    # genera un token aleatorio
-    token = generar_token()
-
-    # imprime en consola el token
-    print("")
-    print(f"Token: {token}")
-    print("")
-
-    # realiza un update en el modelo perfil para actualizar el campo token
-    Perfil.objects.filter(usuario=User.objects.get(
-        username=usuario).pk).update(token=token)
-
-    # imrpime en consola
-    print("[+] Token actualizado con exito")
-
-    # Obtenermo el nombre completo del usuario
-    nombre = f'{User.objects.get(username=usuario).first_name} {User.objects.get(username=usuario).last_name}'
-
-    # Generamos el link de recuperacion
-    link = f'{os.environ.get("DOMINIO")}/contrasena_nueva/{usuario}/{token}'
-
-    # imprimir en consola link
-    print("")
-    print(f"Link: {link}")
-    print("")
-
-    context_correo = {
-        'nombre': nombre,
-        'link': link
-    }
-
-    # obtener el nombre de correo del usuario
-    correo_usuario = User.objects.get(username=usuario).email
-
-    to = []
-    if correo_usuario != None:
-        to = [correo_usuario]
-    else:
-        to = [correo_usuario]
-
-    cc = [os.environ.get('EMAIL_CC')]
-    subject = f"Recuperación de contraseña"
-
-    correo_contenido = render_to_string(
-        'correo_recuperacion.html', context_correo, request=request)
-    enviar_correo_plantilla(correo_contenido, subject, to, cc)
-
-    return redirect('/')
-
-
-def contrasena_nueva(request, usuario, token):
-
-    # token recibido por parametro
-    print(f"Token recibido: {token}")
-
-    # obtener de el modelo Perfil el token del usuario que se recibe por parametro
-    token_usuario = Perfil.objects.get(
-        usuario=User.objects.get(username=usuario).pk).token
-
-    # token del usuario
-    # print(f"Token del usuario: {token_usuario}")
-
-    # si el token del usuario es igual al token que se recibe por parametro
-    if token_usuario == token:
-        # token valido
-        print("[+] Token valido")
-
-        context = {
-            'usuario': usuario,
-            'token': token
-        }
-
-        return render(request, 'contrasena_nueva.html', context)
-    else:
-        # token invalido
-        print("[-] Token invalido")
-
-        # redireccionar a la pagina qeu indique el token ya expiro
-
-        return redirect('/')
-
-
-def cambiar_contrasena(request, usuario, token, contrasena):
-
-    # imprimimos en consola el token que se recibe por parametro
-    print(f"Token recibido: {token}")
-
-    # imprime en consola la contraseña que se recibe por parametro
-    print(f"Contraseña encriptada: {contrasena}")
-
-    # desencriptamos la contraseña
-    contrasena = desencriptar(contrasena)
-
-    # imprime en consola la contraseña desencriptada
-    # print(f"Contraseña desencriptada: {contrasena}")
-
-    # consultamos del modelo Perfil el token del usuario que se recibe por parametro
-    token_usuario = Perfil.objects.get(
-        usuario=User.objects.get(username=usuario).pk).token
-
-    # imprimimos en consola el token del usuario
-    print(f"Token del usuario: {token_usuario}")
-
-    # si el token del usuario es igual al token que se recibe por parametro
-    if token_usuario == token:
-        # token valido
-        print("[+] Token valido")
-
-        # cambiar la contraseña del usuario
-        user = User.objects.get(username=usuario)
-        user.set_password(contrasena)
-        user.save()
-
-        # imprime en consola el usuario y la contraseña
-        print(f"Usuario: {usuario} - Contraseña: {contrasena}")
-        print("[+] Contraseña cambiada con exito")
-
-        # genra un nuevo token por seguridad
-        token_nuevo = generar_token()
-
-        # actializamos el modelo Perfil con el nuevo token
-        Perfil.objects.filter(usuario=User.objects.get(
-            username=usuario).pk).update(token=token_nuevo)
-
-        # enviamos un correo al usuario indicando que la contraseña fue cambiada con exito
-        # creando el contexto del correo
-
-        context_correo = {
-            'nombre': f'{user.first_name} {user.last_name}'
-        }
-
-        # obtener el nombre de correo del usuario
-        correo_usuario = User.objects.get(username=usuario).email
-
-        to = []
-        if correo_usuario != None:
-            to = [correo_usuario]
-        else:
-            to = [correo_usuario]
-
-        cc = [os.environ.get('EMAIL_CC')]
-        subject = f"Contraseña cambiada"
-
-        correo_contenido = render_to_string(
-            'correo_contrasena_cambiada.html', context_correo, request=request)
-        enviar_correo_plantilla(correo_contenido, subject, to, cc)
-
-        return redirect('/')
-
-    else:
-        # token invalido
-        print("[-] Token invalido o ya expiro")
-        print("[+] Contraseña no cambiada")
-
-        # retorna a la pagina de 404
-        return redirect('/')
-
-
-# -----------------------------------------------------------------
-
 # Funciones adicionales
 
 # funcion que recibe el numero del mes y lo convierte en nombre del mes
@@ -548,11 +374,11 @@ def mes_formato(mes):
     }
     return meses[mes]
 
-# funcion que reciba un fecha en cadena y la conveirte en formato dias nombre mes año
+# funcion que reciba un fecha en cadena y la conveirte en formato dias mes año
 
 
 def fecha_str_format(fecha):
-    fecha_obj = datetime.strptime(fecha, '%Y-%M-%d').date()
+    fecha_obj = datetime.strptime(fecha, '%Y-%m-%d').date()
     fecha_srt = f"{fecha_obj.day}-{mes_formato(fecha_obj.month)[:3]}-{fecha_obj.year}"
     return fecha_srt
 
@@ -562,21 +388,3 @@ def fecha_str_format(fecha):
 def fecha_obj_str_format(fecha_obj):
     fecha_srt = f"{fecha_obj.day}-{mes_formato(fecha_obj.month)[:3]}-{fecha_obj.year}"
     return fecha_srt
-
-
-# funcion que genera una cadena aleatoria de 32 caracteres hexadecimales
-def generar_token():
-    # import secrets
-    import secrets
-    return secrets.token_hex(32)
-
-# funcion que desencripta una cadena de texto restandole 3 a cada caracter
-
-
-def desencriptar(cadena):
-    cadena_desencriptada = ""
-    for caracter in cadena:
-        caracter = ord(caracter) - 3
-        caracter = chr(caracter)
-        cadena_desencriptada += caracter
-    return cadena_desencriptada

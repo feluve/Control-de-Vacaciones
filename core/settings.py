@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'core',
     'vacaciones',
+    'usuarios',
     'import_export',
 ]
 

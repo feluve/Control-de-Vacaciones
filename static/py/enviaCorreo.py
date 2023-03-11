@@ -36,7 +36,7 @@ def enviar_correo_simple(subject, msg, to):
         print(e)
 
 
-def enviar_correo_plantilla(correo_contenido, subject, to, cc):
+def enviar_correo_plantilla(correo_contenido, subject, to, cc_flag=False):
     try:
         print("[py<] Enviando correo...")
 
@@ -58,12 +58,25 @@ def enviar_correo_plantilla(correo_contenido, subject, to, cc):
         # print("bcc: ", bcc)
         # print("")
 
+        # Si el flag de cc es verdadero
+        if cc_flag:
+            cc = [os.environ.get("EMAIL_CC")]
+        else:
+            cc = []
+
         mensaje = MIMEMultipart()
         mensaje['From'] = os.environ.get("EMAIL_USERNAME")
         mensaje['To'] = ', '.join(to)
         mensaje['Cc'] = ', '.join(cc)
         mensaje['Bcc'] = ', '.join(bcc)
         mensaje['Subject'] = subject
+
+        print("")
+        print("to: ", to)
+        print("cc: ", cc)
+        print("bcc: ", bcc)
+        print("sunject: ", subject)
+        print("")
 
         # contenido = render_to_string('send_email.html')
         mensaje.attach(MIMEText(correo_contenido, 'html'))

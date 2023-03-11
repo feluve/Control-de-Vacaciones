@@ -4,7 +4,9 @@ from vacaciones.views import salir
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+
     path('', include("vacaciones.urls")),
+    path('', include("usuarios.urls")),
 
     path("accounts/", include('django.contrib.auth.urls')),
     path("salir/", salir, name="salir"),
