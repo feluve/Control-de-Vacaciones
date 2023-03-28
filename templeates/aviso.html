@@ -1,0 +1,45 @@
+{% extends 'master.html' %}
+
+{% block title %}
+Aviso
+{% endblock %}
+
+{% block content %}
+
+
+
+<section style="background-color: #eeee; text-align: center;">
+
+    <div class="container py-4">
+        <div class="col-lg-12">
+            <div class="card mb-8">
+                <div class="col-md-12 px-0 py-0">
+
+                    <div class="col-md-6 col-lg-3 col-xl-4 offset-xl-1 px-3 py-1">
+
+                        {% csrf_token %}
+
+                        <div class="divider d-flex align-items-center my-4">
+                            <p id="aviso" class="fw-bold" style="font-size: 18px;">{{ aviso }}</p>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- inicio -->
+    <a class="btn btn-sm btn-secondary mt-2" href="/">Inicio</a>
+
+</section>
+
+<div style="background-color: #eeee; height: 500px;">
+</div>
+
+{% load static %}
+<!-- JavaScript -->
+<script type="text/javascript" src="{% static 'js/aviso.js'%}"></script>
+
+{% endblock %}

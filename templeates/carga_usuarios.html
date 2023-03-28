@@ -1,0 +1,31 @@
+{% extends 'master.html' %}
+
+{% block title %}
+Carga de usuarios
+{% endblock %}
+
+{% block content %}
+<h1>Carga de usuarios</h1>
+<p>Sube un archivo excel con los datos de los usuarios</p>
+
+<section>
+    <form action="/carga_usuarios/" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="file" title="Upload excel file" name="excel_file" style="border: 1px solid black; padding: 5px;" required="required">
+        <p>
+            <input type="submit" value="Upload" style="border: 1px solid green; padding:5px; border-radius: 2px; cursor: pointer;">
+    </form>
+
+    <p></p>
+    <hr>
+
+    {% for row in excel_data %}
+    {% for cell in row %}
+    {{ cell }}&nbsp;&nbsp;
+    {% endfor %}
+    <br>
+    {% endfor %}
+
+</section>
+
+{% endblock %}

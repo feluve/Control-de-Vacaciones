@@ -1,148 +1,128 @@
-{% block content %} {% load static %}
+{% extends "master.html" %}
 
-<!DOCTYPE html>
-<html lang="en">
+{% block title %}
+Nuevo Usuario
+{% endblock %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Alertas personalizadas -->
-    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-    <!-- Bootstrap 5 -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD"
-        crossorigin="anonymous">
-    <!-- Mi estilo css -->
-    <link rel="stylesheet" href={% static 'css/estilo.css' %}>
-    <!-- Funete de Google -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
-
-    <title>Nuevo usuario</title>
-</head>
+{% block content %}
 
 {% if request.user.is_authenticated %}
 {% if request.user.perfil.rol == "admin" or request.user.perfil.rol == "RH" %}
 
-<body>
-    <nav class="navbar navbar-dark  bg-black">
-        <div class="container-fluid  bg-black">
-            <a class="navbar-brand" href="#">
-                <img src={% static 'img/logo1.png' %} class="me-2" height="100" alt="MDB Logo" loading="lazy" />
-                <small class="text-white">CEGEMEX</small>
-            </a>
-            <h1 class="text-white">Bienvenido {{user|title}}</h1>
-            <a class="mx-4" href="{% url 'salir' %}">Cerrar sesion</a>
-        </div>
-    </nav>
+<section style="background-color: #eeee">
 
-    <section style="background-color: #eeee">
+    <div class="container py-4">
+        <div class="col-lg-12">
+            <div class="card mb-8">
+                <div class="col-md-12 px-3 py-3">
 
-        <div class="container py-4">
-            <div class="col-lg-12">
-                <div class="card mb-8">
-                    <div class="col-md-12 px-3 py-3">
+                    <div class="col-md-8 col-lg-6 col-xl-4 offset-xl-1 px-5 py-3">
 
-                        <div class="col-md-8 col-lg-6 col-xl-4 offset-xl-1 px-5 py-3">
+                        <form action="/guardar_nuevo_usuario/" method="POST" , id="form" enctype="multipart/form-data">
+                            {% csrf_token %}
 
-                            <form action="/guardar_nuevo_usuario/" method="POST" , id="form">
-                                {% csrf_token %}
+                            <div class="divider d-flex align-items-center my-4">
+                                <p class="text-center fw-bold mb-0" style="font-size: 25px;">Crear nuevo usuario</p>
+                            </div>
 
-                                <div class="divider d-flex align-items-center my-4">
-                                    <p class="text-center fw-bold mb-0" style="font-size: 25px;">Crear nuevo usuario</p>
-                                </div>
+                            <!-- Foto de usuario -->
+                            <div class="form-outline mb-2">
+                                <label>Foto:</label>
+                                <!-- <label id="e_usuario"></label> -->
+                                <input onchange="previewImage();" type="FILE" name="imagen" id="imagen" class="form-control form-control-sm" accept="image/*">
+                                <img id="preview" style="max-width: 150px;">
+                            </div>
 
-                                <!-- Nombre de Usuario -->
-                                <div class="form-outline mb-2">
-                                    <label for="usuario">Nombre de Usuario:</label>
-                                    <label id="e_usuario"></label>
-                                    <input type="text" name="usuario" id="usuario" class="form-control form-control-sm" data-usuarios="{{ lista_usuarios }}" placeholder="Coloca usuario" required>
-                                </div>
+                            <!-- Nombre de Usuario -->
+                            <div class="form-outline mb-2">
+                                <label for="usuario">Nombre de Usuario:</label>
+                                <label id="e_usuario"></label>
+                                <input type="text" name="usuario" id="usuario" class="form-control form-control-sm" data-usuarios="{{ lista_usuarios }}" placeholder="Coloca usuario" required>
+                            </div>
 
-                                <!-- Nombre -->
-                                <div class="form-outline mb-2">
-                                    <label for="nombre">Nombre:</label>
-                                    <label id="e_nombre"></label>
-                                    <input type="text" name="nombre" id="nombre" class="form-control form-control-sm" placeholder="Coloca el nombre" required>
-                                </div>
+                            <!-- Nombre -->
+                            <div class="form-outline mb-2">
+                                <label for="nombre">Nombre:</label>
+                                <label id="e_nombre"></label>
+                                <input type="text" name="nombre" id="nombre" class="form-control form-control-sm" placeholder="Coloca el nombre" required>
+                            </div>
 
-                                <!-- Apellidos -->
-                                <div class="form-outline mb-2">
-                                    <label for="apellidos">Apellidos:</label>
-                                    <label id="e_apellidos"></label>
-                                    <input type="text" name="apellidos" id="apellidos" class="form-control form-control-sm" placeholder="Coloca uno o dos apellidos" required>
-                                </div>
+                            <!-- Apellidos -->
+                            <div class="form-outline mb-2">
+                                <label for="apellidos">Apellidos:</label>
+                                <label id="e_apellidos"></label>
+                                <input type="text" name="apellidos" id="apellidos" class="form-control form-control-sm" placeholder="Coloca uno o dos apellidos" required>
+                            </div>
 
-                                <!-- Contraseña -->
-                                <div class="form-outline mb-2">
-                                    <label for="contrasena">Contraseña:</label>
-                                    <label id="e_contrasena"></label>
-                                    <input type="password" name="contrasena" id="contrasena" class="form-control form-control-sm" placeholder="Al menos de 8 caracteres" required>
-                                </div>
+                            <!-- Contraseña -->
+                            <div class="form-outline mb-2">
+                                <label for="contrasena">Contraseña:</label>
+                                <label id="e_contrasena"></label>
+                                <input type="password" name="contrasena" id="contrasena" class="form-control form-control-sm" placeholder="Al menos de 8 caracteres" required>
+                            </div>
 
-                                <!-- Corre de Usuario -->
-                                <div class="form-outline mb-2">
-                                    <label for="correo">Correo de Usuario:</label>
-                                    <label id="e_correo"></label>
-                                    <input type="text" name="correo" id="correo" class="form-control form-control-sm" placeholder="Coloca el correo" required>
-                                </div>
+                            <!-- Corre de Usuario -->
+                            <div class="form-outline mb-2">
+                                <label for="correo">Correo de Usuario:</label>
+                                <label id="e_correo"></label>
+                                <input type="text" name="correo" id="correo" class="form-control form-control-sm" placeholder="Coloca el correo" required>
+                            </div>
 
-                                <!-- Telefono -->
-                                <div class="form-outline mb-2">
-                                    <label for="telefono">Telefono:</label>
-                                    <label id="e_telefono"></label>
-                                    <!-- numero de telefono -->
-                                    <input type="tel" name="telefono" id="telefono" class="form-control form-control-sm" placeholder="A 10 digitos" required>
-                                </div>
+                            <!-- Telefono -->
+                            <div class="form-outline mb-2">
+                                <label for="telefono">Telefono:</label>
+                                <label id="e_telefono"></label>
+                                <!-- numero de telefono -->
+                                <input type="tel" name="telefono" id="telefono" class="form-control form-control-sm" placeholder="A 10 digitos" required>
+                            </div>
 
-                                <!-- Fecha de ingreso -->
-                                <div class="form-outline mb-2">
-                                    <label for="fecha_ingreso">Fecha de ingreso:</label>
-                                    <input type="date" name="fecha_ingreso" id="fecha_ingreso" class="form-control form-control-sm" required>
-                                </div>
+                            <!-- Fecha de ingreso -->
+                            <div class="form-outline mb-2">
+                                <label for="fecha_ingreso">Fecha de ingreso:</label>
+                                <input type="date" name="fecha_ingreso" id="fecha_ingreso" class="form-control form-control-sm" required>
+                            </div>
 
-                                <!-- Fecha de nacimiento -->
-                                <div class="form-outline mb-2">
-                                    <label for="fecha_nacimiento">Fecha de nacimiento:</label>
-                                    <input type="date" name="fecha_nacimiento" id="fecha_nacimiento" class="form-control form-control-sm" required>
-                                </div>
+                            <!-- Fecha de nacimiento -->
+                            <div class="form-outline mb-2">
+                                <label for="fecha_nacimiento">Fecha de nacimiento:</label>
+                                <input type="date" name="fecha_nacimiento" id="fecha_nacimiento" class="form-control form-control-sm" required>
+                            </div>
 
-                                <!-- Jefe Inmediato -->
-                                <div class="form-outline mb-2">
-                                    <label for="jefe">Jefe Inmediato:</label>
-                                    <!-- Combobox Javier Gonzalez, Govani Gonzalez, David Gonzalez, Erika Chagolla, Jorge Hernandez, Victor Valdez, Aldo Martinez -->
-                                    <select name="jefe" id="jefe" class="form-control form-control-sm">
-                                        <option value="Javier Gonzalez">Javier Gonzalez</option>
-                                        <option value="Govani Gonzalez">Jovani Gonzalez</option>
-                                        <option value="David Gonzalez">David Gonzalez</option>
-                                        <option value="Erika Chagolla">Erika Chagolla</option>
-                                        <option value="Jorge Hernandez">Jorge Hernandez</option>
-                                        <option value="Victor Valdez">Victor Valdez</option>
-                                        <option value="Aldo Martinez">Aldo Garcia</option>
-                                    </select>
-                                </div>
+                            <!-- Jefe Inmediato -->
+                            <div class="form-outline mb-2">
+                                <label for="jefe">Jefe Inmediato:</label>
+                                <!-- Combobox Javier Gonzalez, Govani Gonzalez, David Gonzalez, Erika Chagolla, Jorge Hernandez, Victor Valdez, Aldo Martinez -->
+                                <select name="jefe" id="jefe" class="form-control form-control-sm">
+                                    <option value="Javier Gonzalez">Javier Gonzalez</option>
+                                    <option value="Govani Gonzalez">Jovani Gonzalez</option>
+                                    <option value="David Gonzalez">David Gonzalez</option>
+                                    <option value="Erika Chagolla">Erika Chagolla</option>
+                                    <option value="Jorge Hernandez">Jorge Hernandez</option>
+                                    <option value="Victor Valdez">Victor Valdez</option>
+                                    <option value="Aldo Martinez">Aldo Garcia</option>
+                                </select>
+                            </div>
 
-                                <!-- Area -->
-                                <div class="form-outline mb-2">
-                                    <label for="area">Area:</label>
-                                    <!-- combobox Administracion, Modulos, Mecanica, Laboratorio -->
-                                    <select name="area" id="area" class="form-control form-control-sm">
-                                        <option value="Administracion">Administracion</option>
-                                        <option value="Modulos">Modulos</option>
-                                        <option value="Mecanica">Mecanica</option>
-                                        <option value="Laboratorio">Laboratorio</option>
-                                        <option value="Ventas">Ventas</option>
-                                    </select>
-                                </div>
+                            <!-- Area -->
+                            <div class="form-outline mb-2">
+                                <label for="area">Area:</label>
+                                <!-- combobox Administracion, Modulos, Mecanica, Laboratorio -->
+                                <select name="area" id="area" class="form-control form-control-sm">
+                                    <option value="Administracion">Administracion</option>
+                                    <option value="Modulos">Modulos</option>
+                                    <option value="Mecanica">Mecanica</option>
+                                    <option value="Laboratorio">Laboratorio</option>
+                                    <option value="Ventas">Ventas</option>
+                                </select>
+                            </div>
 
-                                <!-- Dias de vacaciones -->
-                                <!-- <div class="form-outline mb-2"> -->
-                                <!-- <label for="dias_vacaciones_disp">Dias de vacaciones:</label> -->
-                                <!-- numero de dias -->
-                                <!-- <input type="number" name="dias_vacaciones_disp" id="dias_vacaciones_disp" class="form-control form-control-sm" required> -->
-                                <!-- ganera un combobox de entra del numero 1 al 10 -->
-                                <!-- <select name="dias_vacaciones_disp" id="dias_vacaciones_disp" class="form-control form-control-sm">
+                            <!-- Dias de vacaciones -->
+                            <!-- <div class="form-outline mb-2"> -->
+                            <!-- <label for="dias_vacaciones_disp">Dias de vacaciones:</label> -->
+                            <!-- numero de dias -->
+                            <!-- <input type="number" name="dias_vacaciones_disp" id="dias_vacaciones_disp" class="form-control form-control-sm" required> -->
+                            <!-- ganera un combobox de entra del numero 1 al 10 -->
+                            <!-- <select name="dias_vacaciones_disp" id="dias_vacaciones_disp" class="form-control form-control-sm">
                                         <option value="0">0</option>
                                         <option value="1">1</option>
                                         <option value="2">2</option>
@@ -177,64 +157,48 @@
                                     </select> 
                                 </div> -->
 
-                                <!-- Role -->
-                                <div class="form-outline mb-2">
-                                    <label for="rol">Role:</label>
-                                    <!-- combobox Empleado, Supervisor, Gerente, Director, Dueño, RH-->
-                                    <select name="rol" id="rol" class="form-control form-control-sm">
-                                        <option value="Empleado">Empleado</option>
-                                        <option value="Supervisor">Supervisor</option>
-                                        <option value="Gerente">Gerente</option>
-                                        <option value="Director">Director</option>
-                                        <option value="Dueño">Dueño</option>
-                                        <option value="RH">RH</option>
-                                    </select>
-                                </div>
+                            <!-- Role -->
+                            <div class="form-outline mb-2">
+                                <label for="rol">Role:</label>
+                                <!-- combobox Empleado, Supervisor, Gerente, Director, Dueño, RH-->
+                                <select name="rol" id="rol" class="form-control form-control-sm">
+                                    <option value="Empleado">Empleado</option>
+                                    <option value="Supervisor">Supervisor</option>
+                                    <option value="Gerente">Gerente</option>
+                                    <option value="Director">Director</option>
+                                    <option value="Dueño">Dueño</option>
+                                    <option value="RH">RH</option>
+                                </select>
+                            </div>
 
-                                <!-- semana -->
-                                <div class="form-outline mb-2">
-                                    <label for="semana">Semana:</label>
-                                    <!-- combobox Normal, Inglesa -->
-                                    <select name="semana" id="semana" class="form-control form-control-sm">
-                                        <option value="Normal">Normal</option>
-                                        <option value="Inglesa">Inglesa</option>
-                                    </select>
-                                </div>
+                            <!-- semana -->
+                            <div class="form-outline mb-2">
+                                <label for="semana">Semana:</label>
+                                <!-- combobox Normal, Inglesa -->
+                                <select name="semana" id="semana" class="form-control form-control-sm">
+                                    <option value="Normal">Normal</option>
+                                    <option value="Inglesa">Inglesa</option>
+                                </select>
+                            </div>
 
+                            <!-- Submit -->
+                            <div class="position-relative pt-5">
+                                <input type="button" value="Agregar Usuario" onclick="guardar_usuario()" class="btn btn-primary position-absolute bottom-0 start-50 translate-middle-x">
+                            </div>
 
-                                <!-- Submit -->
-                                <div class="text-center text-lg-start mt-4 pt-2">
-                                    <input type="button" value="Agregar Usuario" onclick="guardar_usuario()" class="btn btn-primary btn-lg" style="padding-left: 5.5rem; padding-right: 5.5rem">
-                                </div>
-
-                            </form>
-                        </div>
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
 
-    <footer style="position: absolute; bottom: 1; width: 100%;">
-        <div class="d-flex flex-column flex-md-row text-center text-md-start justify-content-between py-4 px-4 px-xl-5 bg-black">
-
-            <div class="text-white mb-3 mb-md-0">
-                CEGMEX Copyright © 2023. All rights reserved.
-            </div>
-        </div>
-    </footer>
-
-    <!-- JavaScript -->
-    <script type="text/javascript" src="{% static 'js/usuarios.js'%}"></script>
-    <!-- Bootstrap -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
-        crossorigin="anonymous"></script>
-
-
-</body>
+</section>
 {% endif %}
 {% endif %}
 
-</html>
+{% load static %}
+<!-- JavaScript -->
+<script type="text/javascript" src="{% static 'js/usuarios.js'%}"></script>
 
 {% endblock %}

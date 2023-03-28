@@ -11,6 +11,22 @@ window.addEventListener("load", (event) => {
 
 });
 
+function previewImage() {
+    
+    // print("previewImage");
+
+    var file = document.getElementById("imagen").files
+    if (file.length > 0) {
+        var fileReader = new FileReader()
+
+        fileReader.onload = function (event) {
+            document.getElementById("preview").setAttribute("src", event.target.result)
+        }
+
+        fileReader.readAsDataURL(file[0])
+    }
+}
+
 // listener del campo de texto usuario
 document.getElementById("usuario").addEventListener("keyup", (event) => {
 
@@ -19,6 +35,11 @@ document.getElementById("usuario").addEventListener("keyup", (event) => {
 
     // eliminar los espacios en blanco
     event.target.value = event.target.value.replace(/ /g, "");
+
+});
+
+// listener del campo de texto usuario unfocus
+document.getElementById("usuario").addEventListener("blur", (event) => {
 
     // obtenemos el atributo data- del campo de texto usuario
     var usuarios = document.getElementById("usuario").getAttribute("data-usuarios");
@@ -34,45 +55,56 @@ document.getElementById("usuario").addEventListener("keyup", (event) => {
     //     console.log("usuario: " + usuarios[i]);
     // }
 
-    // verifica cada 5 segundos si el usuario ya existe
-    setTimeout(() => {
-        // si el usuario ya existe
-        if (usuarios.includes(event.target.value)) {
-            // mostramos alerta de error
-            swal({
-                title: "Información",
-                text: "El usuario "+ event.target.value +" ya existe! Coloque otro nombre de usuario.",
-                icon: "info",
+    // si el usuario ya existe
+    if (usuarios.includes(event.target.value)) {
+        // mostramos alerta de error
+        swal({
+            title: "Información",
+            text: "El usuario "+ event.target.value +" ya existe! Coloque otro nombre de usuario.",
+            icon: "info",
 
-                buttons: {
-                    Ok: "Ok",
-                },
-            })
-            .then((value) => {
-                switch (value) {
-                    case "Ok":
-                        // borramos el valor del campo de texto usuario
-                        event.target.value = "";    
+            buttons: {
+                Ok: "Ok",
+            },    
+        });
 
-                        // borramos el valor de la etiqueta e_usuario
-                        document.getElementById("e_usuario").innerHTML = "";
+        // borramos el valor del campo de texto usuario
+        event.target.value = "";    
 
-                        // ponemos el foco en el campo de texto usuario
-                        document.getElementById("usuario").focus();
-                        break;
-                }
-            });
-        }
-    }, 5000);
+        // borramos el valor de la etiqueta e_usuario
+        document.getElementById("e_usuario").innerHTML = "";
 
-    // si hay mas de 3 caracteres
-    if (event.target.value.length > 3) {
+        // ponemos el foco en el campo de texto usuario
+        document.getElementById("usuario").focus();
+
+    } 
+    // si el usuario es null
+    else if (event.target.value == "") {
+        // // mostramos alerta de error
+        // swal({
+        //     title: "Información",
+        //     text: "El usuario no puede ser un valor vacio! Coloque un nombre de usuario valido.",
+        //     icon: "info",
+
+        //     buttons: {
+        //         Ok: "Ok",
+        //     },
+        // });
+
+        // // borramos el valor del campo de texto usuario
+        // event.target.value = "";    
+
+        // // borramos el valor de la etiqueta e_usuario
+        // document.getElementById("e_usuario").innerHTML = "";
+
+        // // ponemos el foco en el campo de texto usuario
+        // document.getElementById("usuario").focus();
+
+    }
+    else {
         //colo OK en la etiqueta e_usuario
         document.getElementById("e_usuario").innerHTML = "OK";
         document.getElementById("e_usuario").style.color = "green";
-    }else {
-        //colo OK en la etiqueta e_usuario
-        document.getElementById("e_usuario").innerHTML = "";
     }
 
 });
@@ -105,15 +137,6 @@ document.getElementById("apellidos").addEventListener("keyup", (event) => {
     // colocar la primera letra en mayuscula y despues de cada espacio
     event.target.value = event.target.value.replace(/\w\S*/g, (w) => (w.replace(/^\w/, (c) => c.toUpperCase())));
 
-    // verfica cada 5 segundos si el nombre tiene espacios en blanco al final
-    setTimeout(() => {
-        // si el ultimo caracter es un espacio
-        if (event.target.value.slice(-1) == " ") {
-            // borramos el ultimo caracter
-            event.target.value = event.target.value.slice(0, -1);
-        }
-    }, 5000);
-
     // si hay mas de 3 caracteres
     if (event.target.value.length > 3) {
         //colo OK en la etiqueta e_apellidos
@@ -126,10 +149,20 @@ document.getElementById("apellidos").addEventListener("keyup", (event) => {
 
 });
 
+// listener del campo de texto apellidos unfocus
+
+document.getElementById("apellidos").addEventListener("blur", (event) => {
+    // si el ultimo caracter es un espacio
+    if (event.target.value.slice(-1) == " ") {
+        // borramos el ultimo caracter
+        event.target.value = event.target.value.slice(0, -1);
+    }
+});
+
 // listener del campo de texto contraseña
 document.getElementById("contrasena").addEventListener("keyup", (event) => {
-    // si hay mas de 1 caracteres
-    if (event.target.value.length >= 1) {
+    // si hay mas de 8 caracteres
+    if (event.target.value.length >= 8) {
         //colo OK en la etiqueta e_contrasena
         document.getElementById("e_contrasena").innerHTML = "OK";
         document.getElementById("e_contrasena").style.color = "green";
@@ -137,10 +170,34 @@ document.getElementById("contrasena").addEventListener("keyup", (event) => {
         //colo OK en la etiqueta e_contrasena
         document.getElementById("e_contrasena").innerHTML = "";
     }
-
 });
 
+// listener del campo de texto contraseña unfocus
+document.getElementById("contrasena").addEventListener("blur", (event) => {
+    // si no hay mas de 8 caracteres
+    if (event.target.value.length < 8) {
+        // mostramos alerta de error
 
+        swal({
+            title: "Información",
+            text: "La contraseña debe tener al menos 8 caracteres!",
+            icon: "info",
+
+            buttons: {
+                Ok: "Ok",
+            },
+        })
+        .then((value) => {
+            // coloca el foco en el campo de texto contraseña
+            document.getElementById("contrasena").focus();
+                
+            // borramos el valor del campo de texto contraseña
+            event.target.value = "";
+        });
+    
+    }
+
+});
 
 // listener del campo de texto email
 document.getElementById("correo").addEventListener("keyup", (event) => {
@@ -154,32 +211,38 @@ document.getElementById("correo").addEventListener("keyup", (event) => {
         event.target.value = event.target.value.slice(0, -1);
     }
 
-    // verfica cada 5 segundos si el nombre tiene espacios en blanco al final
-    setTimeout(() => {
-        // valida que el email al menos tenga un @ y un .
-        if (!(event.target.value.includes("@") && event.target.value.includes("."))) {
-            // mostramos alerta de error
-            swal({
-                title: "Información",
-                text: "El email "+ event.target.value +" no tiene el formato correcto! Coloque un email valido.",
-                icon: "info",
+});
 
-                buttons: {
-                    Ok: "Ok",
-                },
-            })
-            .then((value) => {
-                switch (value) {
-                    case "Ok":
-                        // borramos el valor del campo de texto email
-                        event.target.value = "";
-                        // ponemos el foco en el campo de texto email
-                        document.getElementById("correo").focus();
-                        break;
-                }
-            });
-        }
-    }, 10000);
+// listener del campo de texto email unfocus
+document.getElementById("correo").addEventListener("blur", (event) => {
+
+    // Define our regular expression.
+    var validEmail =  /^\w+([.-_+]?\w+)*@\w+([.-]?\w+)*(\.\w{2,10})+$/;
+
+    // si el email no tiene el formato correcto
+    if (!validEmail.test(event.target.value)) {
+        // mostramos alerta de error
+        swal({
+            title: "Información",
+            text: "El email "+ event.target.value +" no tiene el formato correcto! Coloque un email valido.",
+            icon: "info",
+
+            buttons: {
+                Ok: "Ok",
+            },
+        })
+        .then((value) => {
+            // borrando el valor del campo de texto email
+            event.target.value = "";
+            // ponemos el foco en el campo de texto email
+            document.getElementById("correo").focus();
+        });
+    }
+    else {
+        //colo OK en la etiqueta e_correo
+        document.getElementById("e_correo").innerHTML = "OK";
+        document.getElementById("e_correo").style.color = "green";
+    }
 
 });
 
@@ -197,6 +260,14 @@ document.getElementById("telefono").addEventListener("keyup", (event) => {
     if (event.target.value.length > 10) {
         // borramos el ultimo caracter
         event.target.value = event.target.value.slice(0, -1);
+
+        // coloco OK en la etiqueta e_telefono
+        document.getElementById("e_telefono").innerHTML = "OK";
+        document.getElementById("e_telefono").style.color = "green";
+    } 
+    else {
+        // coloco OK en la etiqueta e_telefono
+        document.getElementById("e_telefono").innerHTML = "";
     }
 
 });

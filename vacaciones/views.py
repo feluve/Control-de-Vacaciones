@@ -171,7 +171,8 @@ def vacaciones(request):
         "lista_dias_festivos_str": lista_dias_festivos_str,
         "dias_min_sol": dias_min_sol,
         "dias_max_sol": dias_max_sol,
-        "dias_disponibles": dias_disponibles
+        "dias_disponibles": dias_disponibles,
+        "dominio": os.environ.get("DOMINIO")
     }
 
     return render(request, "vacaciones.html", context)
@@ -245,7 +246,11 @@ def registra_solicitud(request, dias_solicitados, fecha_solicitud, fecha_final, 
             'correo_resgitro_solicitud.html', context_correo, request=request)
         enviar_correo_plantilla(correo_contenido, subject, to, cc_flag=True)
 
-    return redirect('/')
+    aviso = 'Solicitud registrada con exito.'
+    # remplazar de la variable aviso los espacios por guiones bajos
+    aviso = aviso.replace(' ', '_')
+
+    return redirect(f'/aviso/{aviso}')
 
 
 @login_required()
@@ -298,7 +303,11 @@ def aprobarSolicitud(request, id, comentario):
             'correo_estado_solicitud.html', context_correo, request=request)
         enviar_correo_plantilla(correo_contenido, subject, to, cc_flag=True)
 
-    return redirect('/')
+    aviso = 'Solicitud aprobada con exito.'
+    # remplazar de la variable aviso los espacios por guiones bajos
+    aviso = aviso.replace(' ', '_')
+
+    return redirect(f'/aviso/{aviso}')
 
 
 @login_required()
@@ -342,7 +351,11 @@ def rechazarSolicitud(request, id, comentario):
             'correo_estado_solicitud.html', context_correo, request=request)
         enviar_correo_plantilla(correo_contenido, subject, to, cc_flag=True)
 
-    return redirect('/')
+    aviso = 'Solicitud rechazada con exito.'
+    # remplazar de la variable aviso los espacios por guiones bajos
+    aviso = aviso.replace(' ', '_')
+
+    return redirect(f'/aviso/{aviso}')
 
 
 def salir(request):

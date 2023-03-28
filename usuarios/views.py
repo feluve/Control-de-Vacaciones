@@ -1,7 +1,9 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, reverse
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import User
 from vacaciones.models import Perfil
+
+from django.core.files.storage import FileSystemStorage
 
 from static.py.enviaCorreo import enviar_correo_simple, enviar_correo_plantilla
 
@@ -10,10 +12,141 @@ from django.template.loader import render_to_string
 import os
 import environ
 
+import openpyxl
+
+from datetime import datetime
+
+import urllib
+
 # Create your views here.
 
-# decorador para verificar si usuario tiene el rol de admin o RH
 # @ user_passes_test(lambda u: u.perfil.rol == 'admin' or u.perfil.rol == 'RH')
+
+
+def master(request):
+
+    return render(request, 'master.html')
+
+
+@login_required()
+# decorador para verificar si usuario tiene el rol de admin o RH
+@user_passes_test(lambda u: u.perfil.rol == 'admin' or u.perfil.rol == 'RH')
+def carga_usuarios(request):
+
+    print("")
+    print("Carga de usuarios")
+    print("")
+
+    # print(request.FILES)
+    # print(request.POST)
+
+    if "GET" == request.method:
+        return render(request, 'carga_usuarios.html', {})
+    else:
+        excel_file = request.FILES["excel_file"]
+        # you may put validations here to check extension or file size
+        wb = openpyxl.load_workbook(excel_file)
+
+        # getting a particular sheet by name out of many sheets
+        worksheet = wb["Hoja1"]
+        # print(worksheet)
+
+        excel_data = list()
+        usuarios_excel = list()
+        # iterating over the rows and
+        # getting value from each cell in row
+        for row in worksheet.iter_rows():
+            row_data = list()
+            for cell in row:
+                row_data.append(str(cell.value))
+
+            if row_data[0] == "None":
+                print("usuario vacio")
+            else:
+                excel_data.append(row_data)
+
+        for i in range(0, len(excel_data) - 2):
+            usuarios_excel.append(excel_data[i + 2])
+
+        # si el tamaño de usuarios_excel es mayor a 0, guardamos los usuarios en la base de datos
+        if len(usuarios_excel) > 0:
+            # imprimir en consola los usuarios del excel
+            print(usuarios_excel)
+
+            print("Guardando usuarios en la base de datos")
+            guardar_usuarios_excel(usuarios_excel)
+        else:
+            print("No hay usuarios para guardar en la base de datos")
+
+        context = {
+            "excel_data": excel_data
+        }
+
+        return render(request, 'carga_usuarios.html', context)
+
+
+# crear una funcion que alamcena los usuarios del excel en la base de datos
+def guardar_usuarios_excel(usuarios_excel):
+
+    n_usuarios = 0
+
+    for u in usuarios_excel:
+
+        usuario = u[0].replace(" ", "")
+        nombre = u[1]
+        apellidos = u[2]
+        contrasena = u[3].replace(" ", "")
+        correo = u[4].replace(" ", "")
+        telefono = u[5].replace(" ", "")
+        # convertimos la fecha de ingreso a formato datetime con el formato año-mes-dia
+        fecha_ingreso = datetime.strptime(
+            u[6].replace(" ", ""), '%Y-%m-%d').date()
+        # convertimos la fecha de nacimiento a formato datetime con el formato año-mes-dia
+        fecha_nacimiento = datetime.strptime(
+            u[7].replace(" ", ""), '%Y-%m-%d').date()
+        jefe = u[8]
+        area = u[9].replace(" ", "")
+        rol = u[10].replace(" ", "")
+        semana = u[11].replace(" ", "")
+
+        dias_vacaciones_disp = 0  # request.POST.get("dias_vacaciones_disp")
+        # establecemos que la vigencia de los dias de vacaciones es la fecha de ingreso para que el proximo inicio de sesion calcule los dias de vacaciones y la vigencia
+        vigencia_dias_vacaciones = fecha_ingreso
+
+        # imagen del usuario
+        imagen = u[12].replace(" ", "")
+
+        # imprimir en consola los datos del usuario
+        # print("usuario: ", usuario)
+        # print("nombre: ", nombre)
+        # print("apellidos: ", apellidos)
+        # print("contrasena: ", contrasena)
+        # print("correo: ", correo)
+        # print("telefono: ", telefono)
+        # print("fecha_ingreso: ", fecha_ingreso)
+        # print("fecha_nacimiento: ", fecha_nacimiento)
+        # print("jefe: ", jefe)
+        # print("area: ", area)
+
+        # crear un nuevo usuario del modelo User
+        nuevo_usuario = User.objects.create_user(
+            username=usuario, first_name=nombre, last_name=apellidos, password=contrasena, email=correo)
+        # imprimir en consola usuario guardado con exito
+        print("[+] Usuario guardado con exito")
+
+        # actualizamos el perfil del usuario
+        Perfil.objects.filter(usuario=User.objects.get(username=usuario).pk).update(telefono=telefono, fecha_ingreso=fecha_ingreso,
+                                                                                    fecha_nacimiento=fecha_nacimiento, area=area, dias_vacaciones_disp=dias_vacaciones_disp, vigencia_dias_vacaciones=vigencia_dias_vacaciones, rol=rol, jefe=jefe, semana=semana, imagen=imagen)
+        # imprimir en consola perfil guardado con exito
+        print("[+] Perfil guardado con exito")
+
+        # incrementamos el contador de usuarios
+        n_usuarios += 1
+
+    # imprimir en consola el numero de usuarios guardados
+    print("Numero de usuarios guardados correctamente: ", n_usuarios)
+
+    return True
 
 
 @login_required()
@@ -48,28 +181,32 @@ def guardar_nuevo_usuario(request):
     fecha_nacimiento = request.POST.get("fecha_nacimiento")
     jefe = request.POST.get("jefe")
     area = request.POST.get("area")
+    rol = request.POST.get("rol")
+    semana = request.POST.get("semana")
+
     dias_vacaciones_disp = 0  # request.POST.get("dias_vacaciones_disp")
     # establecemos que la vigencia de los dias de vacaciones es la fecha de ingreso para que el proximo inicio de sesion calcule los dias de vacaciones y la vigencia
     vigencia_dias_vacaciones = request.POST.get("fecha_ingreso")
-    rol = request.POST.get("rol")
-    semana = request.POST.get("semana")
+
+    # imagen del usuario
+    imagen = request.FILES['imagen']
+    fs = FileSystemStorage()
+    filename = fs.save(imagen.name, imagen)
+    uploaded_file_url = fs.url(filename)
 
     # crear un nuevo usuario del modelo User
     nuevo_usuario = User.objects.create_user(
         username=usuario, first_name=nombre, last_name=apellidos, password=contrasena, email=correo)
-
     # imprimir en consola usuario guardado con exito
     print("[+] Usuario guardado con exito")
 
-    # # actualizamos el perfil del usuario
+    # actualizamos el perfil del usuario
     Perfil.objects.filter(usuario=User.objects.get(username=usuario).pk).update(telefono=telefono, fecha_ingreso=fecha_ingreso,
-                                                                                fecha_nacimiento=fecha_nacimiento, area=area, dias_vacaciones_disp=dias_vacaciones_disp, vigencia_dias_vacaciones=vigencia_dias_vacaciones, rol=rol, jefe=jefe, semana=semana)
-
-    # # imprimir en consola perfil guardado con exito
+                                                                                fecha_nacimiento=fecha_nacimiento, area=area, dias_vacaciones_disp=dias_vacaciones_disp, vigencia_dias_vacaciones=vigencia_dias_vacaciones, rol=rol, jefe=jefe, semana=semana, imagen=imagen.name)
+    # imprimir en consola perfil guardado con exito
     print("[+] Perfil guardado con exito")
 
     # retonamos al DOMINO mas el path de la vista
-
     return redirect('/')
 
 
@@ -118,7 +255,8 @@ def link_recuperacion(request, usuario):
 
     context_correo = {
         'nombre': nombre,
-        'link': link
+        'link': link,
+        'dominio': os.environ.get('DOMINIO')
     }
 
     # obtener el nombre de correo del usuario
@@ -137,7 +275,11 @@ def link_recuperacion(request, usuario):
         'correo_recuperacion.html', context_correo, request=request)
     enviar_correo_plantilla(correo_contenido, subject, to)
 
-    return redirect('/')
+    aviso = 'Se genero un link de recuperación de contraseña, por favor revisa tu correo'
+    # remplazar de la variable aviso los espacios por guiones bajos
+    aviso = aviso.replace(' ', '_')
+
+    return redirect(f'/aviso/{aviso}')
 
 
 def contrasena_nueva(request, usuario, token):
@@ -159,7 +301,8 @@ def contrasena_nueva(request, usuario, token):
 
         context = {
             'usuario': usuario,
-            'token': token
+            'token': token,
+            'dominio': os.environ.get('DOMINIO')
         }
 
         return render(request, 'contrasena_nueva.html', context)
@@ -167,15 +310,11 @@ def contrasena_nueva(request, usuario, token):
         # token invalido
         print("[-] Token invalido o expirado")
 
-        # redireccionar a la pagina link_expirado
-        return redirect('/link_expirado')
+        aviso = 'El link de recuperación de contraseña a expirado, favor de generar uno nuevo.'
+        # remplazar de la variable aviso los espacios por guiones bajos
+        aviso = aviso.replace(' ', '_')
 
-        # return redirect('/')
-
-
-def link_expirado(request):
-
-    return render(request, 'link_expirado.html')
+        return redirect(f'/aviso/{aviso}')
 
 
 def cambiar_contrasena(request, usuario, token, contrasena):
@@ -243,7 +382,10 @@ def cambiar_contrasena(request, usuario, token, contrasena):
             'correo_contrasena_cambiada.html', context_correo, request=request)
         enviar_correo_plantilla(correo_contenido, subject, to)
 
-        return redirect('/')
+        context = {
+            'aviso': 'Contraseña cambiada con exito'
+        }
+        return render(request, 'aviso.html', context)
 
     else:
         # token invalido
@@ -251,7 +393,18 @@ def cambiar_contrasena(request, usuario, token, contrasena):
         print("[+] Contraseña no cambiada")
 
         # retorna a la pagina de 404
-        return redirect('/')
+        context = {
+            'aviso': 'Ocurrio un error al cambiar la contraseña'
+        }
+        return render(request, 'aviso.html', context)
+
+
+# @login_required()
+def aviso(request, aviso):
+    context = {
+        'aviso': aviso
+    }
+    return render(request, 'aviso.html', context)
 
 # -----------------------Funciones adcionales-----------------------
 

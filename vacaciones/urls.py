@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import vacaciones, registra_solicitud, aprobarSolicitud, rechazarSolicitud
+from .views import vacaciones, registra_solicitud, aprobarSolicitud, rechazarSolicitud, vacaciones
 
 from django.conf import settings
 
@@ -11,7 +11,6 @@ urlpatterns = [
     path("aprobarSolicitud/<int:id>/<str:comentario>", aprobarSolicitud),
     path("rechazarSolicitud/<int:id>/<str:comentario>", rechazarSolicitud),
 ]
-
 
 if settings.DEBUG:
     from django.conf.urls.static import static

@@ -1,3 +1,4 @@
+
 window.addEventListener("load", (event) => {
     console.log("Pagina cargada completamente.");
 
@@ -391,8 +392,9 @@ swal({
 
 
 function muestra_calendario(){
-    // console.log("Muestra calendario")
-    //document.getElementById('fecha_sol').click();
+    console.log("Muestra calendario")
+    // abrimos el calendario
+    document.getElementById("fecha_sol").click();
 }
 
 

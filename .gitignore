@@ -128,6 +128,7 @@ ENV/
 env.bak/
 venv.bak/
 
+
 # Spyder project settings
 .spyderproject
 .spyproject
@@ -151,6 +152,9 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+
+# Base de datos sqlite
+.sqlite3
 
 # PyCharm
 #  JetBrains specific template is maintained in a separate JetBrains.gitignore that can
