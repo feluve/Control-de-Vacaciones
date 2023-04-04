@@ -3,6 +3,8 @@ from .views import vacaciones, registra_solicitud, aprobarSolicitud, rechazarSol
 
 from django.conf import settings
 
+app_name = "vacaciones"
+
 urlpatterns = [
     path("", vacaciones, name="vacaciones"),
 

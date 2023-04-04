@@ -1,0 +1,109 @@
+{% extends 'master.html' %}
+
+{% load static %}
+
+{% block title %}
+Carga de usuarios
+{% endblock %}
+
+{% block content %}
+
+
+
+<section style="background-color: #eeee">
+
+    <div class="container py-1">
+        <div class="row">
+            <div class="col">
+                <nav aria-label="breadcrumb" class="bg-light rounded-3 p-3 mb-4">
+                    <ol class="breadcrumb mb-0">
+                        <h2 class="my-0">Cargar Usuarios</h2>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center">
+        <form action="/carga_usuarios_excel/" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="file" title="Upload excel file" name="excel_file" style="border: 1px solid black; padding: 5px;" required="required">
+            <p>
+                <input type="submit" value="Upload" style="border: 1px solid green; padding:5px; border-radius: 2px; cursor: pointer;">
+        </form>
+    </div>
+
+
+    <!-- {% for row in excel_data %}
+        {% for cell in row %}
+        {{ cell }}&nbsp;&nbsp;
+        {% endfor %}
+        <br>
+        {% endfor %}
+        
+        <br>
+        <br> -->
+
+    {% if usuarios_excel != None %}
+    <hr>
+    <div class="container pb-4">
+        <div class="col-lg-12">
+            <div class="card mb-8">
+                <div class="col-md-12 px-3 py-3">
+                    <h2 class="py-3 px-3 text-xl-center">Usuarios</h2>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead class="bg-dark">
+                                <tr>
+                                    <th class="campo_corto">#</th>
+                                    <th class="campo">Nombre de usuario</th>
+                                    <th class="campo">Nombre(s)</th>
+                                    <th class="campo">Apellidos</th>
+                                    <th class="campo">Contraseña</th>
+                                    <th class="campo">Correo</th>
+                                    <th class="campo">Telefono</th>
+                                    <th class="campo">Ingreso</th>
+                                    <th class="campo">Nacimiento</th>
+                                    <th class="campo">Jefe</th>
+                                    <th class="campo">Area</th>
+                                    <th class="campo">Rol</th>
+                                    <th class="campo">Semana</th>
+                                    <th class="campo">Imagen</th>
+                                    <th class="campo">Dias</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for usuario in usuarios_excel %}
+                                <tr>
+                                    <td class="campo_corto">{{ forloop.counter }}</td>
+                                    <!-- <td class="registro">{{ s.fecha |date:'d-M-Y' }}</td> -->
+                                    <td class="registro">{{ usuario.0 }}</td>
+                                    <td class="registro">{{ usuario.1 }}</td>
+                                    <td class="registro">{{ usuario.2 }}</td>
+                                    <td class="registro">{{ usuario.3 }}</td>
+                                    <td class="registro">{{ usuario.4 }}</td>
+                                    <td class="registro">{{ usuario.5 }}</td>
+                                    <td class="registro">{{ usuario.6 }}</td>
+                                    <td class="registro">{{ usuario.7 }}</td>
+                                    <td class="registro">{{ usuario.8 }}</td>
+                                    <td class="registro">{{ usuario.9 }}</td>
+                                    <td class="registro">{{ usuario.10 }}</td>
+                                    <td class="registro">{{ usuario.11 }}</td>
+                                    <!-- <td class="registro"><img src="{% static 'img/logo1.png' %}" alt="" style="max-width: 30px; max-height: 30px;"></td> -->
+                                    <td class="registro">{{ usuario.12 }}</td>
+                                    <td class="registro">{{ usuario.13 }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+
+</section>
+
+{% endblock %}

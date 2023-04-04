@@ -4,10 +4,14 @@ window.addEventListener("load", (event) => {
     // coloca la fecha actual en el campo de texto fecha_ingreso
     document.getElementById("fecha_ingreso").value = new Date().toISOString().slice(0, 10);
 
-    // coloca la fecha de hace 18 años en el campo de texto fecha_nacimiento
-    var fecha = new Date();
-    fecha.setFullYear(fecha.getFullYear() - 18);
-    document.getElementById("fecha_nacimiento").value = fecha.toISOString().slice(0, 10);
+    // coloca la fecha de hace 30 años en el campo de texto fecha_nacimiento
+    // var fecha = new Date();
+    // fecha.setFullYear(fecha.getFullYear() - 30);
+    // document.getElementById("fecha_nacimiento").value = fecha.toISOString().slice(0, 10);
+
+    // colocamos la fecha 1990-01-01 en el campo de texto fecha_nacimiento
+    document.getElementById("fecha_nacimiento").value = "1990-01-01";
+
 
 });
 
@@ -80,26 +84,30 @@ document.getElementById("usuario").addEventListener("blur", (event) => {
     } 
     // si el usuario es null
     else if (event.target.value == "") {
-        // // mostramos alerta de error
-        // swal({
-        //     title: "Información",
-        //     text: "El usuario no puede ser un valor vacio! Coloque un nombre de usuario valido.",
-        //     icon: "info",
 
-        //     buttons: {
-        //         Ok: "Ok",
-        //     },
-        // });
+        // colocamos el texto requerido en el campo de texto usuario
+        document.getElementById("usuario").placeholder = "Requerido";
 
-        // // borramos el valor del campo de texto usuario
-        // event.target.value = "";    
+        // mostramos alerta de error
+        swal({
+            title: "Información",
+            text: "El usuario no puede ser un valor vacio! Coloque un nombre de usuario valido.",
+            icon: "info",
 
-        // // borramos el valor de la etiqueta e_usuario
-        // document.getElementById("e_usuario").innerHTML = "";
+            buttons: {
+                Ok: "Ok",
+            },
+        })
+        .then((value) => {
+            // borramos el valor del campo de texto usuario
+            event.target.value = "";    
 
-        // // ponemos el foco en el campo de texto usuario
-        // document.getElementById("usuario").focus();
+            // borramos el valor de la etiqueta e_usuario
+            document.getElementById("e_usuario").innerHTML = "";
 
+            // ponemos el foco en el campo de texto usuario
+            document.getElementById("usuario").focus();
+        });
     }
     else {
         //colo OK en la etiqueta e_usuario
@@ -160,44 +168,42 @@ document.getElementById("apellidos").addEventListener("blur", (event) => {
 });
 
 // listener del campo de texto contraseña
-document.getElementById("contrasena").addEventListener("keyup", (event) => {
-    // si hay mas de 8 caracteres
-    if (event.target.value.length >= 8) {
-        //colo OK en la etiqueta e_contrasena
-        document.getElementById("e_contrasena").innerHTML = "OK";
-        document.getElementById("e_contrasena").style.color = "green";
-    } else {
-        //colo OK en la etiqueta e_contrasena
-        document.getElementById("e_contrasena").innerHTML = "";
-    }
-});
+// document.getElementById("contrasena").addEventListener("keyup", (event) => {
+//     // si hay mas de 8 caracteres
+//     if (event.target.value.length >= 8) {
+//         //colo OK en la etiqueta e_contrasena
+//         document.getElementById("e_contrasena").innerHTML = "OK";
+//         document.getElementById("e_contrasena").style.color = "green";
+//     } else {
+//         //colo OK en la etiqueta e_contrasena
+//         document.getElementById("e_contrasena").innerHTML = "";
+//     }
+// });
 
 // listener del campo de texto contraseña unfocus
-document.getElementById("contrasena").addEventListener("blur", (event) => {
-    // si no hay mas de 8 caracteres
-    if (event.target.value.length < 8) {
-        // mostramos alerta de error
+// document.getElementById("contrasena").addEventListener("blur", (event) => {
+//     // si no hay mas de 8 caracteres
+//     if (event.target.value.length < 8) {
+//         // mostramos alerta de error
 
-        swal({
-            title: "Información",
-            text: "La contraseña debe tener al menos 8 caracteres!",
-            icon: "info",
+//         swal({
+//             title: "Información",
+//             text: "La contraseña debe tener al menos 8 caracteres!",
+//             icon: "info",
 
-            buttons: {
-                Ok: "Ok",
-            },
-        })
-        .then((value) => {
-            // coloca el foco en el campo de texto contraseña
-            document.getElementById("contrasena").focus();
+//             buttons: {
+//                 Ok: "Ok",
+//             },
+//         })
+//         .then((value) => {
+//             // coloca el foco en el campo de texto contraseña
+//             document.getElementById("contrasena").focus();
                 
-            // borramos el valor del campo de texto contraseña
-            event.target.value = "";
-        });
-    
-    }
-
-});
+//             // borramos el valor del campo de texto contraseña
+//             event.target.value = "";
+//         });
+//     }
+// });
 
 // listener del campo de texto email
 document.getElementById("correo").addEventListener("keyup", (event) => {
@@ -219,7 +225,7 @@ document.getElementById("correo").addEventListener("blur", (event) => {
     // Define our regular expression.
     var validEmail =  /^\w+([.-_+]?\w+)*@\w+([.-]?\w+)*(\.\w{2,10})+$/;
 
-    // si el email no tiene el formato correcto
+    // si el email no tiene el formato correcto y el campo no esta vacio
     if (!validEmail.test(event.target.value)) {
         // mostramos alerta de error
         swal({
@@ -246,7 +252,6 @@ document.getElementById("correo").addEventListener("blur", (event) => {
 
 });
 
-
 // listener del campo de texto telefono que solo acepta numeros y como maximo 10 caracteres
 document.getElementById("telefono").addEventListener("keyup", (event) => {
 
@@ -260,22 +265,76 @@ document.getElementById("telefono").addEventListener("keyup", (event) => {
     if (event.target.value.length > 10) {
         // borramos el ultimo caracter
         event.target.value = event.target.value.slice(0, -1);
+    } 
 
+    // si el telefono tiene mas 10 caracteres
+    if (event.target.value.length == 10) {
         // coloco OK en la etiqueta e_telefono
         document.getElementById("e_telefono").innerHTML = "OK";
         document.getElementById("e_telefono").style.color = "green";
-    } 
-    else {
+    } else {
         // coloco OK en la etiqueta e_telefono
         document.getElementById("e_telefono").innerHTML = "";
     }
 
 });
 
-
 function guardar_usuario(){
-    console.log("Nuevo usuario");
+    console.log("Guardando nuevo usuario...");
 
+    // validamos que e_usuario tenga un valor OK
+    if (document.getElementById("e_usuario").innerHTML != "OK") {
+        // nos concentramos en el campo de texto usuario
+        document.getElementById("usuario").focus();
+        return false;
+    }
+
+    // validamos que e_nombre tenga un valor OK
+    if (document.getElementById("e_nombre").innerHTML != "OK") {
+        // nos concentramos en el campo de texto nombres
+        document.getElementById("nombre").focus();
+        return false;
+    }
+
+    // validamos que e_apellidos tenga un valor OK
+    if (document.getElementById("e_apellidos").innerHTML != "OK") {
+        // nos concentramos en el campo de texto apellidos
+        document.getElementById("apellidos").focus();
+        return false;
+    }
+
+    // validamos que e_correro tenga un valor OK
+    if (document.getElementById("e_correo").innerHTML != "OK") {
+        // nos concentramos en el campo de texto correo
+        document.getElementById("correo").focus();
+        return false;
+    }
+
+    // validamos que e_telefono tenga un valor OK
+    if (document.getElementById("e_telefono").innerHTML != "OK") {
+        // nos concentramos en el campo de texto telefono
+        document.getElementById("telefono").focus();
+        return false;
+    }
+
+    // validamos que la fecha de nacimiento no sea mayor a la fecha de ingreso
+    if (document.getElementById("fecha_nacimiento").value > document.getElementById("fecha_ingreso").value) {
+        // mostramos alerta de error
+        swal({
+            title: "Información",
+            text: "La fecha de nacimiento no puede ser mayor a la fecha de ingreso!",
+            icon: "info",
+
+            buttons: {
+                Ok: "Ok",
+            },
+        })
+
+        // nos concentramos en el campo de texto fecha_ingreso
+        document.getElementById("fecha_ingreso").focus();
+        return false;
+    }
+    
     // mostramos una alerta de confirmacion
     swal({
         title: "Confirmación",
@@ -291,10 +350,10 @@ function guardar_usuario(){
         switch (value) {
             case "Si":
                 document.getElementById('form').submit();
-                console.log('Se envio la solictud');
+                console.log('Se envio la solictud para crear el usuario');
                 break;
             case "No":
-                swal("Cancelado", "No se creo el usuario", "error");
+                // swal("Cancelado", "No se creo el usuario", "error");
                 break;
         }
     });

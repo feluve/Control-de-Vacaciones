@@ -13,6 +13,7 @@ import os
 import environ
 
 import openpyxl
+from openpyxl_image_loader import SheetImageLoader
 
 from datetime import datetime
 
@@ -30,18 +31,16 @@ def master(request):
 
 @login_required()
 # decorador para verificar si usuario tiene el rol de admin o RH
-@user_passes_test(lambda u: u.perfil.rol == 'admin' or u.perfil.rol == 'RH')
-def carga_usuarios(request):
+# @user_passes_test(lambda u: u.perfil.rol == 'admin' or u.perfil.rol == 'RH')
+def carga_usuarios_excel(request):
 
-    print("")
     print("Carga de usuarios")
-    print("")
 
     # print(request.FILES)
     # print(request.POST)
 
     if "GET" == request.method:
-        return render(request, 'carga_usuarios.html', {})
+        return render(request, 'carga_usuarios_excel.html', {})
     else:
         excel_file = request.FILES["excel_file"]
         # you may put validations here to check extension or file size
@@ -51,20 +50,50 @@ def carga_usuarios(request):
         worksheet = wb["Hoja1"]
         # print(worksheet)
 
+        # # calling the image_loader
+        # image_loader = SheetImageLoader(worksheet)
+
+        # # get the image (put the cell you need instead of 'A1')
+        # imagen = image_loader.get('N3')
+
+        # print("**********")
+        # print(imagen)
+        # print(type(imagen))
+        # print("**********")
+
+        # fs = FileSystemStorage()
+        # filename = fs.save('hola', imagen)
+        # uploaded_file_url = fs.url(filename)
+
+        # print('imagen guardada en: ', uploaded_file_url)
+
+        # showing the image
+        # image.show()
+
+        # saving the image
+        # image.save('my_path/image_name.jpg')
+
         excel_data = list()
         usuarios_excel = list()
         # iterating over the rows and
         # getting value from each cell in row
         for row in worksheet.iter_rows():
             row_data = list()
+            c = 0
             for cell in row:
                 row_data.append(str(cell.value))
+
+                # if c == 6:
+                #     print("esta es la fecha de ingreso")
+                #     row_data.append(str(cell.value))
+                # c += 1
 
             if row_data[0] == "None":
                 print("usuario vacio")
             else:
                 excel_data.append(row_data)
 
+        # usuario a partir de la segunda fila
         for i in range(0, len(excel_data) - 2):
             usuarios_excel.append(excel_data[i + 2])
 
@@ -74,23 +103,31 @@ def carga_usuarios(request):
             print(usuarios_excel)
 
             print("Guardando usuarios en la base de datos")
-            guardar_usuarios_excel(usuarios_excel)
+            guardar_usuarios_excel(usuarios_excel, request)
         else:
             print("No hay usuarios para guardar en la base de datos")
 
         context = {
-            "excel_data": excel_data
+            'excel_data': excel_data,
+            'usuarios_excel': usuarios_excel,
         }
 
-        return render(request, 'carga_usuarios.html', context)
+        return render(request, 'carga_usuarios_excel.html', context)
+
+# decorador para verificar si usuario tiene el rol de admin o RH
+# @user_passes_test(lambda u: u.perfil.rol == 'admin' or u.perfil.rol == 'RH')
 
 
-# crear una funcion que alamcena los usuarios del excel en la base de datos
-def guardar_usuarios_excel(usuarios_excel):
+def guardar_usuarios_excel(usuarios_excel, request):
 
     n_usuarios = 0
 
     for u in usuarios_excel:
+
+        # print("")
+        # print("fecha_ingreso: ", u[6])
+        # print("fecha_ingreso tipo: ", type(u[6]))
+        # print("")
 
         usuario = u[0].replace(" ", "")
         nombre = u[1]
@@ -100,10 +137,10 @@ def guardar_usuarios_excel(usuarios_excel):
         telefono = u[5].replace(" ", "")
         # convertimos la fecha de ingreso a formato datetime con el formato año-mes-dia
         fecha_ingreso = datetime.strptime(
-            u[6].replace(" ", ""), '%Y-%m-%d').date()
+            u[6], '%Y-%m-%d %H:%M:%S').date()
         # convertimos la fecha de nacimiento a formato datetime con el formato año-mes-dia
         fecha_nacimiento = datetime.strptime(
-            u[7].replace(" ", ""), '%Y-%m-%d').date()
+            u[7], '%Y-%m-%d %H:%M:%S').date()
         jefe = u[8]
         area = u[9].replace(" ", "")
         rol = u[10].replace(" ", "")
@@ -116,32 +153,24 @@ def guardar_usuarios_excel(usuarios_excel):
         # imagen del usuario
         imagen = u[12].replace(" ", "")
 
-        # imprimir en consola los datos del usuario
-        # print("usuario: ", usuario)
-        # print("nombre: ", nombre)
-        # print("apellidos: ", apellidos)
-        # print("contrasena: ", contrasena)
-        # print("correo: ", correo)
-        # print("telefono: ", telefono)
-        # print("fecha_ingreso: ", fecha_ingreso)
-        # print("fecha_nacimiento: ", fecha_nacimiento)
-        # print("jefe: ", jefe)
-        # print("area: ", area)
+        # # crear un nuevo usuario del modelo User
+        # nuevo_usuario = User.objects.create_user(
+        #     username=usuario, first_name=nombre, last_name=apellidos, password=contrasena, email=correo)
+        # # imprimir en consola usuario guardado con exito
+        # print("[+] Usuario guardado con exito")
 
-        # crear un nuevo usuario del modelo User
-        nuevo_usuario = User.objects.create_user(
-            username=usuario, first_name=nombre, last_name=apellidos, password=contrasena, email=correo)
-        # imprimir en consola usuario guardado con exito
-        print("[+] Usuario guardado con exito")
-
-        # actualizamos el perfil del usuario
-        Perfil.objects.filter(usuario=User.objects.get(username=usuario).pk).update(telefono=telefono, fecha_ingreso=fecha_ingreso,
-                                                                                    fecha_nacimiento=fecha_nacimiento, area=area, dias_vacaciones_disp=dias_vacaciones_disp, vigencia_dias_vacaciones=vigencia_dias_vacaciones, rol=rol, jefe=jefe, semana=semana, imagen=imagen)
-        # imprimir en consola perfil guardado con exito
-        print("[+] Perfil guardado con exito")
+        # # actualizamos el perfil del usuario
+        # Perfil.objects.filter(usuario=User.objects.get(username=usuario).pk).update(telefono=telefono, fecha_ingreso=fecha_ingreso,
+        #                                                                             fecha_nacimiento=fecha_nacimiento, area=area, dias_vacaciones_disp=dias_vacaciones_disp, vigencia_dias_vacaciones=vigencia_dias_vacaciones, rol=rol, jefe=jefe, semana=semana, imagen=imagen)
+        # # imprimir en consola perfil guardado con exito
+        # print("[+] Perfil guardado con exito")
 
         # incrementamos el contador de usuarios
         n_usuarios += 1
+
+        # # enviamos correo de notificacion al usuario
+        # notificacion_usuario_registrado(
+        #     f'{nombre} {apellidos}', str(correo), request)
 
     # imprimir en consola el numero de usuarios guardados
     print("Numero de usuarios guardados correctamente: ", n_usuarios)
@@ -150,6 +179,8 @@ def guardar_usuarios_excel(usuarios_excel):
 
 
 @login_required()
+# decorador para verificar si usuario tiene el rol de admin o RH
+@user_passes_test(lambda u: u.perfil.rol == 'admin' or u.perfil.rol == 'RH')
 def nuevo_usuario(request):
 
     # obtenemos del modelo User todos los campos username
@@ -169,12 +200,15 @@ def nuevo_usuario(request):
 
 
 @ login_required()
+# decorador para verificar si usuario tiene el rol de admin o RH
+@user_passes_test(lambda u: u.perfil.rol == 'admin' or u.perfil.rol == 'RH')
 def guardar_nuevo_usuario(request):
 
     usuario = request.POST.get("usuario")
     nombre = request.POST.get("nombre")
     apellidos = request.POST.get("apellidos")
-    contrasena = request.POST.get("contrasena")
+    # contrasena = request.POST.get("contrasena")
+    contrasena = "neo"
     correo = request.POST.get("correo")
     telefono = request.POST.get("telefono")
     fecha_ingreso = request.POST.get("fecha_ingreso")
@@ -188,11 +222,13 @@ def guardar_nuevo_usuario(request):
     # establecemos que la vigencia de los dias de vacaciones es la fecha de ingreso para que el proximo inicio de sesion calcule los dias de vacaciones y la vigencia
     vigencia_dias_vacaciones = request.POST.get("fecha_ingreso")
 
-    # imagen del usuario
-    imagen = request.FILES['imagen']
-    fs = FileSystemStorage()
-    filename = fs.save(imagen.name, imagen)
-    uploaded_file_url = fs.url(filename)
+    imagen = None
+    #  si imagen es diferente de None
+    if len(request.FILES) != 0:
+        imagen = request.FILES['imagen']
+        fs = FileSystemStorage()
+        filename = fs.save(imagen.name, imagen)
+        uploaded_file_url = fs.url(filename)
 
     # crear un nuevo usuario del modelo User
     nuevo_usuario = User.objects.create_user(
@@ -201,13 +237,78 @@ def guardar_nuevo_usuario(request):
     print("[+] Usuario guardado con exito")
 
     # actualizamos el perfil del usuario
-    Perfil.objects.filter(usuario=User.objects.get(username=usuario).pk).update(telefono=telefono, fecha_ingreso=fecha_ingreso,
-                                                                                fecha_nacimiento=fecha_nacimiento, area=area, dias_vacaciones_disp=dias_vacaciones_disp, vigencia_dias_vacaciones=vigencia_dias_vacaciones, rol=rol, jefe=jefe, semana=semana, imagen=imagen.name)
+    # si imagen es diferente de None
+    if imagen != None:
+        Perfil.objects.filter(usuario=User.objects.get(username=usuario).pk).update(telefono=telefono, fecha_ingreso=fecha_ingreso,
+                                                                                    fecha_nacimiento=fecha_nacimiento, area=area, dias_vacaciones_disp=dias_vacaciones_disp, vigencia_dias_vacaciones=vigencia_dias_vacaciones, rol=rol, jefe=jefe, semana=semana, imagen=imagen.name)
+    else:
+        Perfil.objects.filter(usuario=User.objects.get(username=usuario).pk).update(telefono=telefono, fecha_ingreso=fecha_ingreso,
+                                                                                    fecha_nacimiento=fecha_nacimiento, area=area, dias_vacaciones_disp=dias_vacaciones_disp, vigencia_dias_vacaciones=vigencia_dias_vacaciones, rol=rol, jefe=jefe, semana=semana)
+
     # imprimir en consola perfil guardado con exito
     print("[+] Perfil guardado con exito")
 
+    # genera un token aleatorio
+    token = generar_token()
+
+    # imprime en consola el token generado
+    print(f"Token generado: {token}")
+
+    # realiza un update en el modelo perfil para actualizar el campo token
+    Perfil.objects.filter(usuario=User.objects.get(
+        username=usuario).pk).update(token=token)
+
+    # imrpime en consola
+    print("[+] Token actualizado con exito")
+
+    # Generamos el link de recuperacion
+    link = f'{os.environ.get("DOMINIO")}/contrasena_nueva/{usuario}/{token}'
+
+    # imprimir en consola link
+    print(f"Link: {link}")
+
+    # contexto para el correo
+    context_correo = {
+        'usuario': usuario,
+        'nombre': f'{nombre} {apellidos}',
+        'area': area,
+        'fecha_ingreso': formato_fecha(fecha_ingreso),
+        'jefe': jefe,
+        'semana': semana,
+        'fecha_nacimiento': formato_fecha(fecha_nacimiento),
+        'telefono': telefono,
+        'link': link,
+    }
+
+    # enviamos correo de notificacion al usuario
+    notificacion_usuario_registrado(
+        context_correo, str(correo), request)
+
     # retonamos al DOMINO mas el path de la vista
-    return redirect('/')
+    # return redirect('/')
+
+    aviso = 'Usuario registrado con exito.'
+    # remplazar de la variable aviso los espacios por guiones bajos
+    aviso = aviso.replace(' ', '_')
+
+    return redirect(f'/aviso/{aviso}')
+
+# funcion para enviar correo de notificacion al usuario
+
+
+def notificacion_usuario_registrado(context_correo, correo_usuario, request):
+
+    to = [correo_usuario]
+
+    cc = [os.environ.get('EMAIL_CC')]
+    subject = f"Registo de usuario"
+
+    correo_contenido = render_to_string(
+        'correo_registro_usuario.html', context_correo, request=request)
+    enviar_correo_plantilla(correo_contenido, subject, to)
+
+    # imprimir en consola
+    print("[+] Correo de registro de usuario enviado con exito")
 
 
 # -----------------------Recupracion de contraseña-----------------------
@@ -230,10 +331,8 @@ def link_recuperacion(request, usuario):
     # genera un token aleatorio
     token = generar_token()
 
-    # imprime en consola el token
-    print("")
+    # imprime en consola el token generado
     print(f"Token: {token}")
-    print("")
 
     # realiza un update en el modelo perfil para actualizar el campo token
     Perfil.objects.filter(usuario=User.objects.get(
@@ -242,16 +341,14 @@ def link_recuperacion(request, usuario):
     # imrpime en consola
     print("[+] Token actualizado con exito")
 
-    # Obtenermo el nombre completo del usuario
+    # Obtenermos el nombre completo del usuario
     nombre = f'{User.objects.get(username=usuario).first_name} {User.objects.get(username=usuario).last_name}'
 
     # Generamos el link de recuperacion
     link = f'{os.environ.get("DOMINIO")}/contrasena_nueva/{usuario}/{token}'
 
     # imprimir en consola link
-    print("")
     print(f"Link: {link}")
-    print("")
 
     context_correo = {
         'nombre': nombre,
@@ -426,3 +523,52 @@ def desencriptar(cadena):
         caracter = chr(caracter)
         cadena_desencriptada += caracter
     return cadena_desencriptada
+
+
+# funcion que convierte una fecha en el fromato 2022-01-10 a un objeto date
+
+
+def convert_to_date(date):
+    import datetime
+    # convertir la cadena 2022-01-10 a un objeto date
+    date = datetime.datetime.strptime(date, '%Y-%m-%d').date()
+    return date
+
+# funcion recibe como entrada un objeto datetime obtiene el mes y devuelve el nombre del mes a 3 letras en español
+
+
+def get_month_name(date):
+    # obtener el mes
+    month = date.month
+    # obtener el nombre del mes
+    month_name = {
+        1: 'Ene',
+        2: 'Feb',
+        3: 'Mar',
+        4: 'Abr',
+        5: 'May',
+        6: 'Jun',
+        7: 'Jul',
+        8: 'Ago',
+        9: 'Sep',
+        10: 'Oct',
+        11: 'Nov',
+        12: 'Dic',
+    }[month]
+    return month_name
+
+# funcion que recibe como entrada un string en el formato 2022-01-10 y devuelve en string el dia nombre del mes y año
+
+
+def formato_fecha(date):
+    # convertir la cadena 2022-01-10 a un objeto date
+    date = convert_to_date(date)
+    # obtener el nombre del mes
+    month_name = get_month_name(date)
+    # obtener el dia
+    day = date.day
+    # obtener el año
+    year = date.year
+    # concatenar el dia, el nombre del mes y el año
+    date = f'{day}-{month_name}-{year}'
+    return date
