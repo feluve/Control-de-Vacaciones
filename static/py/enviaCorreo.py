@@ -37,6 +37,8 @@ def enviar_correo_simple(subject, msg, to):
 
 
 def enviar_correo_plantilla(correo_contenido, subject, to, cc_flag=False):
+    print("Funcion: enviar_correo_plantilla")
+
     try:
         print("[py<] Enviando correo...")
 

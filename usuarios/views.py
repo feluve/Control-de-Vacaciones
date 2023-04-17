@@ -4,9 +4,7 @@ from django.contrib.auth.models import User
 from vacaciones.models import Perfil
 
 from django.core.files.storage import FileSystemStorage
-
 from static.py.enviaCorreo import enviar_correo_simple, enviar_correo_plantilla
-
 from django.template.loader import render_to_string
 
 import os
@@ -31,10 +29,9 @@ def master(request):
 
 @login_required()
 # decorador para verificar si usuario tiene el rol de admin o RH
-# @user_passes_test(lambda u: u.perfil.rol == 'admin' or u.perfil.rol == 'RH')
+@user_passes_test(lambda u: u.perfil.rol == 'admin' or u.perfil.rol == 'RH')
 def carga_usuarios_excel(request):
-
-    print("Carga de usuarios")
+    print("Vista: carga_usuarios_excel")
 
     # print(request.FILES)
     # print(request.POST)
@@ -114,11 +111,12 @@ def carga_usuarios_excel(request):
 
         return render(request, 'carga_usuarios_excel.html', context)
 
+
+@ login_required()
 # decorador para verificar si usuario tiene el rol de admin o RH
-# @user_passes_test(lambda u: u.perfil.rol == 'admin' or u.perfil.rol == 'RH')
-
-
+@user_passes_test(lambda u: u.perfil.rol == 'admin' or u.perfil.rol == 'RH')
 def guardar_usuarios_excel(usuarios_excel, request):
+    print("Vista: guardar_usuarios_excel")
 
     n_usuarios = 0
 
@@ -182,6 +180,7 @@ def guardar_usuarios_excel(usuarios_excel, request):
 # decorador para verificar si usuario tiene el rol de admin o RH
 @user_passes_test(lambda u: u.perfil.rol == 'admin' or u.perfil.rol == 'RH')
 def nuevo_usuario(request):
+    print("Vista: nuevo_usuario")
 
     # obtenemos del modelo User todos los campos username
     lista_usuarios = User.objects.values_list('username', flat=True)
@@ -203,6 +202,7 @@ def nuevo_usuario(request):
 # decorador para verificar si usuario tiene el rol de admin o RH
 @user_passes_test(lambda u: u.perfil.rol == 'admin' or u.perfil.rol == 'RH')
 def guardar_nuevo_usuario(request):
+    print("Vista: guardar_nuevo_usuario")
 
     usuario = request.POST.get("usuario")
     nombre = request.POST.get("nombre")
@@ -297,6 +297,7 @@ def guardar_nuevo_usuario(request):
 
 
 def notificacion_usuario_registrado(context_correo, correo_usuario, request):
+    print("Funcion: notificacion_usuario_registrado")
 
     to = [correo_usuario]
 
@@ -314,6 +315,7 @@ def notificacion_usuario_registrado(context_correo, correo_usuario, request):
 # -----------------------Recupracion de contraseña-----------------------
 
 def olvide_contrasena(request):
+    print("Vista: olvide_contrasena")
 
     # consulta a la base de datos para obtener todos nombres de usuario
     usuarios = list(User.objects.all().values_list('username', flat=True))
@@ -327,6 +329,7 @@ def olvide_contrasena(request):
 
 
 def link_recuperacion(request, usuario):
+    print("Vista: link_recuperacion")
 
     # genera un token aleatorio
     token = generar_token()
@@ -380,6 +383,7 @@ def link_recuperacion(request, usuario):
 
 
 def contrasena_nueva(request, usuario, token):
+    print("Vista: contrasena_nueva")
 
     # token recibido por parametro
     print(f"Token recibido: {token}")
@@ -415,6 +419,7 @@ def contrasena_nueva(request, usuario, token):
 
 
 def cambiar_contrasena(request, usuario, token, contrasena):
+    print("Vista: cambiar_contrasena")
 
     # imprimimos en consola el token que se recibe por parametro
     print(f"Token recibido: {token}")
@@ -498,6 +503,8 @@ def cambiar_contrasena(request, usuario, token, contrasena):
 
 # @login_required()
 def aviso(request, aviso):
+    print("Vista: aviso")
+
     context = {
         'aviso': aviso
     }
@@ -509,6 +516,8 @@ def aviso(request, aviso):
 
 
 def generar_token():
+    print("Funcion: generar_token")
+
     # import secrets
     import secrets
     return secrets.token_hex(32)
@@ -517,6 +526,8 @@ def generar_token():
 
 
 def desencriptar(cadena):
+    print("Funcion: desencriptar")
+
     cadena_desencriptada = ""
     for caracter in cadena:
         caracter = ord(caracter) - 3
@@ -529,6 +540,8 @@ def desencriptar(cadena):
 
 
 def convert_to_date(date):
+    print("Funcion: convert_to_date")
+
     import datetime
     # convertir la cadena 2022-01-10 a un objeto date
     date = datetime.datetime.strptime(date, '%Y-%m-%d').date()
@@ -538,6 +551,8 @@ def convert_to_date(date):
 
 
 def get_month_name(date):
+    print("Funcion: get_month_name")
+
     # obtener el mes
     month = date.month
     # obtener el nombre del mes
@@ -561,6 +576,8 @@ def get_month_name(date):
 
 
 def formato_fecha(date):
+    print("Funcion: formato_fecha")
+
     # convertir la cadena 2022-01-10 a un objeto date
     date = convert_to_date(date)
     # obtener el nombre del mes

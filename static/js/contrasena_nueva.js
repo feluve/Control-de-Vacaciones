@@ -1,8 +1,17 @@
 window.addEventListener("load", (event) => {
-    console.log("Cargando contraseña nueva");
+    console.log("Pagina contraseña nueva cargada completamente.");
 
     inicializar();
 
+});
+
+// listener para detectar cuando se regresa a la pagina desde el cache
+window.addEventListener('pageshow', function(event) {
+    if (event.persisted) {
+        //console.log("Pagina cargada desde el cache.");
+        // recargar la pagina actual
+        location.reload();
+    }
 });
 
 // funcion que inicializa los estados de la etiquetas

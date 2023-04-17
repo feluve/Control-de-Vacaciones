@@ -2,6 +2,7 @@ from datetime import date, datetime
 
 
 def calcula_dias_vacaciones_ley(fecha_ingreso):
+    print("Funcion: calcula_dias_vacaciones_ley")
 
     print("[py] Calculando dias de vacaciones...")
 

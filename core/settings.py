@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     'core',
     'vacaciones',
     'usuarios',
+    'asistencia',
     'import_export',
 ]
 
@@ -106,7 +107,7 @@ TIME_ZONE = 'America/Mexico_City'
 
 USE_I18N = True
 
-USE_TZ = True
+USE_TZ = False
 
 
 # Static files (CSS, JavaScript, Images)

@@ -20,6 +20,7 @@ import uuid
 
 @login_required()
 def vacaciones(request):
+    print("Vista: vacaciones")
 
     # cursos = Cursos.objects.all()
     # cursos = Cursos.objects.all()[:5]
@@ -69,7 +70,7 @@ def vacaciones(request):
     if (fecha_vigencia_actual < datetime.now().date()):
         print("**************************+***")
         print(
-            "Vencio la fecha de vigencia se recalculan dia de vacaiones y fecha de vigencia")
+            "Vencio la fecha de vigencia se recalculan dia de vacaciones y fecha de vigencia")
         print("**************************+***")
 
         dias_disponibles = calcula_dias_vacaciones_ley(fecha_ingreso)
@@ -129,7 +130,7 @@ def vacaciones(request):
     #     estado="Aprobada", usuario=request.user, fecha__gte=f1, fecha__lte=f2)
 
     # Verificamos si el usuario tiene una solictud pendiente o si sus dias siponibles con 0
-    if (len(solicitudes_enviadas_pendientes) > 0 or dias_disponibles == 0):
+    if (len(solicitudes_enviadas_pendientes) > 0 or dias_disponibles <= 0):
         print(
             f"[-] {request.user} tienes {len(solicitudes_enviadas_pendientes)} solictude(s) pendiente(s) y {dias_disponibles} dia(s) disponible(s)")
         disabled = "disabled"
@@ -180,6 +181,7 @@ def vacaciones(request):
 
 @login_required()
 def registra_solicitud(request, dias_solicitados, fecha_solicitud, fecha_final, comentario_solicitud):
+    print("Vista: registra_solicitud")
 
     # fecha_solicitud = request.POST["fecha_sol"]
     # dias_solicitados = int(request.POST["dias_sol"])
@@ -255,6 +257,7 @@ def registra_solicitud(request, dias_solicitados, fecha_solicitud, fecha_final, 
 
 @login_required()
 def aprobarSolicitud(request, id, comentario):
+    print("Vista: aprobarSolicitud")
 
     # Obtenemos solicitud a aprobar
     solicitud = Solicitud_Vacaciones.objects.get(id=id)
@@ -312,6 +315,7 @@ def aprobarSolicitud(request, id, comentario):
 
 @login_required()
 def rechazarSolicitud(request, id, comentario):
+    print("Vista: rechazarSolicitud")
 
     solicitud = Solicitud_Vacaciones.objects.get(id=id)
     solicitud.estado = "Rechazada"
@@ -359,6 +363,7 @@ def rechazarSolicitud(request, id, comentario):
 
 
 def salir(request):
+    print("Vista: salir")
 
     logout(request)
 
@@ -371,6 +376,8 @@ def salir(request):
 
 
 def mes_formato(mes):
+    print("Funcion: mes_formato")
+
     meses = {
         1: "Enero",
         2: "Febrero",
@@ -391,6 +398,8 @@ def mes_formato(mes):
 
 
 def fecha_str_format(fecha):
+    print("Funcion: fecha_str_format")
+
     fecha_obj = datetime.strptime(fecha, '%Y-%m-%d').date()
     fecha_srt = f"{fecha_obj.day}-{mes_formato(fecha_obj.month)[:3]}-{fecha_obj.year}"
     return fecha_srt
@@ -399,5 +408,7 @@ def fecha_str_format(fecha):
 
 
 def fecha_obj_str_format(fecha_obj):
+    print("Funcion: fecha_obj_str_format")
+
     fecha_srt = f"{fecha_obj.day}-{mes_formato(fecha_obj.month)[:3]}-{fecha_obj.year}"
     return fecha_srt

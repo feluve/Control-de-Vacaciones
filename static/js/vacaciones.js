@@ -1,11 +1,38 @@
-
 window.addEventListener("load", (event) => {
-    console.log("Pagina cargada completamente.");
+    console.log("Pagina vacaciones cargada completamente.");
 
-    document.getElementById("num_dias_sol").value = document.getElementById('-').getAttribute('data-dias_min_sol')
-
+    document.getElementById("num_dias_sol").value = document.getElementById('-').getAttribute('data-dias_min_sol');
 });
 
+// ****************************************************************************************
+// funcion para hacer focus en el input date
+function muestra_calendario(){
+    // console.log("Muestra calendario")
+    // abrimos el calendario
+    document.getElementById("fecha_sol").focus();
+}
+// listener para mostrar el datepicker cuando se concentra el input date
+document.getElementById("fecha_sol").addEventListener('focus', function(event) {
+    event.target.showPicker();
+    // console.log("Mostrando el datepicker");
+});
+// listener que detecta un click en el div que contiene el input date y lo enfoca
+var miDiv = document.getElementById("divDate");
+miDiv.addEventListener("click", function() {
+    // nos concentramos en el input date
+    document.getElementById("fecha_sol").focus();
+});
+// ****************************************************************************************
+
+// listener para detectar cuando se regresa a la pagina desde el cache
+window.addEventListener('pageshow', function(event) {
+    if (event.persisted) {
+        //console.log("Pagina cargada desde el cache.");
+        // recargar la pagina actual
+        location.reload();
+    }
+});
+  
 function resta_dias(){
 
     const dias_min = parseInt(document.getElementById("-").getAttribute("data-dias_min_sol"));
@@ -389,14 +416,6 @@ swal({
 });
 
 }
-
-
-function muestra_calendario(){
-    console.log("Muestra calendario")
-    // abrimos el calendario
-    document.getElementById("fecha_sol").click();
-}
-
 
 // Funcion para formatear fecha
 function format_fecha(fecha_srt) {

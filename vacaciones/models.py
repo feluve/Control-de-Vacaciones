@@ -33,12 +33,14 @@ class Perfil(models.Model):
 
     JEFES = [
         ('Javier Gonzalez', 'Javier Gonzalez'),
-        ('Jovani Gonzalez', 'Jovani Gonzalez'),
-        ('Erika Chagolla', 'Erika Gonzalez'),
-        ('Victor Valdez', 'Victor Valdez'),
-        ('Aldo Gacía', 'Aldo Gacía'),
-        ('Jorge Hernandez', 'Jorge Hernandez'),
-        ('Fransisco Vargas', 'Fransisco Vargas'),
+        ('Javier Ramirez', 'Javier Ramirez'),
+        ('Yovani Gonzalez', 'Yovani Gonzalez'),
+        ('Ivan Gonzalez', 'Ivan Gonzalez')
+        # ('Erika Chagolla', 'Erika Gonzalez'),
+        # ('Victor Valdez', 'Victor Valdez'),
+        # ('Aldo Gacía', 'Aldo Gacía'),
+        # ('Jorge Hernandez', 'Jorge Hernandez'),
+        # ('Fransisco Vargas', 'Fransisco Vargas'),
     ]
 
     ROL = [
@@ -46,13 +48,12 @@ class Perfil(models.Model):
         ('Supervisor', 'Supervisor'),
         ('Gerente', 'Gerente'),
         ('RH', 'RH'),
-        ('Director', 'Director'),
-        ('Dueño', 'Dueño'),
+        ('Directivo', 'Directivo'),
         ('admin', 'admin')
     ]
     SEMANA = [
-        ('Normal', 'Normal'),
-        ('Inglesa', 'Inglesa')
+        ('Normal', 'Lunes-Sabado'),
+        ('Inglesa', 'Lunes-Viernes')
     ]
 
     usuario = models.OneToOneField(
@@ -63,7 +64,7 @@ class Perfil(models.Model):
     fecha_ingreso = models.DateField(null=True, blank=True)
     area = models.CharField(max_length=15, null=True,
                             blank=True, choices=AREAS)
-    dias_vacaciones_disp = models.PositiveSmallIntegerField(
+    dias_vacaciones_disp = models.SmallIntegerField(
         null=True, blank=True)
     vigencia_dias_vacaciones = models.DateField(null=True, blank=True)
     jefe = models.CharField(max_length=50, null=True,
@@ -74,6 +75,7 @@ class Perfil(models.Model):
     semana = models.CharField(max_length=50, null=True,
                               blank=True, choices=SEMANA, default="Normal")
     token = models.CharField(max_length=100, null=True, blank=True)
+    id_asistencia = models.PositiveSmallIntegerField(null=True, blank=True)
 
     def __str__(self):
         return self.rol
@@ -109,12 +111,14 @@ class Solicitud_Vacaciones(models.Model):
 
     JEFES = [
         ('Javier Gonzalez', 'Javier Gonzalez'),
-        ('Jovani Gonzalez', 'Jovani Gonzalez'),
-        ('Erika Chagolla', 'Erika Chagolla'),
-        ('Victor Vales', 'Victor Vales'),
-        ('Aldo', 'Aldo'),
-        ('Jorge', 'Jorge'),
-        ('Fransisco', 'Fransisco'),
+        ('Javier Ramirez', 'Javier Ramirez'),
+        ('Yovani Gonzalez', 'Yovani Gonzalez'),
+        ('Ivan Gonzalez', 'Ivan Gonzalez')
+        # ('Erika Chagolla', 'Erika Gonzalez'),
+        # ('Victor Valdez', 'Victor Valdez'),
+        # ('Aldo Gacía', 'Aldo Gacía'),
+        # ('Jorge Hernandez', 'Jorge Hernandez'),
+        # ('Fransisco Vargas', 'Fransisco Vargas'),
     ]
 
     usuario = models.CharField(max_length=50)

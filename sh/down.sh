@@ -34,7 +34,6 @@ kill $(ps aux | grep '[d]own.sh' | awk '{print $2}')
 # matar el proceso llamada python3
 kill $(ps aux | grep '[p]ython3' | awk '{print $2}')
 
-
 # del comando uptime obtener load average
 load=$(uptime | awk '{print $9,$10,$11}')
 

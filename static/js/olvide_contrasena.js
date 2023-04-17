@@ -1,5 +1,5 @@
 window.addEventListener("load", (event) => {
-    console.log("Olvide contraseña");
+    console.log("Pagina olvide contraseña cargada completamente.");
 
 });
 

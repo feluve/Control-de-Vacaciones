@@ -3,6 +3,7 @@ import math
 
 
 def calcula_fecha_vigencia(fecha_ingreso):
+    print("Funcion: calcula_fecha_vigencia")
 
     print("[py<] Calculando fecha de vigencia...")
 

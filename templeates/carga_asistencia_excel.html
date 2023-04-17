@@ -1,0 +1,115 @@
+{% extends 'master.html' %}
+
+{% load static %}
+
+{% block title %}
+Carga de Asistencia
+{% endblock %}
+
+{% block content %}
+
+
+<section>
+
+    <!-- <div class="container py-1">
+        <div class="row">
+            <div class="col">
+                <nav aria-label="breadcrumb" class="bg-light rounded-3 p-3 mb-4">
+                    <ol class="breadcrumb mb-0">
+                        <h2 class="my-0">Cargar Asistencia</h2>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div> -->
+
+    <div class="text-center pt-3">
+        <a class="btn btn-dark" href="/" style="width: 100px;">Inicio</a>
+    </div>
+
+    <div class="text-center pt-4">
+        <form action="/carga_asistencia_excel/" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="file" class="m-1" title="Cargar excel file" name="excel_file" style="border: 1px solid black; padding: 5px;" accept="application/vnd.ms-excel.sheet.macroEnabled.12"
+                required="required">
+            <input type="submit" class="btn btn-success m-1" value="Cargar registros" style="border: 1px solid green; padding:5px; border-radius: 2px; cursor: pointer;">
+        </form>
+    </div>
+
+    <!-- {% for row in excel_data %}
+    {% for cell in row %}
+    {{ cell }}&nbsp;&nbsp;
+    {% endfor %}
+    <br>
+    {% endfor %}
+
+    <br>
+    <br> -->
+
+
+    {% if asistencia_excel != None %}
+    <hr>
+
+    <div class="container pb-4">
+        <div class="col-lg-12">
+            <div class="card mb-8">
+                <div class="col-md-12 px-3 py-3 text-center">
+                    <h3>Registros nuevos: {{ n_asistencia }}</h3>
+                    <h3>Registros existentes: {{ n_asistencia_existente }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container pb-2">
+        <div class="col-lg-12">
+            <div class="card mb-8">
+                <div class="col-md-12 px-3 py-3">
+                    <h2 class="py-3 px-3 text-center">Asistencia</h2>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead class="bg-dark">
+                                <tr>
+                                    <th class="campo_corto">#</th>
+                                    <th class="campo">Usuario</th>
+                                    <th class="campo">Nombre</th>
+                                    <th class="campo">Fecha y Hora</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for usuario in asistencia_excel %}
+                                <tr>
+                                    <td class="registro_corto">{{ forloop.counter }}</td>
+                                    <td class="registro">{{ usuario.0 }}</td>
+                                    <td class="registro">{{ usuario.1 }}</td>
+                                    <td class="registro">{{ usuario.2 }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- {% if asistencia_excel != None %}
+    <div class="container pb-4">
+        <div class="col-lg-12">
+            <div class="card mb-8">
+                <div class="col-md-12 px-3 py-3 text-center">
+                    <button class="btn btn-success">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %} -->
+
+    <div class="p-2 text-center">
+        <h3>{{ error }}</h3>
+    </div>
+
+</section>
+
+{% endblock %}

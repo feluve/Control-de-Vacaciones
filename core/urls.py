@@ -8,6 +8,7 @@ urlpatterns = [
 
     path('', include("vacaciones.urls")),
     path('', include("usuarios.urls")),
+    path('', include("asistencia.urls")),
 
     path("accounts/", include('django.contrib.auth.urls')),
     path("salir/", salir, name="salir"),

@@ -1,5 +1,5 @@
 window.addEventListener("load", (event) => {
-    console.log("Cargando Nuevo usuario");
+    console.log("Pagina usuarios cargada completamente.");
 
     // coloca la fecha actual en el campo de texto fecha_ingreso
     document.getElementById("fecha_ingreso").value = new Date().toISOString().slice(0, 10);
