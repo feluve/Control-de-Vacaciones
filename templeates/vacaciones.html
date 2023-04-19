@@ -271,7 +271,8 @@ Vacaciones
     </div>
     {% endif %}
 
-    {% if usuario_rol != "Empleado" and solicitudes_recibidas_count != 0%}
+
+    {% if solicitudes_recibidas_count != 0%}
     <div class="container pb-4">
         <div class="col-lg-12">
             <div class="card mb-8">
@@ -373,7 +374,7 @@ Vacaciones
     </div>
     {% endif %}
 
-    {% if usuario_rol == "admin" or usuario_rol == "RH" %}
+    {% if user.perfil.rol == "admin" or user.perfil.rol == "RH" %}
     {% if todas_solicitudes_count != 0 %}
     <div class="container pb-4">
         <div class="col-lg-12">
@@ -396,6 +397,7 @@ Vacaciones
                                     <th class="campo">Coment. Solicitante</th>
                                     <th class="campo">Coment. Jefe</th>
                                     <th class="campo">Estatus</th>
+                                    <th class="campo_largo">Opcciones</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -445,6 +447,24 @@ Vacaciones
                                         <button class="btn btn-sm btn-block btn-secondary mx-0 botones">{{ s.estado }}</button>
                                     </td>
                                     {% endif%}
+
+                                    <!-- Opcciones de solicitudes -->
+                                    <td class="opcciones">
+
+                                        {% if s.estado == 'Pendiente' %}
+                                        <!-- <a href="rechazarSolicitud/{{s.id}}" class="btn btn-sm btn-block btn-danger mx-0 botones">Rechazar</a> -->
+                                        <!-- <a href="aprobarSolicitud/{{s.id}}" class="btn btn-sm btn-block btn-success mx-0 botones">Aprobar</a> -->
+
+                                        <button onclick="confirmacionAprobar('{{s.id}}')" class="btn btn-sm btn-block btn-success mx-0 botones">Aprobar</button>
+                                        <button onclick="confirmacionRechazar('{{s.id}}')" class="btn btn-sm btn-block btn-danger mx-0 botones">Rechazar</button>
+                                        {% else %}
+                                        <!-- <a href="rechazarSolicitud/{{s.id}}" class="btn btn-sm btn-block btn-danger mx-0 botones">Rechazar</a> -->
+                                        <!-- <a href="aprobarSolicitud/{{s.id}}" class="btn btn-sm btn-block btn-success mx-0 botones">Aprobar</a> -->
+
+                                        <button disabled class="btn btn-sm btn-block btn-success mx-0 botones">Aprobar</button>
+                                        <button disabled class="btn btn-sm btn-block btn-danger mx-0 botones">Rechazar</button>
+                                        {% endif%}
+                                    </td>
 
                                 </tr>
                                 {% endfor %}

@@ -112,66 +112,90 @@ def carga_usuarios_excel(request):
         return render(request, 'carga_usuarios_excel.html', context)
 
 
-@ login_required()
-# decorador para verificar si usuario tiene el rol de admin o RH
-@user_passes_test(lambda u: u.perfil.rol == 'admin' or u.perfil.rol == 'RH')
 def guardar_usuarios_excel(usuarios_excel, request):
-    print("Vista: guardar_usuarios_excel")
+    print("Funcion: guardar_usuarios_excel")
 
     n_usuarios = 0
 
+    # cargamos usuarios de excel y los guardamos en la base de datos
     for u in usuarios_excel:
 
-        # print("")
-        # print("fecha_ingreso: ", u[6])
-        # print("fecha_ingreso tipo: ", type(u[6]))
-        # print("")
+        print("")
+        print("fecha_ingreso: ", u[5])
+        print("fecha_ingreso tipo: ", type(u[5]))
+        print("")
 
         usuario = u[0].replace(" ", "")
         nombre = u[1]
         apellidos = u[2]
-        contrasena = u[3].replace(" ", "")
-        correo = u[4].replace(" ", "")
-        telefono = u[5].replace(" ", "")
-        # convertimos la fecha de ingreso a formato datetime con el formato año-mes-dia
-        fecha_ingreso = datetime.strptime(
-            u[6], '%Y-%m-%d %H:%M:%S').date()
-        # convertimos la fecha de nacimiento a formato datetime con el formato año-mes-dia
-        fecha_nacimiento = datetime.strptime(
-            u[7], '%Y-%m-%d %H:%M:%S').date()
-        jefe = u[8]
-        area = u[9].replace(" ", "")
-        rol = u[10].replace(" ", "")
-        semana = u[11].replace(" ", "")
+        correo = u[3].replace(" ", "")
+        telefono = u[4].replace(" ", "")
+        # convertimos u[5] a un objeto datetime
+        fecha_ingreso = datetime.strptime(u[5], '%Y-%m-%d %H:%M:%S')
+        # convertimos u[6] a un objeto datetime
+        fecha_nacimiento = datetime.strptime(u[6], '%Y-%m-%d %H:%M:%S')
+        jefe = u[7]
+        area = u[8].replace(" ", "")
+        rol = u[9].replace(" ", "")
+        semana = u[10].replace(" ", "")
+        dias_tomados = u[11].replace(" ", "")
 
         dias_vacaciones_disp = 0  # request.POST.get("dias_vacaciones_disp")
         # establecemos que la vigencia de los dias de vacaciones es la fecha de ingreso para que el proximo inicio de sesion calcule los dias de vacaciones y la vigencia
         vigencia_dias_vacaciones = fecha_ingreso
 
         # imagen del usuario
-        imagen = u[12].replace(" ", "")
+        # imagen = u[12].replace(" ", "")
 
-        # # crear un nuevo usuario del modelo User
-        # nuevo_usuario = User.objects.create_user(
-        #     username=usuario, first_name=nombre, last_name=apellidos, password=contrasena, email=correo)
-        # # imprimir en consola usuario guardado con exito
-        # print("[+] Usuario guardado con exito")
+        # genera un token aleatorio
+        token = generar_token()
 
-        # # actualizamos el perfil del usuario
-        # Perfil.objects.filter(usuario=User.objects.get(username=usuario).pk).update(telefono=telefono, fecha_ingreso=fecha_ingreso,
-        #                                                                             fecha_nacimiento=fecha_nacimiento, area=area, dias_vacaciones_disp=dias_vacaciones_disp, vigencia_dias_vacaciones=vigencia_dias_vacaciones, rol=rol, jefe=jefe, semana=semana, imagen=imagen)
-        # # imprimir en consola perfil guardado con exito
-        # print("[+] Perfil guardado con exito")
+        # imprime en consola el token generado
+        print(f"Token generado: {token}")
+
+        # imrpime en consola
+        print("[+] Token actualizado con exito")
+
+        # crear un nuevo usuario del modelo User
+        nuevo_usuario = User.objects.create_user(
+            username=usuario, first_name=nombre, last_name=apellidos, password="neo", email=correo)
+        # imprimir en consola usuario guardado con exito
+        print("[+] Usuario guardado con exito")
+
+        # actualizamos el perfil del usuario
+        Perfil.objects.filter(usuario=User.objects.get(username=usuario).pk).update(telefono=telefono, fecha_ingreso=fecha_ingreso,
+                                                                                    fecha_nacimiento=fecha_nacimiento, area=area, dias_vacaciones_disp=dias_vacaciones_disp, vigencia_dias_vacaciones=vigencia_dias_vacaciones, rol=rol, jefe=jefe, semana=semana, token=token)
+        # imprimir en consola perfil guardado con exito
+        print("[+] Perfil guardado con exito")
+
+        # Generamos el link de recuperacion
+        link = f'{os.environ.get("DOMINIO")}/contrasena_nueva/{usuario}/{token}'
+
+        # imprimir en consola link
+        print(f"Link: {link}")
+
+        # notificamos al usuario que se ha creado su cuenta
+        # contexto para el correo
+        context_correo = {
+            'usuario': usuario,
+            'nombre': f'{nombre} {apellidos}',
+            'area': area,
+            'fecha_ingreso': formato_fecha(str(fecha_ingreso.date())),
+            'jefe': jefe,
+            'semana': semana,
+            'fecha_nacimiento': formato_fecha(str(fecha_nacimiento.date())),
+            'telefono': telefono,
+            'link': link,
+        }
+
+        # enviamos correo de notificacion al usuario
+        notificacion_usuario_registrado(context_correo, str(correo), request)
 
         # incrementamos el contador de usuarios
         n_usuarios += 1
 
-        # # enviamos correo de notificacion al usuario
-        # notificacion_usuario_registrado(
-        #     f'{nombre} {apellidos}', str(correo), request)
-
     # imprimir en consola el numero de usuarios guardados
-    print("Numero de usuarios guardados correctamente: ", n_usuarios)
+    print("[+] Numero de usuarios guardados correctamente: ", n_usuarios)
 
     return True
 
@@ -191,8 +215,35 @@ def nuevo_usuario(request):
     # convertimos lista_usuarios a una cadena de texto
     lista_usuarios = str(lista_usuarios)
 
+    # importamos la lista de JEFES
+    from vacaciones.models import JEFES, AREAS, ROLES, SEMANA
+
+    # obtenemos los nombres de los jefes
+    jefes = list()
+    for j in JEFES:
+        jefes.append(j[0])
+
+    # obtenemos los nombres de las areas
+    areas = list()
+    for a in AREAS:
+        areas.append(a[0])
+
+    # obtenemos los nombres de los roles
+    roles = list()
+    for r in ROLES:
+        roles.append(r[0])
+
+    # obtenemos los nombres de las semanas
+    semana = list()
+    for s in SEMANA:
+        semana.append(s[0])
+
     context = {
-        'lista_usuarios': lista_usuarios
+        'lista_usuarios': lista_usuarios,
+        'jefes': jefes,
+        'areas': areas,
+        'roles': roles,
+        'semana': semana,
     }
 
     return render(request, "nuevo_usuario.html", context)
@@ -281,8 +332,7 @@ def guardar_nuevo_usuario(request):
     }
 
     # enviamos correo de notificacion al usuario
-    notificacion_usuario_registrado(
-        context_correo, str(correo), request)
+    notificacion_usuario_registrado(context_correo, str(correo), request)
 
     # retonamos al DOMINO mas el path de la vista
     # return redirect('/')
@@ -452,7 +502,7 @@ def cambiar_contrasena(request, usuario, token, contrasena):
 
         # imprime en consola el usuario y la contraseña
         print(f"Usuario: {usuario} - Contraseña: {contrasena}")
-        print("[+] Contraseña cambiada con exito")
+        print("[+] Contraseña generada con exito")
 
         # genra un nuevo token por seguridad
         token_nuevo = generar_token()
@@ -485,7 +535,7 @@ def cambiar_contrasena(request, usuario, token, contrasena):
         enviar_correo_plantilla(correo_contenido, subject, to)
 
         context = {
-            'aviso': 'Contraseña cambiada con exito'
+            'aviso': 'Contraseña generada con exito'
         }
         return render(request, 'aviso.html', context)
 

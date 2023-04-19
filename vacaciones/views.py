@@ -139,8 +139,13 @@ def vacaciones(request):
         disabled = ""
 
     # Solicitudes recibidas
+    # Obtenemo solo el primer apellido del usuario
+    apellido = request.user.last_name.split(" ")[0]
+
     solicitudes_recibidas = Solicitud_Vacaciones.objects.filter(
-        jefe__startswith=f"{request.user.first_name} {request.user.last_name}").order_by('-id')
+        jefe__startswith=f"{request.user.first_name} {apellido}").order_by('-id')
+
+    print("solictudes recibidas", solicitudes_recibidas)
 
     # Dias festivos oficiales
     lista_dias_festivos = Dias_Festivos_Oficiales.objects.all().order_by('id')
@@ -235,6 +240,8 @@ def registra_solicitud(request, dias_solicitados, fecha_solicitud, fecha_final, 
 
         correo_jefe = User.objects.get(
             first_name=request.user.perfil.jefe.split(' ')[0]).email
+        # correo_jefe = User.objects.get(first_name=request.user.perfil.jefe)
+        # correo_jefe = correo_jefe.split(' ')[0].email
 
         to = []
         if correo_jefe != None:
@@ -262,104 +269,135 @@ def aprobarSolicitud(request, id, comentario):
     # Obtenemos solicitud a aprobar
     solicitud = Solicitud_Vacaciones.objects.get(id=id)
 
-    dias_aprobados = solicitud.dias
-    usuario = solicitud.usuario
+    # si la solicitud esta pendiente
+    if solicitud.estado == "Pendiente":
 
-    dias_actuales = Perfil.objects.get(
-        usuario=User.objects.get(username=usuario).pk).dias_vacaciones_disp
+        dias_aprobados = solicitud.dias
+        usuario = solicitud.usuario
 
-    dias_actuales = dias_actuales - dias_aprobados
+        dias_actuales = Perfil.objects.get(
+            usuario=User.objects.get(username=usuario).pk).dias_vacaciones_disp
 
-    # Actualizamos dias disponibles
-    Perfil.objects.filter(usuario=User.objects.get(username=usuario).pk).update(
-        dias_vacaciones_disp=dias_actuales)
+        dias_actuales = dias_actuales - dias_aprobados
 
-    solicitud.estado = "Aprobada"
-    solicitud.comentario_jefe = comentario
-    solicitud.save()
+        # Actualizamos dias disponibles
+        Perfil.objects.filter(usuario=User.objects.get(username=usuario).pk).update(
+            dias_vacaciones_disp=dias_actuales)
 
-    # Notificamos por correo de la aprobacion de la solicitud
-    if (os.environ.get('NOTIFICACIONES')):
+        solicitud.estado = "Aprobada"
+        solicitud.comentario_jefe = comentario
+        solicitud.save()
 
-        context_correo = {
-            'nombre': solicitud.nombre,
-            'dias': solicitud.dias,
-            'fecha_inicio': fecha_obj_str_format(solicitud.fecha_inicio),
-            'fecha_fin': fecha_obj_str_format(solicitud.fecha_fin),
-            'jefe': solicitud.jefe,
-            'comentario_jefe': solicitud.comentario_jefe,
-            'estado': solicitud.estado
-        }
+        # Notificamos por correo de la aprobacion de la solicitud
+        if (os.environ.get('NOTIFICACIONES')):
 
-        # obtenemos del modelo User el correo de la persona que realizo la solicitud
-        correo_usuario = User.objects.get(username=solicitud.usuario).email
+            context_correo = {
+                'nombre': solicitud.nombre,
+                'dias': solicitud.dias,
+                'fecha_inicio': fecha_obj_str_format(solicitud.fecha_inicio),
+                'fecha_fin': fecha_obj_str_format(solicitud.fecha_fin),
+                # 'jefe': solicitud.jefe,
+                'jefe': request.user.first_name + " " + request.user.last_name,
+                'comentario_jefe': solicitud.comentario_jefe,
+                'estado': solicitud.estado
+            }
 
-        to = []
-        if correo_usuario != None:
-            to = [request.user.email, correo_usuario]
-        else:
-            to = [request.user.email]
+            # obtenemos del modelo User el correo de la persona que realizo la solicitud
+            correo_usuario = User.objects.get(username=solicitud.usuario).email
 
-        subject = f"Solicitud # {solicitud.id} {solicitud.estado}"
+            to = []
+            if correo_usuario != None:
+                to = [request.user.email, correo_usuario]
+            else:
+                to = [request.user.email]
 
-        correo_contenido = render_to_string(
-            'correo_estado_solicitud.html', context_correo, request=request)
-        enviar_correo_plantilla(correo_contenido, subject, to, cc_flag=True)
+            subject = f"Solicitud # {solicitud.id} {solicitud.estado}"
 
-    aviso = 'Solicitud aprobada con exito.'
-    # remplazar de la variable aviso los espacios por guiones bajos
-    aviso = aviso.replace(' ', '_')
+            correo_contenido = render_to_string(
+                'correo_estado_solicitud.html', context_correo, request=request)
+            enviar_correo_plantilla(
+                correo_contenido, subject, to, cc_flag=True)
 
-    return redirect(f'/aviso/{aviso}')
+        aviso = 'Solicitud aprobada con exito.'
+        # remplazar de la variable aviso los espacios por guiones bajos
+        aviso = aviso.replace(' ', '_')
+
+        return redirect(f'/aviso/{aviso}')
+
+    else:
+        # solicitud ya aprobada o rechazada
+
+        aviso = 'Esta solicitud ya fue aprobada o rechazada.'
+        # remplazar de la variable aviso los espacios por guiones bajos
+        aviso = aviso.replace(' ', '_')
+
+        return redirect(f'/aviso/{aviso}')
 
 
 @login_required()
 def rechazarSolicitud(request, id, comentario):
     print("Vista: rechazarSolicitud")
 
+    # Obtenemos solicitud
     solicitud = Solicitud_Vacaciones.objects.get(id=id)
-    solicitud.estado = "Rechazada"
-    solicitud.comentario_jefe = comentario
-    solicitud.save()
 
-    # Notificamos por correo de la aprobacion de la solicitud
-    if (os.environ.get('NOTIFICACIONES')):
+    # si la solicitud esta pendiente
+    if solicitud.estado == "Pendiente":
 
-        context_correo = {
-            'nombre': solicitud.nombre,
-            'dias': solicitud.dias,
-            'fecha_inicio': fecha_obj_str_format(solicitud.fecha_inicio),
-            'fecha_fin': fecha_obj_str_format(solicitud.fecha_fin),
-            'jefe': solicitud.jefe,
-            'comentario_jefe': solicitud.comentario_jefe,
-            'estado': solicitud.estado
-        }
+        solicitud.estado = "Rechazada"
+        solicitud.comentario_jefe = comentario
+        solicitud.save()
 
-        # obtenemos del modelo User el correo de la persona que realizo la solicitud
-        correo_usuario = User.objects.get(username=solicitud.usuario).email
+        # Notificamos por correo de la aprobacion de la solicitud
+        if (os.environ.get('NOTIFICACIONES')):
 
-        # imprimir correo
-        print(f"Correo del usuario: {correo_usuario}")
+            context_correo = {
+                'nombre': solicitud.nombre,
+                'dias': solicitud.dias,
+                'fecha_inicio': fecha_obj_str_format(solicitud.fecha_inicio),
+                'fecha_fin': fecha_obj_str_format(solicitud.fecha_fin),
+                # 'jefe': solicitud.jefe,
+                'jefe': request.user.first_name + " " + request.user.last_name,
+                'comentario_jefe': solicitud.comentario_jefe,
+                'estado': solicitud.estado
+            }
 
-        to = []
+            # obtenemos del modelo User el correo de la persona que realizo la solicitud
+            correo_usuario = User.objects.get(username=solicitud.usuario).email
 
-        if correo_usuario != None:
-            to = [request.user.email, correo_usuario]
-        else:
-            to = [request.user.email]
+            # imprimir correo
+            print(f"Correo del usuario: {correo_usuario}")
 
-        cc = [os.environ.get('EMAIL_CC')]
-        subject = f"Solicitud # {solicitud.id} {solicitud.estado}"
+            to = []
 
-        correo_contenido = render_to_string(
-            'correo_estado_solicitud.html', context_correo, request=request)
-        enviar_correo_plantilla(correo_contenido, subject, to, cc_flag=True)
+            if correo_usuario != None:
+                to = [request.user.email, correo_usuario]
+            else:
+                to = [request.user.email]
 
-    aviso = 'Solicitud rechazada con exito.'
-    # remplazar de la variable aviso los espacios por guiones bajos
-    aviso = aviso.replace(' ', '_')
+            cc = [os.environ.get('EMAIL_CC')]
+            subject = f"Solicitud # {solicitud.id} {solicitud.estado}"
 
-    return redirect(f'/aviso/{aviso}')
+            correo_contenido = render_to_string(
+                'correo_estado_solicitud.html', context_correo, request=request)
+            enviar_correo_plantilla(
+                correo_contenido, subject, to, cc_flag=True)
+
+        aviso = 'Solicitud rechazada con exito.'
+        # remplazar de la variable aviso los espacios por guiones bajos
+        aviso = aviso.replace(' ', '_')
+
+        return redirect(f'/aviso/{aviso}')
+
+    else:
+
+        # solicitud ya aprobada o rechazada
+
+        aviso = 'Esta solicitud ya fue aprobada o rechazada.'
+        # remplazar de la variable aviso los espacios por guiones bajos
+        aviso = aviso.replace(' ', '_')
+
+        return redirect(f'/aviso/{aviso}')
 
 
 def salir(request):

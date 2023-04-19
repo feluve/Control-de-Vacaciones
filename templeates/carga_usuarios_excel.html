@@ -10,7 +10,7 @@ Carga de usuarios
 
 
 
-<section style="background-color: #eeee">
+<section>
 
     <div class="container py-1">
         <div class="row">
@@ -24,12 +24,15 @@ Carga de usuarios
         </div>
     </div>
 
-    <div class="text-center">
+    <div class="text-center pt-3">
+        <a class="btn btn-dark" href="/" style="width: 100px;">Inicio</a>
+    </div>
+
+    <div class="text-center pt-4">
         <form action="/carga_usuarios_excel/" method="post" enctype="multipart/form-data">
             {% csrf_token %}
-            <input type="file" title="Cargar excel file" name="excel_file" style="border: 1px solid black; padding: 5px;" required="required">
-            <p>
-                <input type="submit" value="Cargar" style="border: 1px solid green; padding:5px; border-radius: 2px; cursor: pointer;">
+            <input type="file" class="m-1" title="Cargar excel file" name="excel_file" style="border: 1px solid black; padding: 5px;" required="required">
+            <input type="submit" class="btn btn-success m-1" value="Cargar registros" style="border: 1px solid green; padding:5px; border-radius: 2px; cursor: pointer;">
         </form>
     </div>
 
@@ -59,7 +62,6 @@ Carga de usuarios
                                     <th class="campo">Nombre de usuario</th>
                                     <th class="campo">Nombre(s)</th>
                                     <th class="campo">Apellidos</th>
-                                    <th class="campo">Contraseña</th>
                                     <th class="campo">Correo</th>
                                     <th class="campo">Telefono</th>
                                     <th class="campo">Ingreso</th>
@@ -68,14 +70,14 @@ Carga de usuarios
                                     <th class="campo">Area</th>
                                     <th class="campo">Rol</th>
                                     <th class="campo">Semana</th>
+                                    <th class="campo">Dias tomados</th>
                                     <th class="campo">Imagen</th>
-                                    <th class="campo">Dias</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for usuario in usuarios_excel %}
                                 <tr>
-                                    <td class="campo_corto">{{ forloop.counter }}</td>
+                                    <td class="registro_corto">{{ forloop.counter }}</td>
                                     <!-- <td class="registro">{{ s.fecha |date:'d-M-Y' }}</td> -->
                                     <td class="registro">{{ usuario.0 }}</td>
                                     <td class="registro">{{ usuario.1 }}</td>
@@ -91,7 +93,6 @@ Carga de usuarios
                                     <td class="registro">{{ usuario.11 }}</td>
                                     <!-- <td class="registro"><img src="{% static 'img/logo1.png' %}" alt="" style="max-width: 30px; max-height: 30px;"></td> -->
                                     <td class="registro">{{ usuario.12 }}</td>
-                                    <td class="registro">{{ usuario.13 }}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>

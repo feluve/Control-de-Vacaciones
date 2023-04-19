@@ -4,14 +4,60 @@ window.addEventListener("load", (event) => {
     // coloca la fecha actual en el campo de texto fecha_ingreso
     document.getElementById("fecha_ingreso").value = new Date().toISOString().slice(0, 10);
 
-    // coloca la fecha de hace 30 años en el campo de texto fecha_nacimiento
-    // var fecha = new Date();
-    // fecha.setFullYear(fecha.getFullYear() - 30);
-    // document.getElementById("fecha_nacimiento").value = fecha.toISOString().slice(0, 10);
-
     // colocamos la fecha 1990-01-01 en el campo de texto fecha_nacimiento
     document.getElementById("fecha_nacimiento").value = "1990-01-01";
 
+    // obtenemos el atributo data-jefes del campo de texto jefe
+    var jefes = document.getElementById("jefe").getAttribute("data-jefes");
+    // convertimos a un array el string de jefes
+    jefes = jefes.replace(/'/g, "").replace("[", "").replace("]", "").split(",");
+
+    // agregamos la opcion de seleccionar jefe del array de jefes
+    for (var i = 0; i < jefes.length; i++) {
+        var option = document.createElement("option");
+        option.text = jefes[i];
+        option.value = jefes[i];
+        document.getElementById("jefe").add(option);
+    }
+
+    // obtenemos el atributo data-roles del campo de texto rol
+    var roles = document.getElementById("rol").getAttribute("data-roles");
+    // convertimos a un array el string de roles
+    roles = roles.replace(/'/g, "").replace("[", "").replace("]", "").split(",");
+
+    // agregamos la opcion de seleccionar rol del array de roles
+    for (var i = 0; i < roles.length; i++) {
+        var option = document.createElement("option");
+        option.text = roles[i];
+        option.value = roles[i];
+        document.getElementById("rol").add(option);
+    }
+
+    // obtenemos el atributo data-areas del campo de texto area
+    var areas = document.getElementById("area").getAttribute("data-areas");
+    // convertimos a un array el string de areas
+    areas = areas.replace(/'/g, "").replace("[", "").replace("]", "").split(",");
+
+    // agregamos la opcion de seleccionar area del array de areas
+    for (var i = 0; i < areas.length; i++) {
+        var option = document.createElement("option");
+        option.text = areas[i];
+        option.value = areas[i];
+        document.getElementById("area").add(option);
+    }
+
+    // obtenemos el atributo data-semana del campo de texto semana
+    var semanas = document.getElementById("semana").getAttribute("data-semana");
+    // convertimos a un array el string de semanas
+    semanas = semanas.replace(/'/g, "").replace("[", "").replace("]", "").split(",");
+
+    // agregamos la opcion de seleccionar semana del array de semanas
+    for (var i = 0; i < semanas.length; i++) {
+        var option = document.createElement("option");
+        option.text = semanas[i];
+        option.value = semanas[i];
+        document.getElementById("semana").add(option);
+    }
 
 });
 
@@ -39,6 +85,9 @@ document.getElementById("usuario").addEventListener("keyup", (event) => {
 
     // eliminar los espacios en blanco
     event.target.value = event.target.value.replace(/ /g, "");
+
+    // eliminar los acentos
+    event.target.value = event.target.value.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
 });
 
@@ -122,6 +171,9 @@ document.getElementById("nombre").addEventListener("keyup", (event) => {
     // colocar la primera letra en mayuscula 
     event.target.value = event.target.value.replace(/^\w/, (c) => c.toUpperCase());
 
+    // eliminar los acentos
+    event.target.value = event.target.value.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
     // si se captura un espacio en blanco
     if (event.target.value.slice(-1) == " ") {
         // borramos el ultimo caracter
@@ -145,6 +197,9 @@ document.getElementById("apellidos").addEventListener("keyup", (event) => {
     // colocar la primera letra en mayuscula y despues de cada espacio
     event.target.value = event.target.value.replace(/\w\S*/g, (w) => (w.replace(/^\w/, (c) => c.toUpperCase())));
 
+    // eliminar los acentos
+    event.target.value = event.target.value.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
     // si hay mas de 3 caracteres
     if (event.target.value.length > 3) {
         //colo OK en la etiqueta e_apellidos
@@ -160,6 +215,7 @@ document.getElementById("apellidos").addEventListener("keyup", (event) => {
 // listener del campo de texto apellidos unfocus
 
 document.getElementById("apellidos").addEventListener("blur", (event) => {
+
     // si el ultimo caracter es un espacio
     if (event.target.value.slice(-1) == " ") {
         // borramos el ultimo caracter
@@ -210,6 +266,9 @@ document.getElementById("correo").addEventListener("keyup", (event) => {
     // colocar el texto en minusculas
     event.target.value = event.target.value.toLowerCase();
     // validar que el email tenga el formato correcto
+
+    // eliminar los acentos
+    event.target.value = event.target.value.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
     // borramos el ultimo caracter si es un espacio
     if (event.target.value.slice(-1) == " ") {

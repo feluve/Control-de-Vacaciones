@@ -92,14 +92,15 @@ Nuevo Usuario
                             <div class="form-outline mb-2">
                                 <label for="jefe">Jefe Inmediato:</label>
                                 <!-- Combobox Javier Gonzalez, Govani Gonzalez, David Gonzalez, Erika Chagolla, Jorge Hernandez, Victor Valdez, Aldo Martinez -->
-                                <select name="jefe" id="jefe" class="form-control form-control-sm">
-                                    <option value="Javier Gonzalez">Javier Gonzalez</option>
-                                    <option value="Govani Gonzalez">Jovani Gonzalez</option>
-                                    <option value="David Gonzalez">David Gonzalez</option>
-                                    <option value="Erika Chagolla">Erika Chagolla</option>
+                                <select name="jefe" id="jefe" class="form-control form-control-sm" data-jefes="{{ jefes }}">
+                                    <!-- <option value="Javier Gonzalez">Javier Gonzalez</option>
+                                    <option value="Javier Ramirez">Javier Ramirez</option>
+                                    <option value="Yovani Gonzalez">Yovani Gonzalez</option>
+                                    <option value="Ivan Gonzalez">Ivan Gonzalez</option>
+                                    <option value="David Mercado">David Mercado</option>
                                     <option value="Jorge Hernandez">Jorge Hernandez</option>
-                                    <option value="Victor Valdez">Victor Valdez</option>
-                                    <option value="Aldo Martinez">Aldo Garcia</option>
+                                    <option value="Fransisco Vargas">Fransisco Vargas</option>
+                                    <option value="Aldo Garcia">Aldo Garcia</option> -->
                                 </select>
                             </div>
 
@@ -107,67 +108,27 @@ Nuevo Usuario
                             <div class="form-outline mb-2">
                                 <label for="area">Area:</label>
                                 <!-- combobox Administracion, Modulos, Mecanica, Laboratorio -->
-                                <select name="area" id="area" class="form-control form-control-sm">
-                                    <option value="Administracion">Administracion</option>
-                                    <option value="Modulos">Modulos</option>
+                                <select name="area" id="area" class="form-control form-control-sm" data-areas="{{ areas }}">
+                                    <!-- <option value="Modulos">Modulos</option>
                                     <option value="Mecanica">Mecanica</option>
                                     <option value="Laboratorio">Laboratorio</option>
-                                    <option value="Ventas">Ventas</option>
+                                    <option value="Administracion">Administracion</option>
+                                    <option value="Limpieza">Limpieza</option>
+                                    <option value="Cocina">Cocina</option>
+                                    <option value="Mantenimiento">Mantenimiento</option> -->
                                 </select>
                             </div>
-
-                            <!-- Dias de vacaciones -->
-                            <!-- <div class="form-outline mb-2"> -->
-                            <!-- <label for="dias_vacaciones_disp">Dias de vacaciones:</label> -->
-                            <!-- numero de dias -->
-                            <!-- <input type="number" name="dias_vacaciones_disp" id="dias_vacaciones_disp" class="form-control form-control-sm" required> -->
-                            <!-- ganera un combobox de entra del numero 1 al 10 -->
-                            <!-- <select name="dias_vacaciones_disp" id="dias_vacaciones_disp" class="form-control form-control-sm">
-                                        <option value="0">0</option>
-                                        <option value="1">1</option>
-                                        <option value="2">2</option>
-                                        <option value="3">3</option>
-                                        <option value="4">4</option>
-                                        <option value="5">5</option>
-                                        <option value="6">6</option>
-                                        <option value="7">7</option>
-                                        <option value="8">8</option>
-                                        <option value="9">9</option>
-                                        <option value="10">10</option>
-                                        <option value="11">11</option>
-                                        <option value="12">12</option>
-                                        <option value="13">13</option>
-                                        <option value="14">14</option>
-                                        <option value="15">15</option>
-                                        <option value="16">16</option>
-                                        <option value="17">17</option>
-                                        <option value="18">18</option>
-                                        <option value="19">19</option>
-                                        <option value="20">20</option>
-                                        <option value="21">21</option>
-                                        <option value="22">22</option>
-                                        <option value="23">23</option>
-                                        <option value="24">24</option>
-                                        <option value="25">25</option>
-                                        <option value="26">26</option>
-                                        <option value="27">27</option>
-                                        <option value="28">28</option>
-                                        <option value="29">29</option>
-                                        <option value="30">30</option>
-                                    </select> 
-                                </div> -->
 
                             <!-- Role -->
                             <div class="form-outline mb-2">
                                 <label for="rol">Role:</label>
                                 <!-- combobox Empleado, Supervisor, Gerente, Director, Dueño, RH-->
-                                <select name="rol" id="rol" class="form-control form-control-sm">
-                                    <option value="Empleado">Empleado</option>
+                                <select name="rol" id="rol" class="form-control form-control-sm" data-roles="{{ roles }}">
+                                    <!-- <option value="Empleado">Empleado</option>
                                     <option value="Supervisor">Supervisor</option>
                                     <option value="Gerente">Gerente</option>
-                                    <option value="Director">Director</option>
-                                    <option value="Dueño">Dueño</option>
                                     <option value="RH">RH</option>
+                                    <option value="Directivo">Directivo</option> -->
                                 </select>
                             </div>
 
@@ -175,9 +136,9 @@ Nuevo Usuario
                             <div class="form-outline mb-2">
                                 <label for="semana">Semana:</label>
                                 <!-- combobox Normal, Inglesa -->
-                                <select name="semana" id="semana" class="form-control form-control-sm">
-                                    <option value="Normal">Normal</option>
-                                    <option value="Inglesa">Inglesa</option>
+                                <select name="semana" id="semana" class="form-control form-control-sm" data-semana="{{ semana }}">
+                                    <!-- <option value="Lunes-Sabado">Lunes-Sabado</option>
+                                    <option value="Lunes-Viernes">Lunes-Viernes</option> -->
                                 </select>
                             </div>
 

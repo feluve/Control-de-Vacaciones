@@ -20,41 +20,45 @@ from django.db.models.signals import post_save
 
 # --------------------------------------------------------------------
 
+JEFES = [
+    ('Javier Gonzalez', 'Javier Gonzalez'),
+    ('Javier Ramirez', 'Javier Ramirez'),
+    ('Yovani Gonzalez', 'Yovani Gonzalez'),
+    ('Ivan Gonzalez', 'Ivan Gonzalez'),
+    ('David Mercado', 'David Mercado'),
+    ('Aldo Garcia', 'Aldo Garcia'),
+    ('Jorge Hernandez', 'Jorge Hernandez'),
+    ('Fransisco Vargas', 'Fransisco Vargas')
+]
+
+AREAS = [
+    ('Modulos', 'Modulos'),
+    ('Mecanica', 'Mecanica'),
+    ('Laboratorio', 'Laboratorio'),
+    ('Administracion', 'Administracion'),
+    ('Ventas', 'Ventas'),
+    ('Compras', 'Compras'),
+    ('Mantenimiento', 'Mantenimiento'),
+    ('Cocina', 'Cocina'),
+    ('Limpieza', 'Limpieza'),
+]
+
+ROLES = [
+    ('Empleado', 'Empleado'),
+    ('Supervisor', 'Supervisor'),
+    ('Gerente', 'Gerente'),
+    ('RH', 'RH'),
+    ('Directivo', 'Directivo'),
+    ('admin', 'admin')
+]
+
+SEMANA = [
+    ('Lunes-Sabado', 'Lunes-Sabado'),
+    ('Lunes-Viernes', 'Lunes-Viernes')
+]
+
 
 class Perfil(models.Model):
-
-    AREAS = [
-        ('Modulos', 'Modulos'),
-        ('Mecanica', 'Mecanica'),
-        ('Laboratorio', 'Laboratorio'),
-        ('Administracion', 'Administracion'),
-        ('Ventas', 'Ventas')
-    ]
-
-    JEFES = [
-        ('Javier Gonzalez', 'Javier Gonzalez'),
-        ('Javier Ramirez', 'Javier Ramirez'),
-        ('Yovani Gonzalez', 'Yovani Gonzalez'),
-        ('Ivan Gonzalez', 'Ivan Gonzalez')
-        # ('Erika Chagolla', 'Erika Gonzalez'),
-        # ('Victor Valdez', 'Victor Valdez'),
-        # ('Aldo Gacía', 'Aldo Gacía'),
-        # ('Jorge Hernandez', 'Jorge Hernandez'),
-        # ('Fransisco Vargas', 'Fransisco Vargas'),
-    ]
-
-    ROL = [
-        ('Empleado', 'Empleado'),
-        ('Supervisor', 'Supervisor'),
-        ('Gerente', 'Gerente'),
-        ('RH', 'RH'),
-        ('Directivo', 'Directivo'),
-        ('admin', 'admin')
-    ]
-    SEMANA = [
-        ('Normal', 'Lunes-Sabado'),
-        ('Inglesa', 'Lunes-Viernes')
-    ]
 
     usuario = models.OneToOneField(
         User, on_delete=models.CASCADE, related_name='perfil')
@@ -70,7 +74,7 @@ class Perfil(models.Model):
     jefe = models.CharField(max_length=50, null=True,
                             blank=True, choices=JEFES)
     rol = models.CharField(max_length=50, null=True,
-                           blank=True, choices=ROL, default="Empleado")
+                           blank=True, choices=ROLES, default="Empleado")
     fecha_nacimiento = models.DateField(null=True, blank=True)
     semana = models.CharField(max_length=50, null=True,
                               blank=True, choices=SEMANA, default="Normal")
@@ -102,23 +106,12 @@ post_save.connect(guardar_perfil_usuario, sender=User)
 # --------------------------------------------------------------------
 
 class Solicitud_Vacaciones(models.Model):
+
     ESTADO = [
         ('Pendiente', 'Pendiente'),
         ('Rechazada', 'Rechazada'),
         ('Aprobada', 'Aprobada'),
         ('Cancelada', 'Cancelada')
-    ]
-
-    JEFES = [
-        ('Javier Gonzalez', 'Javier Gonzalez'),
-        ('Javier Ramirez', 'Javier Ramirez'),
-        ('Yovani Gonzalez', 'Yovani Gonzalez'),
-        ('Ivan Gonzalez', 'Ivan Gonzalez')
-        # ('Erika Chagolla', 'Erika Gonzalez'),
-        # ('Victor Valdez', 'Victor Valdez'),
-        # ('Aldo Gacía', 'Aldo Gacía'),
-        # ('Jorge Hernandez', 'Jorge Hernandez'),
-        # ('Fransisco Vargas', 'Fransisco Vargas'),
     ]
 
     usuario = models.CharField(max_length=50)
