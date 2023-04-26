@@ -3,7 +3,7 @@
 {% load static %}
 
 {% block title %}
-Carga de Asistencia
+Carga de Asistencia Excel
 {% endblock %}
 
 {% block content %}
@@ -30,8 +30,8 @@ Carga de Asistencia
     <div class="text-center pt-4">
         <form action="/carga_asistencia_excel/" method="post" enctype="multipart/form-data">
             {% csrf_token %}
-            <input type="file" class="m-1" title="Cargar excel file" name="excel_file" style="border: 1px solid black; padding: 5px;" accept="application/vnd.ms-excel.sheet.macroEnabled.12"
-                required="required">
+            <input type="file" class="m-1" title="Cargar excel file" name="excel_file" style="border: 1px solid black; padding: 5px;"
+                accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" required="required">
             <input type="submit" class="btn btn-success m-1" value="Cargar registros" style="border: 1px solid green; padding:5px; border-radius: 2px; cursor: pointer;">
         </form>
     </div>

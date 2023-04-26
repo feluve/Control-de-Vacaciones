@@ -1,0 +1,89 @@
+{% extends 'master.html' %} {% load static %} {% block title %} Reporte de usuarios {% endblock %} {% block content %}
+
+<section>
+    <div class="container py-1">
+        <div class="row">
+            <div class="col">
+                <nav aria-label="breadcrumb" class="bg-light rounded-3 p-3 mb-4">
+                    <ol class="breadcrumb mb-0">
+                        <h2 class="my-0">Reporte de Usuarios</h2>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center pt-3">
+        <a class="btn btn-dark" href="/" style="width: 100px">Inicio</a>
+    </div>
+
+    {% if usuarios != None %}
+    <hr />
+    <div class="container pb-2">
+        <div class="col-lg-12">
+            <div class="card mb-8">
+                <div class="col-md-12 px-3 py-3">
+                    <h2 class="py-3 px-3 text-center">Reporte</h2>
+                    <div class="table-responsive">
+                        <table class="table table-striped" id="miTabla">
+                            <thead class="bg-dark">
+                                <tr>
+                                    <th class="campo_corto">#</th>
+                                    <th class="campo">Usuario</th>
+                                    <th class="campo">Nombre</th>
+                                    <th class="campo">Area</th>
+                                    <th class="campo">Jefe</th>
+                                    <th class="campo">Telefono</th>
+                                    <th class="campo">Fecha Ingreso</th>
+                                    <th class="campo">Fecha Nacimiento</th>
+                                    <th class="campo">Dias disp. vac.</th>
+                                    <th class="campo">Vigencia dias vac.</th>
+                                    <th class="campo">Semana</th>
+                                    <th class="campo">Id Asistencia</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for u in usuarios %}
+                                <tr>
+                                    <td class="registro_corto">{{ forloop.counter }}</td>
+                                    <td class="registro">{{ u.usuario }}</td>
+                                    <td class="registro">{{ u.usuario.first_name}} {{ u.usuario.last_name }}</td>
+                                    <td class="registro">{{ u.area }}</td>
+                                    <td class="registro">{{ u.jefe }}</td>
+                                    <td class="registro">{{ u.telefono }}</td>
+                                    <td class="registro">{{ u.fecha_ingreso|date:'d-F-Y' }}</td>
+                                    <td class="registro">{{ u.fecha_nacimiento|date:'d-F-Y' }}</td>
+                                    <td class="registro">{{ u.dias_vacaciones_disp }}</td>
+                                    <td class="registro">{{ u.vigencia_dias_vacaciones|date:'d-F-Y' }}</td>
+                                    <td class="registro">{{ u.semana }}</td>
+                                    <td class="registro">{{ u.id_asistencia }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+
+    <div class="p-2 text-center">
+        <h3>{{ error }}</h3>
+    </div>
+
+    <div class="text-center pt-1">
+        <button class="btn btn-success mb-5" onclick="exportToExcel()">Exportar a Excel</button>
+    </div>
+</section>
+
+{% load static %}
+
+<!-- Javascript -->
+<script type="text/javascript" src="{% static 'js/reportes.js'%}"></script>
+
+<!-- Exportar a Excel -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.2/xlsx.full.min.js"></script>
+
+{% endblock %}

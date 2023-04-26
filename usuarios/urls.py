@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import nuevo_usuario, guardar_nuevo_usuario, olvide_contrasena, link_recuperacion, contrasena_nueva, cambiar_contrasena, carga_usuarios_excel, aviso, master
+from .views import nuevo_usuario, guardar_nuevo_usuario, olvide_contrasena, link_recuperacion, contrasena_nueva, cambiar_contrasena, carga_usuarios_excel, aviso, master, reporte_usuarios
 
 from django.conf import settings
 
@@ -15,6 +15,8 @@ urlpatterns = [
          cambiar_contrasena),
     path("carga_usuarios_excel/", carga_usuarios_excel,
          name="carga_usuarios_excel"),
+
+    path("reporte_usuarios/", reporte_usuarios, name="reporte_usuarios"),
 
     path("aviso/<str:aviso>/", aviso, name="aviso"),
     path("master/", master, name="master"),

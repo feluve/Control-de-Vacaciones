@@ -34,11 +34,11 @@
 
         /*
         footer {
-            width: 100%;
-            position: fixed;
-            bottom: 0;
+                    width: 100%;
+                position: fixed;
+                bottom: 0;
         }
-        */
+                */
     </style>
 
 
@@ -49,13 +49,13 @@
 
     <nav class="navbar-dark  bg-black">
         <!-- <div class="container-fluid  bg-black">
-            <a class="bg-black" href="{{ dominio }}">
-                <img src={% static 'img/logo1.png' %} class="me-0 align-middle" height="60" alt="MDB Logo" loading="lazy" />
-                <small class="text-white">CEGEMEX</small>
-            </a>
-            <h1 class="text-white">Bienvenido {{user|title}}</h1>
-            <a class="btn btn-sm btn-secondary mx-0" href="{% url 'salir' %}">Cerrar sesion</a>
-        </div> -->
+                        <a class="bg-black" href="{{ dominio }}">
+                            <img src={% static 'img/logo1.png' %} class="me-0 align-middle" height="60" alt="MDB Logo" loading="lazy" />
+                            <small class="text-white">CEGEMEX</small>
+                        </a>
+                        <h1 class="text-white">Bienvenido {{ user| title}}</h1>
+                        <a class="btn btn-sm btn-secondary mx-0" href="{% url 'salir' %}">Cerrar sesion</a>
+                    </div> -->
 
         <div class="container-fluid">
             <div class="row">
@@ -67,7 +67,7 @@
                 </div>
                 {% if user.is_authenticated %}
                 <div class="col text-center text-white mt-4">
-                    <h3 class="text-white" style="font-size: 20px;">Bienvenido {{ user.first_name|split:" " }}</h3>
+                    <h3 class="text-white" style="font-size: 20px;">Bienvenido {{ user.first_name }}</h3>
                 </div>
                 <div class="col text-white mt-4">
                     <a class="btn btn-sm btn-secondary mx-3 float-end" href="{% url 'salir' %}">Cerrar sesion</a>

@@ -28,7 +28,7 @@ JEFES = [
     ('David Mercado', 'David Mercado'),
     ('Aldo Garcia', 'Aldo Garcia'),
     ('Jorge Hernandez', 'Jorge Hernandez'),
-    ('Fransisco Vargas', 'Fransisco Vargas')
+    ('Francisco Vargas', 'Francisco Vargas')
 ]
 
 AREAS = [

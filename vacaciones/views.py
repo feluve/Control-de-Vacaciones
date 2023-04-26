@@ -57,21 +57,12 @@ def vacaciones(request):
     if fecha_vigencia_actual is None:
         fecha_vigencia_actual = request.user.perfil.fecha_ingreso
 
-    # print("")
-    # print("Fecha de vigencia actual", fecha_vigencia_actual)
-    # print(type(fecha_vigencia_actual))
-    # print("Fecha de hoy", datetime.now().date())
-    # print("")
-
-    # f1 = datetime.strptime("2024-01-10", '%Y-%m-%d').date()
-    # f2 = datetime.strptime("2024-01-11", '%Y-%m-%d').date()
-
-    # if (f1 < f2):
+    # Verificamos si la fecha de vigencia ya paso para recalcularle sus dias de vacaciones
     if (fecha_vigencia_actual < datetime.now().date()):
-        print("**************************+***")
+        print("**************************+*******************************************************")
         print(
             "Vencio la fecha de vigencia se recalculan dia de vacaciones y fecha de vigencia")
-        print("**************************+***")
+        print("**************************+*******************************************************")
 
         dias_disponibles = calcula_dias_vacaciones_ley(fecha_ingreso)
         fecha_vigencia = calcula_fecha_vigencia(fecha_ingreso)

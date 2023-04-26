@@ -81,4 +81,7 @@ def calcula_dias_vacaciones_ley(fecha_ingreso):
         return dias_vacaciones
 
 
-# calcula_dias_vacaciones_ley("2015-01-01")
+# input("Ingresa tu fecha de ingreso a la empresa: ")
+# f = input("Ingresa tu fecha de ingreso a la empresa: ")
+
+# calcula_dias_vacaciones_ley(f)

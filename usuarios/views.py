@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, reverse
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import User
-from vacaciones.models import Perfil
+from vacaciones.models import Perfil, Solicitud_Vacaciones
 
 from django.core.files.storage import FileSystemStorage
 from static.py.enviaCorreo import enviar_correo_simple, enviar_correo_plantilla
@@ -16,6 +16,10 @@ from openpyxl_image_loader import SheetImageLoader
 from datetime import datetime
 
 import urllib
+
+from static.py.calculaDiasVacacionesLey import calcula_dias_vacaciones_ley
+from static.py.calculaFechaVigencia import calcula_fecha_vigencia
+from static.py.calculaFechaFinal import calcula_fecha_final
 
 # Create your views here.
 
@@ -99,8 +103,10 @@ def carga_usuarios_excel(request):
             # imprimir en consola los usuarios del excel
             print(usuarios_excel)
 
+            # Guardamos los usuarios en la base de datos
             print("Guardando usuarios en la base de datos")
             guardar_usuarios_excel(usuarios_excel, request)
+
         else:
             print("No hay usuarios para guardar en la base de datos")
 
@@ -120,10 +126,12 @@ def guardar_usuarios_excel(usuarios_excel, request):
     # cargamos usuarios de excel y los guardamos en la base de datos
     for u in usuarios_excel:
 
-        print("")
-        print("fecha_ingreso: ", u[5])
-        print("fecha_ingreso tipo: ", type(u[5]))
-        print("")
+        # print("")
+        # print("fecha_ingreso: ", u[5])
+        # print("fecha_ingreso tipo: ", type(u[5]))
+        # print("")
+
+        print("usuario: ", u[0])
 
         usuario = u[0].replace(" ", "")
         nombre = u[1]
@@ -138,11 +146,44 @@ def guardar_usuarios_excel(usuarios_excel, request):
         area = u[8].replace(" ", "")
         rol = u[9].replace(" ", "")
         semana = u[10].replace(" ", "")
-        dias_tomados = u[11].replace(" ", "")
+        dias_actuales = u[11].replace(" ", "")
+        dias_actuales = int(dias_actuales)
 
-        dias_vacaciones_disp = 0  # request.POST.get("dias_vacaciones_disp")
+        print("**************************+***********************************************************************************")
+        print("Usuario nuevo se calcula los dias que le corresponde de vacaciones y la vigencia de los dias de los mismos")
+        print("**************************+***********************************************************************************")
+
+        dias_vacaciones_disp = dias_actuales
+
+        vigencia_dias_vacaciones = calcula_fecha_vigencia(
+            str(fecha_ingreso.date()))
+
+        print(f"Ahora tienes: {dias_vacaciones_disp} dias de vacaciones")
+        print(f"Con una vigencia de: {vigencia_dias_vacaciones}")
+
+        # **********+*********************************************************************************************************************
+        # dias_tomados = int(u[11].replace(" ", ""))
+
+        # print("dias_tomados: ", dias_tomados)
+
+        # # si dias_tomados es negativo, lo convertimos a positivo
+        # if dias_tomados < 0:
+        #     dias_tomados = dias_tomados * - 1
+
+        # print("**************************+***********************************************************************************")
+        # print("Usuario nuevo se calcula los dias que le corresponde de vacaciones y la vigencia de los dias de los mismos")
+        # print("**************************+***********************************************************************************")
+
+        # dias_vacaciones_disp = calcula_dias_vacaciones_ley(
+        #     str(fecha_ingreso.date())) - dias_tomados
+        # vigencia_dias_vacaciones = calcula_fecha_vigencia(
+        #     str(fecha_ingreso.date()))
+        # ********************************************************************************************************************************
+
+        # dias_vacaciones_disp = 0  # request.POST.get("dias_vacaciones_disp")
         # establecemos que la vigencia de los dias de vacaciones es la fecha de ingreso para que el proximo inicio de sesion calcule los dias de vacaciones y la vigencia
-        vigencia_dias_vacaciones = fecha_ingreso
+        # vigencia_dias_vacaciones = fecha_ingreso
+        # ********************************************************************************************************************************
 
         # imagen del usuario
         # imagen = u[12].replace(" ", "")
@@ -189,7 +230,7 @@ def guardar_usuarios_excel(usuarios_excel, request):
         }
 
         # enviamos correo de notificacion al usuario
-        notificacion_usuario_registrado(context_correo, str(correo), request)
+        # notificacion_usuario_registrado(context_correo, str(correo), request)
 
         # incrementamos el contador de usuarios
         n_usuarios += 1
@@ -269,9 +310,21 @@ def guardar_nuevo_usuario(request):
     rol = request.POST.get("rol")
     semana = request.POST.get("semana")
 
-    dias_vacaciones_disp = 0  # request.POST.get("dias_vacaciones_disp")
+    # dias_vacaciones_disp = 0  # request.POST.get("dias_vacaciones_disp")
     # establecemos que la vigencia de los dias de vacaciones es la fecha de ingreso para que el proximo inicio de sesion calcule los dias de vacaciones y la vigencia
-    vigencia_dias_vacaciones = request.POST.get("fecha_ingreso")
+    # vigencia_dias_vacaciones = request.POST.get("fecha_ingreso")
+
+    print("**************************+*************************************************************************************")
+    print("Usuario nuevo se calcula los dias que le corresponde de vacaciones y la vigencia de los dias de los mismos")
+    print("**************************+*************************************************************************************")
+
+    dias_vacaciones_disp = calcula_dias_vacaciones_ley(fecha_ingreso)
+    vigencia_dias_vacaciones = calcula_fecha_vigencia(fecha_ingreso)
+
+    print(
+        f"Ahora tienes {dias_vacaciones_disp} dias de vacaciones")
+    print(
+        f"Con una vigencia de {vigencia_dias_vacaciones}")
 
     imagen = None
     #  si imagen es diferente de None
@@ -550,6 +603,26 @@ def cambiar_contrasena(request, usuario, token, contrasena):
         }
         return render(request, 'aviso.html', context)
 
+# vista para generar reportes
+
+
+@ login_required()
+# decorador para verificar si usuario tiene el rol de admin o RH
+@user_passes_test(lambda u: u.perfil.rol == 'admin' or u.perfil.rol == 'RH')
+def reporte_usuarios(request):
+
+    # realiza una consulta de la tabla User relacionada con la tabla Perfil
+    usuarios = User.objects.all() and Perfil.objects.all()
+    usuarios = usuarios.order_by('usuario__username')
+
+    # print(usuarios.query)
+
+    context = {
+        'usuarios': usuarios,
+    }
+
+    return render(request, 'reporte_usuarios.html', context)
+
 
 # @login_required()
 def aviso(request, aviso):
@@ -561,6 +634,30 @@ def aviso(request, aviso):
     return render(request, 'aviso.html', context)
 
 # -----------------------Funciones adcionales-----------------------
+
+# funcion que calcula los dias que le corresponden a un usuario y la vigencia de los mismos
+
+
+def calcular_dias_vacaciones_vigencia(nombre_usuario, fecha_ingreso):
+    print("Funcion: calcular_dias_vacaciones_vigencia")
+
+    print("**************************+*******************************************************")
+    print("Usuario nuevo se calcula los dias que le corresponde de vacaciones y la vigencia de los dias de los mismos")
+    print("**************************+*******************************************************")
+
+    dias_disponibles = calcula_dias_vacaciones_ley(fecha_ingreso)
+    fecha_vigencia = calcula_fecha_vigencia(fecha_ingreso)
+
+    print(
+        f"Ahora tienes {dias_disponibles} dias de vacaciones")
+    print(
+        f"Con una vigencia de {fecha_vigencia}")
+
+    # Actulizamos los datos en la BD
+    Perfil.objects.filter(usuario=User.objects.get(username=nombre_usuario).pk).update(
+        dias_vacaciones_disp=dias_disponibles, vigencia_dias_vacaciones=fecha_vigencia)
+
+    print("[+] Actualizamos dias disponibles y fecha de vigencia")
 
 # funcion que genera una cadena aleatoria de 32 caracteres hexadecimales
 

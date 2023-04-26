@@ -12,7 +12,6 @@ from import_export.admin import ImportExportModelAdmin
 # admin.site.register(Dias_Festivos_Oficiales)
 # admin.site.register(Jefes)
 
-
 # @admin.register(Jefes())
 # class AdminJefes(admin.ModelAdmin):
 # list_display = ('nombre',)
@@ -23,6 +22,7 @@ from import_export.admin import ImportExportModelAdmin
 # list_filter = ('nombre',)
 # list_per_page = 20
 # exclude = ('nombre',)
+
 
 @admin.register(Solicitud_Vacaciones)
 class AdminSolicitudVaciones(admin.ModelAdmin):
@@ -39,15 +39,15 @@ class AdminSolicitudVaciones(admin.ModelAdmin):
 
 @admin.register(Perfil)
 class AdminPerfil(ImportExportModelAdmin, admin.ModelAdmin):
-    list_display = ('usuario', 'fecha_ingreso', 'vigencia_dias_vacaciones', 'jefe', 'area',
-                    'dias_vacaciones_disp', 'fecha_nacimiento', 'rol')
+    list_display = ('usuario', 'fecha_ingreso', 'dias_vacaciones_disp',
+                    'vigencia_dias_vacaciones', 'jefe', 'area', 'fecha_nacimiento', 'rol', 'id_asistencia')
     ordering = ('id',)
-    search_fields = ('nombre', 'usuario', 'fecha_ingreso', 'jefe', 'rol')
+    search_fields = ('usuario',)
     list_editable = ('fecha_ingreso', 'vigencia_dias_vacaciones', 'jefe', 'area',
-                     'dias_vacaciones_disp', 'fecha_nacimiento', 'rol')
+                     'dias_vacaciones_disp', 'fecha_nacimiento', 'rol', 'id_asistencia')
     # list_display_links = ('usuario',)
     list_filter = ('usuario', 'jefe', 'rol', 'area')
-    list_per_page = 20
+    list_per_page = 50
     # exclude = ('dias',)
 
 
