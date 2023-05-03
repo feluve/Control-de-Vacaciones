@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'vacaciones',
     'usuarios',
     'asistencia',
+    'asistenciaQR',
     'import_export',
 ]
 

@@ -57,6 +57,11 @@ SEMANA = [
     ('Lunes-Viernes', 'Lunes-Viernes')
 ]
 
+DISPOSITIVO = [
+    ('No registrado', 'No registrado'),
+    ('Registrado', 'Registrado')
+]
+
 
 class Perfil(models.Model):
 
@@ -77,9 +82,10 @@ class Perfil(models.Model):
                            blank=True, choices=ROLES, default="Empleado")
     fecha_nacimiento = models.DateField(null=True, blank=True)
     semana = models.CharField(max_length=50, null=True,
-                              blank=True, choices=SEMANA, default="Normal")
+                              blank=True, choices=SEMANA, default="Lunes-Sabado")
     token = models.CharField(max_length=100, null=True, blank=True)
     id_asistencia = models.PositiveSmallIntegerField(null=True, blank=True)
+    dispositivo = models.CharField(max_length=50, choices=DISPOSITIVO, default="No registrado")
 
     def __str__(self):
         return self.rol

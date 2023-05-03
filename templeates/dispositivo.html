@@ -1,0 +1,55 @@
+{% extends "master.html" %}
+
+{% block title %}
+Dispositivo
+{% endblock %}
+
+{% block content %}
+
+{% if request.user.is_authenticated %}
+<section style="background-color: #eeee">
+
+    <div class="container py-4">
+        <div class="col-lg-12">
+            <div class="card mb-8">
+                <div class="col-md-12 px-3 py-3">
+                    <div class="col-md-8 col-lg-6 col-xl-4 offset-xl-1 px-5 py-3">
+                        <div class="divider d-flex align-items-center my-4">
+
+                            <div id="div" data-disporitivo="{{ dispositivo }}">
+
+                            </div>
+
+                            {% if dispositivo == "No registrado" %}
+                            <div class="col-md-12 px-3 py-3 text-center">
+                                <button class="btn btn-primary" onclick="RegistrarDispositivo();">Registrar este dipositivo</button>
+                            </div>
+                            {% endif %}
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <div>
+            <button onclick="Borrar();">Borrar</button>
+        </div>
+        <div>
+            <button onclick="Setear();">Setear</button>
+        </div>
+        <div>
+            <button onclick="Consultar();">Consultar</button>
+        </div>
+    </div>
+
+</section>
+{% endif %}
+
+{% load static %}
+<!-- JavaScript -->
+<script type="text/javascript" src="{% static 'js/dispositivo.js'%}"></script>
+
+{% endblock %}

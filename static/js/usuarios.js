@@ -338,6 +338,33 @@ document.getElementById("telefono").addEventListener("keyup", (event) => {
 
 });
 
+// listener del campo de texto id_asistencia que solo acepta numeros y como maximo 3 caracteres
+document.getElementById("id_asistencia").addEventListener("keyup", (event) => {
+
+    // si el id_asistencia no es un numero
+    if (isNaN(event.target.value)) {
+        // borramos el ultimo caracter
+        event.target.value = event.target.value.slice(0, -1);
+    }
+
+    // si el id_asistencia tiene mas de 3 caracteres
+    if (event.target.value.length > 3) {
+        // borramos el ultimo caracter
+        event.target.value = event.target.value.slice(0, -1);
+    }
+
+    // si el id_asistencia tiene mas 3 caracteres
+    if (event.target.value.length == 3) {
+        // coloco OK en la etiqueta e_id_asistencia
+        document.getElementById("e_id_asistencia").innerHTML = "OK";
+        document.getElementById("e_id_asistencia").style.color = "green";
+    } else {
+        // coloco OK en la etiqueta e_id_asistencia
+        document.getElementById("e_id_asistencia").innerHTML = "";
+    }
+
+});
+
 function guardar_usuario(){
     console.log("Guardando nuevo usuario...");
 

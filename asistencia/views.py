@@ -13,6 +13,7 @@ import os
 
 def asistencia(request):
     print("Vista: Asistencia")
+
     id_asistencia = request.user.perfil.id_asistencia
 
     asistencias = list()
@@ -51,8 +52,11 @@ def asistencia(request):
     asistencias = Asistencia.objects.filter(
         idUsuario=id_asistencia).order_by('-fecha_hora')
 
-    llegadas_semana = obtener_llegadas(id_asistencia, fecha_lunes_pasado())
-    salidas_semana = obtener_salidas(id_asistencia, fecha_lunes_pasado())
+    # llegadas_semana = obtener_llegadas(id_asistencia, fecha_lunes_pasado())
+    # salidas_semana = obtener_salidas(id_asistencia, fecha_lunes_pasado())
+
+    llegadas_semana = obtener_llegadas(id_asistencia, fecha_lunes())
+    salidas_semana = obtener_salidas(id_asistencia, fecha_lunes())
 
     tolerancia_entrada = int(os.environ.get('TOLERANCIA_ENTRADA'))
 
@@ -69,7 +73,7 @@ def asistencia(request):
         'llegadas_semana': llegadas_semana,
         'salidas_semana': salidas_semana,
         'tolerancia_entrada': tolerancia_entrada,
-        'fecha_lunes_pasado': fecha_lunes_pasado(),
+        'fecha_lunes_pasado': fecha_lunes()
     }
 
     return render(request, 'asistencia.html', context)
@@ -99,25 +103,25 @@ def carga_asistencia_excel(request):
 
         # validaciones del archivo excel
         # si el excel tiene mas de 1 hoja
-        if len(wb.sheetnames) > 1:
-            print("El excel tiene mas de 1 hoja")
-            return render(request, 'carga_asistencia_excel.html', context={'error': 'Error: El excel tiene mas de 1 hoja'})
-        # o si el tiene mas de 6 columnas
-        elif worksheet.max_column > 6:
-            print("El excel tiene mas de 6 columnas")
-            return render(request, 'carga_asistencia_excel.html', context={'error': 'Error: El excel tiene mas de 6 columnas'})
-        # o si el excel no tiene la primera columna con el nombre "ID de Usuario"
-        elif wb[wb.sheetnames[0]].cell(row=1, column=1).value != "ID de Usuario":
-            print("El excel no tiene la primera columna con el nombre ID de Usuario")
-            return render(request, 'carga_asistencia_excel.html', context={'error': 'Error: El excel no tiene la primera columna con el nombre ID de Usuario'})
-        # o si el excel no tiene la segunda columna con el nombre "Nombre"
-        elif wb[wb.sheetnames[0]].cell(row=1, column=2).value != "Nombre":
-            print("El excel no tiene la segunda columna con el nombre Nombre")
-            return render(request, 'carga_asistencia_excel.html', context={'error': 'Error: El excel no tiene la segunda columna con el nombre Nombre'})
-        # o si el excel no tiene la tercera columna con el nombre "Tiempo"
-        elif wb[wb.sheetnames[0]].cell(row=1, column=3).value != "Tiempo":
-            print("El excel no tiene la tercera columna con el nombre Tiempo")
-            return render(request, 'carga_asistencia_excel.html', context={'error': 'Error: El excel no tiene la tercera columna con el nombre Tiempo'})
+        # if len(wb.sheetnames) > 1:
+        #     print("El excel tiene mas de 1 hoja")
+        #     return render(request, 'carga_asistencia_excel.html', context={'error': 'Error: El excel tiene mas de 1 hoja'})
+        # # o si el tiene mas de 6 columnas
+        # elif worksheet.max_column > 6:
+        #     print("El excel tiene mas de 6 columnas")
+        #     return render(request, 'carga_asistencia_excel.html', context={'error': 'Error: El excel tiene mas de 6 columnas'})
+        # # o si el excel no tiene la primera columna con el nombre "ID de Usuario"
+        # elif wb[wb.sheetnames[0]].cell(row=1, column=1).value != "ID de Usuario":
+        #     print("El excel no tiene la primera columna con el nombre ID de Usuario")
+        #     return render(request, 'carga_asistencia_excel.html', context={'error': 'Error: El excel no tiene la primera columna con el nombre ID de Usuario'})
+        # # o si el excel no tiene la segunda columna con el nombre "Nombre"
+        # elif wb[wb.sheetnames[0]].cell(row=1, column=2).value != "Nombre":
+        #     print("El excel no tiene la segunda columna con el nombre Nombre")
+        #     return render(request, 'carga_asistencia_excel.html', context={'error': 'Error: El excel no tiene la segunda columna con el nombre Nombre'})
+        # # o si el excel no tiene la tercera columna con el nombre "Tiempo"
+        # elif wb[wb.sheetnames[0]].cell(row=1, column=3).value != "Tiempo":
+        #     print("El excel no tiene la tercera columna con el nombre Tiempo")
+        #     return render(request, 'carga_asistencia_excel.html', context={'error': 'Error: El excel no tiene la tercera columna con el nombre Tiempo'})
 
         excel_data = list()
         asistencia_excel = list()
@@ -136,8 +140,9 @@ def carga_asistencia_excel(request):
                 excel_data.append(row_data)
 
         # usuario a partir de la segunda fila
-        for i in range(0, len(excel_data) - 1):
-            asistencia_excel.append(excel_data[i + 1])
+        fila = 1
+        for i in range(0, len(excel_data) - fila):
+            asistencia_excel.append(excel_data[i + fila])
 
         # si el tamaño de usuarios_excel es mayor a 0, guardamos los usuarios en la base de datos
         if len(asistencia_excel) > 0:
@@ -170,18 +175,21 @@ def guardar_asistencia_excel(asistencia_excel, request):
 
     for u in asistencia_excel:
 
-        idUsuario = u[0].replace(" ", "")
-        nombre = u[1]
-        fecha_hora = u[2]
+        # idUsuario = u[0].replace(" ", "")
+        # nombre = u[1]
+        # fecha_hora = u[2]
 
-        # print("")
-        # print("idUsuario: ", idUsuario)
+        idUsuario = u[0].replace(" ", "")
+        fecha_hora = u[1]
+
+        print("")
+        print("idUsuario: ", idUsuario)
         # print("nombre: ", nombre)
-        # print("fecha: ", fecha_hora)
-        # print("")
+        print("fecha: ", fecha_hora)
+        print("")
 
         # convertir fecha a formato datetime
-        fecha_hora = datetime.strptime(fecha_hora, '%m/%d/%Y %H:%M:%S')
+        fecha_hora = datetime.strptime(fecha_hora, '%Y-%m-%d %H:%M:%S')
 
         # antes de guardar en la base de datos, verificar si fecha_hora ya existe en la base de datos
         if Asistencia.objects.filter(fecha_hora=fecha_hora).exists():
@@ -192,8 +200,9 @@ def guardar_asistencia_excel(asistencia_excel, request):
 
         else:
             # guardar en la base de datos en el modelo Asistencia los daros del excel
-            Asistencia(idUsuario=idUsuario, nombre=nombre,
-                       fecha_hora=fecha_hora).save()
+            # Asistencia(idUsuario=idUsuario, nombre=nombre,
+            #            fecha_hora=fecha_hora).save()
+            Asistencia(idUsuario=idUsuario, fecha_hora=fecha_hora).save()
             # print("[+] Asistencia guardada con exito")
 
             # incrementamos el contador de asistencias
@@ -208,7 +217,7 @@ def guardar_asistencia_excel(asistencia_excel, request):
 
 # ****************************************************************************************************
 
-# funcion para obtener las llegadas de la semana
+# funcion para obtener las llegadas de la semana anterior
 def obtener_llegadas(id_asistencia, fecha):
     print("Funcion: obtener_llegadas")
 
@@ -231,7 +240,7 @@ def obtener_llegadas(id_asistencia, fecha):
 
     return llegadas_semana
 
-# funcion para obtener las salidas de la semana
+# funcion para obtener las salidas de la semana anterior
 
 
 def obtener_salidas(id_asistencia, fecha):
@@ -267,6 +276,28 @@ def fecha_lunes_pasado():
     today = datetime.date.today()  # fecha actual
     last_monday = today - \
         datetime.timedelta(days=today.weekday() + 7)  # lunes pasado
+
+    # obtener el año, mes y día del lunes pasado
+    year = last_monday.year
+    month = last_monday.month
+    day = last_monday.day
+
+    # crear un objeto datetime con year, month y day
+    fecha = datetime.datetime(year, month, day)
+
+    return fecha
+
+
+# realiza una funcion que obtenga la fecha del lunes de la semana actual
+
+def fecha_lunes():
+    print("Funcion: fecha_lunes")
+
+    import datetime
+
+    today = datetime.date.today()  # fecha actual
+    last_monday = today - \
+        datetime.timedelta(days=today.weekday())  # lunes pasado
 
     # obtener el año, mes y día del lunes pasado
     year = last_monday.year

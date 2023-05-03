@@ -148,6 +148,8 @@ def guardar_usuarios_excel(usuarios_excel, request):
         semana = u[10].replace(" ", "")
         dias_actuales = u[11].replace(" ", "")
         dias_actuales = int(dias_actuales)
+        id_asistencia = u[12].replace(" ", "")
+        id_asistencia = int(id_asistencia)
 
         print("**************************+***********************************************************************************")
         print("Usuario nuevo se calcula los dias que le corresponde de vacaciones y la vigencia de los dias de los mismos")
@@ -205,7 +207,7 @@ def guardar_usuarios_excel(usuarios_excel, request):
 
         # actualizamos el perfil del usuario
         Perfil.objects.filter(usuario=User.objects.get(username=usuario).pk).update(telefono=telefono, fecha_ingreso=fecha_ingreso,
-                                                                                    fecha_nacimiento=fecha_nacimiento, area=area, dias_vacaciones_disp=dias_vacaciones_disp, vigencia_dias_vacaciones=vigencia_dias_vacaciones, rol=rol, jefe=jefe, semana=semana, token=token)
+                                                                                    fecha_nacimiento=fecha_nacimiento, area=area, dias_vacaciones_disp=dias_vacaciones_disp, vigencia_dias_vacaciones=vigencia_dias_vacaciones, rol=rol, jefe=jefe, semana=semana, token=token, id_asistencia=id_asistencia)
         # imprimir en consola perfil guardado con exito
         print("[+] Perfil guardado con exito")
 
@@ -230,7 +232,7 @@ def guardar_usuarios_excel(usuarios_excel, request):
         }
 
         # enviamos correo de notificacion al usuario
-        # notificacion_usuario_registrado(context_correo, str(correo), request)
+        notificacion_usuario_registrado(context_correo, str(correo), request)
 
         # incrementamos el contador de usuarios
         n_usuarios += 1
@@ -309,6 +311,7 @@ def guardar_nuevo_usuario(request):
     area = request.POST.get("area")
     rol = request.POST.get("rol")
     semana = request.POST.get("semana")
+    id_asistencia = request.POST.get("id_asistencia")
 
     # dias_vacaciones_disp = 0  # request.POST.get("dias_vacaciones_disp")
     # establecemos que la vigencia de los dias de vacaciones es la fecha de ingreso para que el proximo inicio de sesion calcule los dias de vacaciones y la vigencia
@@ -344,10 +347,10 @@ def guardar_nuevo_usuario(request):
     # si imagen es diferente de None
     if imagen != None:
         Perfil.objects.filter(usuario=User.objects.get(username=usuario).pk).update(telefono=telefono, fecha_ingreso=fecha_ingreso,
-                                                                                    fecha_nacimiento=fecha_nacimiento, area=area, dias_vacaciones_disp=dias_vacaciones_disp, vigencia_dias_vacaciones=vigencia_dias_vacaciones, rol=rol, jefe=jefe, semana=semana, imagen=imagen.name)
+                                                                                    fecha_nacimiento=fecha_nacimiento, area=area, dias_vacaciones_disp=dias_vacaciones_disp, vigencia_dias_vacaciones=vigencia_dias_vacaciones, rol=rol, jefe=jefe, semana=semana, id_asistencia=id_asistencia, imagen=imagen.name)
     else:
         Perfil.objects.filter(usuario=User.objects.get(username=usuario).pk).update(telefono=telefono, fecha_ingreso=fecha_ingreso,
-                                                                                    fecha_nacimiento=fecha_nacimiento, area=area, dias_vacaciones_disp=dias_vacaciones_disp, vigencia_dias_vacaciones=vigencia_dias_vacaciones, rol=rol, jefe=jefe, semana=semana)
+                                                                                    fecha_nacimiento=fecha_nacimiento, area=area, dias_vacaciones_disp=dias_vacaciones_disp, vigencia_dias_vacaciones=vigencia_dias_vacaciones, rol=rol, jefe=jefe, semana=semana, id_asistencia=id_asistencia)
 
     # imprimir en consola perfil guardado con exito
     print("[+] Perfil guardado con exito")

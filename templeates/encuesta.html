@@ -1,0 +1,153 @@
+{% extends "master.html" %}
+
+{% block title %}
+Nuevo Usuario
+{% endblock %}
+
+{% block content %}
+
+<section style="background-color: #eeee">
+
+    <div class="container py-4">
+
+        <div class="col-lg-12">
+            <div class="card mb-8">
+                <div class="col-md-12 px-3 py-3">
+
+
+                    <div class="col-md-8 col-lg-6 col-xl-8 offset-xl-1 px-5 py-3 form-group">
+                        <form action="/encuesta/" method="POST" , id="form">
+                            {% csrf_token %}
+
+                            <!-- Nombre del Cliente -->
+                            <div class="form-outline mb-2">
+                                <label for="usuario">Nombre de cliente:</label>
+                                <label id="e_usuario"></label>
+                                <input type="text" name="usuario" id="usuario" class="form-control form-control-sm" placeholder="Cliente" required>
+                            </div>
+
+                            <!-- Numero de orden -->
+                            <div class="form-outline mb-2">
+                                <label for="usuario">Numero de Orden:</label>
+                                <label id="e_usuario"></label>
+                                <input type="text" name="usuario" id="usuario" class="form-control form-control-sm" placeholder="Orden" required>
+                            </div>
+
+                            <!-- Area -->
+                            <div class="form-outline mb-2">
+                                <label for="area">Area:</label>
+                                <!-- combobox Administracion, Modulos, Mecanica, Laboratorio -->
+                                <select name="area" id="area" class="form-control form-control-sm">
+                                    <option value="Mecanica">Mecanica</option>
+                                    <option value="Laboratorio">Laboratorio</option>
+                                    <option value="Modulos">Administracion</option>
+                                </select>
+                            </div>
+
+
+                            <fieldset>
+                                <legend>Pregunta 1</legend>
+                                <div>
+                                    <input type="radio" id="opcion1_1" name="grupo1" value="opcion1_1">
+                                    <label for="opcion1_1">Bueno</label>
+                                </div>
+                                <div>
+                                    <input type="radio" id="opcion1_2" name="grupo1" value="opcion1_2">
+                                    <label for="opcion1_2">Regular</label>
+                                </div>
+                                <div>
+                                    <input type="radio" id="opcion1_3" name="grupo1" value="opcion1_3">
+                                    <label for="opcion1_3">Malo</label>
+                                </div>
+                            </fieldset>
+
+                            <fieldset>
+                                <legend>Pregunta 2</legend>
+                                <div>
+                                    <input type="radio" id="opcion2_1" name="grupo2" value="opcion2_1">
+                                    <label for="opcion2_1">Bueno</label>
+                                </div>
+                                <div>
+                                    <input type="radio" id="opcion2_2" name="grupo2" value="opcion2_2">
+                                    <label for="opcion2_2">Regular</label>
+                                </div>
+                                <div>
+                                    <input type="radio" id="opcion2_3" name="grupo2" value="opcion2_3">
+                                    <label for="opcion2_3">Malo</label>
+                                </div>
+                            </fieldset>
+
+                            <fieldset>
+                                <legend>Pregunta 3</legend>
+                                <div>
+                                    <input type="radio" id="opcion2_1" name="grupo3" value="opcion2_1">
+                                    <label for="opcion2_1">Bueno</label>
+                                </div>
+                                <div>
+                                    <input type="radio" id="opcion2_2" name="grupo3" value="opcion2_2">
+                                    <label for="opcion2_2">Regular</label>
+                                </div>
+                                <div>
+                                    <input type="radio" id="opcion2_3" name="grupo3" value="opcion2_3">
+                                    <label for="opcion2_3">Malo</label>
+                                </div>
+                            </fieldset>
+
+                            <fieldset>
+                                <legend>Pregunta 4</legend>
+                                <div>
+                                    <input type="radio" id="opcion2_1" name="grupo4" value="opcion2_1">
+                                    <label for="opcion2_1">Bueno</label>
+                                </div>
+                                <div>
+                                    <input type="radio" id="opcion2_2" name="grupo4" value="opcion2_2">
+                                    <label for="opcion2_2">Regular</label>
+                                </div>
+                                <div>
+                                    <input type="radio" id="opcion2_3" name="grupo4" value="opcion2_3">
+                                    <label for="opcion2_3">Malo</label>
+                                </div>
+                            </fieldset>
+
+                            <fieldset>
+                                <legend>Pregunta 5</legend>
+                                <div>
+                                    <input type="radio" id="opcion2_1" name="grupo5" value="opcion2_1">
+                                    <label for="opcion2_1">Bueno</label>
+                                </div>
+                                <div>
+                                    <input type="radio" id="opcion2_2" name="grupo5" value="opcion2_2">
+                                    <label for="opcion2_2">Regular</label>
+                                </div>
+                                <div>
+                                    <input type="radio" id="opcion2_3" name="grupo5" value="opcion2_3">
+                                    <label for="opcion2_3">Malo</label>
+                                </div>
+                            </fieldset>
+
+
+                            <legend>Deja un comentario o sugerancia</legend>
+
+                            <textarea class="form-control" rows="5" id="comment"></textarea>
+
+
+
+                            <!-- Submit -->
+                            <div class="pt-5">
+                                <input type="button" value="Enviar encuesta" onclick="" class="btn btn-primary position-absolute bottom-0 start-50 translate-middle-x mb-3">
+                            </div>
+
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+</section>
+
+{% load static %}
+<!-- JavaScript -->
+<!-- <script type="text/javascript" src="{% static 'js/usuarios.js'%}"></script> -->
+
+{% endblock %}

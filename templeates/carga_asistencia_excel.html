@@ -72,7 +72,6 @@ Carga de Asistencia Excel
                                 <tr>
                                     <th class="campo_corto">#</th>
                                     <th class="campo">Usuario</th>
-                                    <th class="campo">Nombre</th>
                                     <th class="campo">Fecha y Hora</th>
                                 </tr>
                             </thead>
@@ -82,7 +81,6 @@ Carga de Asistencia Excel
                                     <td class="registro_corto">{{ forloop.counter }}</td>
                                     <td class="registro">{{ usuario.0 }}</td>
                                     <td class="registro">{{ usuario.1 }}</td>
-                                    <td class="registro">{{ usuario.2 }}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
