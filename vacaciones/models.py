@@ -21,14 +21,17 @@ from django.db.models.signals import post_save
 # --------------------------------------------------------------------
 
 JEFES = [
-    ('Javier Gonzalez', 'Javier Gonzalez'),
-    ('Javier Ramirez', 'Javier Ramirez'),
-    ('Yovani Gonzalez', 'Yovani Gonzalez'),
-    ('Ivan Gonzalez', 'Ivan Gonzalez'),
-    ('David Mercado', 'David Mercado'),
-    ('Aldo Garcia', 'Aldo Garcia'),
-    ('Jorge Hernandez', 'Jorge Hernandez'),
-    ('Francisco Vargas', 'Francisco Vargas')
+    ('Javier Gonzalez Piedras', 'Javier Gonzalez Piedras'),
+    ('Javier Gonzalez Ramirez', 'Javier Gonzalez Ramirez'),
+    ('Yovani Gonzalez Piedras', 'Yovani Gonzalez Piedras'),
+    ('Ivan Gonzalez Garcia', 'Ivan Gonzalez Garcia'),
+    ('David Enrique Mercado Gonzalez', 'David Enrique Mercado Gonzalez'),
+
+    ('Aldo Damian Garcia', 'Aldo Damian Garcia'),
+    ('Jorge Roman Hernandez Cuamatla', 'Jorge Roman Hernandez Cuamatla'),
+    ('Francisco Javier Vargas Ojeda', 'Francisco Javier Vargas Ojeda'),
+    ('Erika Paola Chagolla Gonzalez', 'Erika Paola Chagolla Gonzalez'),
+    ('Mario Alberto Mejia Contador', 'Mario Alberto Mejia Contador')
 ]
 
 AREAS = [
@@ -40,7 +43,7 @@ AREAS = [
     ('Compras', 'Compras'),
     ('Mantenimiento', 'Mantenimiento'),
     ('Cocina', 'Cocina'),
-    ('Limpieza', 'Limpieza'),
+    ('Limpieza', 'Limpieza')
 ]
 
 ROLES = [
@@ -85,7 +88,8 @@ class Perfil(models.Model):
                               blank=True, choices=SEMANA, default="Lunes-Sabado")
     token = models.CharField(max_length=100, null=True, blank=True)
     id_asistencia = models.PositiveSmallIntegerField(null=True, blank=True)
-    dispositivo = models.CharField(max_length=50, choices=DISPOSITIVO, default="No registrado")
+    dispositivo = models.CharField(
+        max_length=50, choices=DISPOSITIVO, default="No registrado")
 
     def __str__(self):
         return self.rol

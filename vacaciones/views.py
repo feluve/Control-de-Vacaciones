@@ -229,10 +229,32 @@ def registra_solicitud(request, dias_solicitados, fecha_solicitud, fecha_final, 
             'comentario_solicitud': comentario_solicitud
         }
 
+        # correo_jefe = User.objects.get(
+        #     first_name=request.user.perfil.jefe.split(' ')[0]).email
+
+        print("**************************+*******************************************************")
+        jefe = request.user.perfil.jefe
+        print("jefe consulta: ", jefe)
+
+        # sepramos por espacios el nombre del jefe
+        j = jefe.split(' ')
+
+        # si el tamaño de d es mas de 3 es porque tiene mas de un nombre
+        if len(j) == 3:
+            # concatenamos el primer nombre
+            jefe = f"{j[0]}"
+
+        if len(j) == 4:
+            # concatenamos el primer nombre
+            jefe = f"{j[0]} {j[1]}"
+
+        print("jefe: ", jefe)
+
         correo_jefe = User.objects.get(
-            first_name=request.user.perfil.jefe.split(' ')[0]).email
-        # correo_jefe = User.objects.get(first_name=request.user.perfil.jefe)
-        # correo_jefe = correo_jefe.split(' ')[0].email
+            first_name=jefe).email
+
+        print("correo_jefe: ", correo_jefe)
+        print("**************************+*******************************************************")
 
         to = []
         if correo_jefe != None:

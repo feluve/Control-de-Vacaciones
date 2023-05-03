@@ -184,9 +184,11 @@ Inicio
                             <div class="col-md-12 px-3 py-3 text-center">
                                 <a href="asistencia/" class="btn btn-primary m-3">Consultar</a>
                             </div>
+                            {% if request.user.perfil.rol == "admin" %}
                             <div class="col-md-12 px-3 py-3 text-center">
                                 <a href="dispositivo/" class="btn btn-primary m-3">Registrar</a>
                             </div>
+                            {% endif %}
                         </div>
 
                     </div>
