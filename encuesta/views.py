@@ -4,9 +4,8 @@ from django.shortcuts import render
 
 
 def encuesta(request):
-    
-    context = {
-        
-    }
-    
-    return render(request, 'encuesta.html', context)
+    print("Vista: encuesta", request.user)
+
+    context = {}
+
+    return render(request, "encuesta.html", context)

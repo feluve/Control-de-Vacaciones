@@ -1,77 +1,87 @@
-{% extends 'master.html' %}
-
-{% block title %}
-Contraseña nueva
-{% endblock %}
-
-{% block content %}
+{% extends 'master.html' %} {% block title %} Contraseña nueva {% endblock %} {% block content %}
 
 <section style="background-color: #eeee">
-
-    <div class="container py-4">
-        <div class="col-lg-12">
-            <div class="card mb-8">
-                <div class="col-md-12 px-3 py-3">
-
-                    <div class="col-md-8 col-lg-6 col-xl-4 offset-xl-1 px-5 py-3">
-
-                        <div class="divider d-flex align-items-center my-4">
-                            <p class="fw-bold mx-3 mb-0" style="font-size: 25px;">Crea una nueva contraseña</p>
-                        </div>
-
-                        <!-- <form method="POST" , id="form"> -->
-                        {% csrf_token %}
-
-                        <!-- contrasena1 -->
-                        <div class="form-outline">
-                            <input type="password" name="contrasena1" id="contrasena1" class="form-control form-control-lg" placeholder="Nueva contraseña">
-                        </div>
-
-                        <!-- Validaciones -->
-                        <div class="text-center text-lg-start pt-2">
-                            <label class="form-label">De 8 a 50 caracteres</label><label class="form-label mx-2" id="e_caracteres"></label>
-                            <br>
-                            <label class="form-label">Un numero</label><label class="form-label mx-2" id="e_numero"></label>
-                            <br>
-                            <label class="form-label">Una letra mayuscula</label><label class="form-label mx-2" id="e_mayuscula"></label>
-                            <br>
-                            <label class="form-label">Un caracter especial !,%,&,@,#,$,^,*,_,~</label><label class="form-label mx-2" id="e_caracter_esp"></label>
-                            <br>
-                        </div>
-
-                        <!-- contrasena2 -->
-                        <div class="form-outline py-2">
-                            <input type="password" name="contrasena2" id="contrasena2" class="form-control form-control-lg" placeholder="Confirmar contraseña nueva">
-                        </div>
-
-                        <!-- Confirmar -->
-                        <div class="text-center text-lg-start pt-2">
-                            <label class="form-label">Confirmar contraseña</label><label class="form-label mx-2" id="e_confirmar"></label>
-                        </div>
-
-                        <!-- Submit -->
-                        <div class="text-center text-lg-start mt-4 mb-4">
-                            <!-- <input type="submit" value="Confirmar" onclick="validaciones('{{ usuario }}', '{{ token }}', '{{ dominio }}')" class="btn btn-primary" style="padding-left: 5.5rem; padding-right: 5.5rem"> -->
-                            <input type="submit" id="btn_confirmar" value="Confirmar" onclick="confirmar_contrasena('{{ usuario }}', '{{ token }}', '{{ dominio }}')" class="btn btn-primary pb"
-                                style="padding-left: 5.5rem; padding-right: 5.5rem">
-                        </div>
-
-                    </div>
-
-                </div>
+  <div class="container py-4">
+    <div class="col-lg-12">
+      <div class="card mb-8">
+        <div class="col-md-12 px-3 py-3">
+          <div class="col-md-8 col-lg-6 col-xl-4 offset-xl-1 px-5 py-3">
+            <div class="divider d-flex align-items-center my-4">
+              <p class="fw-bold mx-3 mb-0" style="font-size: 25px">Crea una nueva contraseña</p>
             </div>
-        </div>
 
-        <div class="text-center pt-3">
-            <a class="btn btn-dark" href="/" style="width: 100px;">Inicio</a>
-        </div>
+            <!-- <form method="POST" , id="form"> -->
+            {% csrf_token %}
 
+            <!-- contrasena1 -->
+            <div class="" style="display: flex; align-items: center">
+              <input type="password" name="contrasena1" id="contrasena1" class="form-control form-control-lg" placeholder="Nueva contraseña" />
+              <i id="iconP1" class="bx bx-show" style="font-size: 35px; cursor: pointer; padding-left: 5px"></i>
+            </div>
+
+            <!-- Validaciones -->
+            <div class="text-center text-lg-start pt-2">
+              <label class="form-label">De 8 a 50 caracteres</label><label class="form-label mx-2" id="e_caracteres"></label>
+              <br />
+              <label class="form-label">Un numero</label><label class="form-label mx-2" id="e_numero"></label>
+              <br />
+              <label class="form-label">Una letra mayuscula</label><label class="form-label mx-2" id="e_mayuscula"></label>
+              <br />
+              <label class="form-label">Un caracter especial !,%,&,@,#,$,^,*,_,~</label><label class="form-label mx-2" id="e_caracter_esp"></label>
+              <br />
+            </div>
+
+            <!-- contrasena2 -->
+            <div class="" style="display: flex; align-items: center">
+              <input type="password" name="contrasena2" id="contrasena2" class="form-control form-control-lg" placeholder="Confirmar contraseña nueva" />
+              <i id="iconP2" class="bx bx-show" style="font-size: 35px; cursor: pointer; padding-left: 5px"></i>
+            </div>
+
+            <!-- Confirmar -->
+            <div class="text-center text-lg-start pt-2"><label class="form-label">Confirmar contraseña</label><label class="form-label mx-2" id="e_confirmar"></label></div>
+
+            <!-- Submit -->
+            <div class="text-center text-lg-start mt-4 mb-4">
+              <!-- <input type="submit" value="Confirmar" onclick="validaciones('{{ usuario }}', '{{ token }}', '{{ dominio }}')" class="btn btn-primary" style="padding-left: 5.5rem; padding-right: 5.5rem"> -->
+              <input type="submit" id="btn_confirmar" value="Confirmar" onclick="confirmar_contrasena('{{ usuario }}', '{{ token }}', '{{ dominio }}')" class="btn btn-primary pb" style="padding-left: 5.5rem; padding-right: 5.5rem" />
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
+    <div class="text-center pt-3">
+      <a class="btn btn-dark" href="/" style="width: 100px">Inicio</a>
+    </div>
+  </div>
 </section>
 
 {% load static %}
 <!-- JavaScript -->
 <script type="text/javascript" src="{% static 'js/contrasena_nueva.js'%}"></script>
+<script>
+  // listener click en el icono
+  // cambiar el tipo de input de password a text y viceversa y cambiar el icono
+  document.getElementById("iconP1").addEventListener("click", function () {
+    if (document.getElementById("contrasena1").type === "password") {
+      document.getElementById("contrasena1").type = "text";
+      document.getElementById("iconP1").className = "bx bx-hide";
+    } else {
+      document.getElementById("contrasena1").type = "password";
+      document.getElementById("iconP1").className = "bx bx-show";
+    }
+  });
+  // listener click en el icono
+  // cambiar el tipo de input de password a text y viceversa y cambiar el icono
+  document.getElementById("iconP2").addEventListener("click", function () {
+    if (document.getElementById("contrasena2").type === "password") {
+      document.getElementById("contrasena2").type = "text";
+      document.getElementById("iconP2").className = "bx bx-hide";
+    } else {
+      document.getElementById("contrasena2").type = "password";
+      document.getElementById("iconP2").className = "bx bx-show";
+    }
+  });
+</script>
 
 {% endblock %}

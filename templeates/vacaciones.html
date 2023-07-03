@@ -1,16 +1,8 @@
-{% extends "master.html" %}
-
-{% block title %}
-Inicio
-{% endblock %}
-
-{% if request.user.is_authenticated %}
-{% block content %}
+{% extends "master.html" %} {% block title %} Inicio {% endblock %} {% if request.user.is_authenticated %} {% block content %}
 
 <section style="background-color: #eeee">
-
-    <div class="container py-1">
-        <!-- <div class="row">
+  <div class="container py-1">
+    <!-- <div class="row">
             <div class="col">
                 <nav aria-label="breadcrumb" class="bg-light rounded-3 p-3 mb-4">
                     <ol class="breadcrumb mb-0">
@@ -20,493 +12,477 @@ Inicio
             </div>
         </div> -->
 
-        <div class="row pt-4">
-            <div class="col-lg-4">
-                <div class="card mb-4">
-                    <div class="card-body text-center">
-                        <img src={{user.perfil.imagen.url}} alt="avatar" class="rounded-circle img-fluid" style="width: 250px;">
-                        <h5 class="my-3">{{user.get_full_name}}</h5>
-                        <p class="text-muted mb-1">{{user.perfil.rol}}</p>
-                        <p class="text-muted mb-4"></p>
-                        <div class="d-flex justify-content-center mb-2">
-                        </div>
-                    </div>
-                </div>
+    <div class="row pt-4">
+      <div class="col-lg-4">
+        <div class="card mb-4">
+          <div class="card-body text-center">
+            <img src="{{user.perfil.imagen.url}}" alt="avatar" class="rounded-circle img-fluid" style="width: 250px" />
+            <h5 class="my-3">{{user.get_full_name}}</h5>
+            <p class="text-muted mb-1">{{user.perfil.rol}}</p>
+            <p class="text-muted mb-4"></p>
+            <div class="d-flex justify-content-center mb-2"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-8">
+        <div class="card mb-4">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-sm-12">
+                <p class="mb-0 fw-bold fs-5 text-center pb-4">Perfil</p>
+              </div>
+              <div class="col-sm-3">
+                <p class="mb-0 fw-bold">Correo:</p>
+              </div>
+              <div class="col-sm-9">
+                <p class="text-muted mb-0">{{user.email}}</p>
+              </div>
             </div>
+            <hr />
+            <div class="row">
+              <div class="col-sm-3">
+                <p class="mb-0 fw-bold">Fecha de Nacimiento:</p>
+              </div>
+              <div class="col-sm-9">
+                <p class="text-muted mb-0">{{ user.perfil.fecha_nacimiento }}</p>
+              </div>
+            </div>
+            <hr />
+            <div class="row">
+              <div class="col-sm-3">
+                <p class="mb-0 fw-bold">Telefono:</p>
+              </div>
+              <div class="col-sm-9">
+                <p class="text-muted mb-0">{{user.perfil.telefono}}</p>
+              </div>
+            </div>
+            <hr />
+            <div class="row">
+              <div class="col-sm-3">
+                <p class="mb-0 fw-bold">Area:</p>
+              </div>
+              <div class="col-sm-9">
+                <p class="text-muted mb-0">{{user.perfil.area}}</p>
+              </div>
+            </div>
+            <hr />
+            <div class="row">
+              <div class="col-sm-3">
+                <p class="mb-0 fw-bold">Jefe:</p>
+              </div>
+              <div class="col-sm-9">
+                <p class="text-muted mb-0">{{user.perfil.jefe}}</p>
+              </div>
+            </div>
+            <hr />
+            <div class="row">
+              <div class="col-sm-3">
+                <p class="mb-0 fw-bold">Fecha de Ingreso:</p>
+              </div>
+              <div class="col-sm-9">
+                <p class="text-muted mb-0">{{user.perfil.fecha_ingreso|date:'d-M-Y'}}</p>
+              </div>
+            </div>
+            <hr />
+            <div class="row">
+              <div class="col-sm-3">
+                <p class="mb-0 fw-bold">Semana de trabajo:</p>
+              </div>
+              <div class="col-sm-9">
+                <p class="text-muted mb-0">{{user.perfil.semana}}</p>
+              </div>
+            </div>
+            <hr />
+            <div class="row">
+              <div class="col-sm-3">
+                <p class="mb-0 fw-bold">D&iacute;as dosponibles de vacaciones:</p>
+              </div>
+              <div class="col-sm-9">
+                <p class="text-muted mb-0" id="dias_disp">{{dias_disponibles}}</p>
+              </div>
+            </div>
+            <hr />
+            <div class="row">
+              <div class="col-sm-3">
+                <p class="mb-0 fw-bold">Vigencia:</p>
+              </div>
+              <div class="col-sm-9">
+                <p class="text-muted mb-0">{{fecha_vigencia_obj|date:'d-M-Y'}}</p>
+              </div>
+            </div>
+            <hr />
+            <div class="row text-center">
+              <div class="col-sm-12">
+                <p class="mb-0 fw-bold fs-5">Solicitar Vacaciones</p>
+              </div>
 
-            <div class="col-lg-8">
-                <div class="card mb-4">
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-sm-12">
-                                <p class="mb-0 fw-bold fs-5 text-center pb-4">Perfil</p>
-                            </div>
-                            <div class="col-sm-3">
-                                <p class="mb-0 fw-bold">Correo:</p>
-                            </div>
-                            <div class="col-sm-9">
-                                <p class="text-muted mb-0">{{user.email}}</p>
-                            </div>
-                        </div>
-                        <hr />
-                        <div class="row">
-                            <div class="col-sm-3">
-                                <p class="mb-0 fw-bold">Fecha de Nacimiento:</p>
-                            </div>
-                            <div class="col-sm-9">
-                                <p class="text-muted mb-0">{{ user.perfil.fecha_nacimiento }}</p>
-                            </div>
-                        </div>
-                        <hr />
-                        <div class="row">
-                            <div class="col-sm-3">
-                                <p class="mb-0 fw-bold">Telefono:</p>
-                            </div>
-                            <div class="col-sm-9">
-                                <p class="text-muted mb-0">{{user.perfil.telefono}}</p>
-                            </div>
-                        </div>
-                        <hr />
-                        <div class="row">
-                            <div class="col-sm-3">
-                                <p class="mb-0 fw-bold">Area:</p>
-                            </div>
-                            <div class="col-sm-9">
-                                <p class="text-muted mb-0">{{user.perfil.area}}</p>
-                            </div>
-                        </div>
-                        <hr />
-                        <div class="row">
-                            <div class="col-sm-3">
-                                <p class="mb-0 fw-bold">Jefe:</p>
-                            </div>
-                            <div class="col-sm-9">
-                                <p class="text-muted mb-0">{{user.perfil.jefe}}</p>
-                            </div>
-                        </div>
-                        <hr />
-                        <div class="row">
-                            <div class="col-sm-3">
-                                <p class="mb-0 fw-bold">Fecha de Ingreso:</p>
-                            </div>
-                            <div class="col-sm-9">
-                                <p class="text-muted mb-0">{{user.perfil.fecha_ingreso|date:'d-M-Y'}}</p>
-                            </div>
-                        </div>
-                        <hr />
-                        <div class="row">
-                            <div class="col-sm-3">
-                                <p class="mb-0 fw-bold">Semana de trabajo:</p>
-                            </div>
-                            <div class="col-sm-9">
-                                <p class="text-muted mb-0">{{user.perfil.semana}}</p>
-                            </div>
-                        </div>
-                        <hr />
-                        <div class="row">
-                            <div class="col-sm-3">
-                                <p class="mb-0 fw-bold">D&iacute;as dosponibles de vacaciones:</p>
-                            </div>
-                            <div class="col-sm-9">
-                                <p class="text-muted mb-0" id="dias_disp">{{dias_disponibles}}</p>
-                            </div>
-                        </div>
-                        <hr />
-                        <div class="row">
-                            <div class="col-sm-3">
-                                <p class="mb-0 fw-bold">Vigencia:</p>
-                            </div>
-                            <div class="col-sm-9">
-                                <p class="text-muted mb-0">{{fecha_vigencia_obj|date:'d-M-Y'}}</p>
-                            </div>
-                        </div>
-                        <hr />
-                        <div class="row text-center">
+              <div class="col-sm-12">
+                <form action="/registra_solicitud/" method="POST" id="form">
+                  {% csrf_token %}
 
-                            <div class="col-sm-12">
-                                <p class="mb-0 fw-bold fs-5">Solicitar Vacaciones</p>
-                            </div>
+                  <div class="col-sm-12 py-3">
+                    <label class="mb-0 px-1">D&iacute;as a solicitar:</label>
 
-                            <div class="col-sm-12">
+                    <button type="button" id="-" value="-" onclick="resta_dias()" class="btn btn-primary px-3" data-dias_min_sol="{{ dias_min_sol}}" {{disabled}}><i class="fa fa-minus-circle"></i></button>
 
-                                <form action="/registra_solicitud/" method="POST" id="form">
-                                    {% csrf_token %}
+                    <input class="mx-0" type="number" id="num_dias_sol" name="dias_sol" min="1" max="10" value="0" disabled />
 
-                                    <div class="col-sm-12 py-3">
-                                        <label class="mb-0 px-1">D&iacute;as a solicitar:</label>
+                    <button type="button" id="+" value="+" onclick="suma_dias()" class="btn btn-primary px-3" data-dias_max_sol="{{ dias_max_sol}}" {{disabled}}><i class="fa fa-plus-circle"></i></button>
+                  </div>
 
-                                        <button type="button" id="-" value="-" onclick="resta_dias()" class="btn btn-primary px-3" data-dias_min_sol={{ dias_min_sol}} {{disabled}}> <i
-                                                class="fa fa-minus-circle"></i></button>
+                  <div class="col-sm-12 py-3" id="divDate">
+                    <label class="mx-1">Seleccione Fecha: </label>
 
-                                        <input class="mx-0" type="number" id="num_dias_sol" name="dias_sol" min="1" max="10" value="0" disabled />
+                    <input class="" type="date" id="fecha_sol" name="fecha_sol" min="{{ fecha_anticipacion }}" max="{{ fecha_vigencia }}" value="{{ fecha_anticipacion }}" required {{disabled}} />
 
-                                        <button type="button" id="+" value="+" onclick="suma_dias()" class="btn btn-primary px-3" data-dias_max_sol={{ dias_max_sol}} {{disabled}}> <i
-                                                class="fa fa-plus-circle"></i></button>
+                    <button type="button" id="calendario" onclick="muestra_calendario()" class="btn btn-primary px-2 m-1" {{disabled}}><i class="fa fa-calendar-check-o"></i></button>
+                  </div>
 
-                                    </div>
+                  <div class="col-sm-12 py-3">
+                    <label class="mx-1">Comentario: </label>
+                    <textarea id="comentario_solicitud" name="comentario_solicitud" placeholder="Observaciones" cols="40" rows="3" form="form" {{ disabled }}></textarea>
+                  </div>
 
-                                    <div class="col-sm-12 py-3" id="divDate">
-                                        <label class="mx-1">Seleccione Fecha: </label>
+                  <div class="col-sm-12 py-3">
+                    <button type="button" onclick="validaciones('{{ lista_dias_festivos_str|escapejs }}', '{{ lista_nombres_festivos_str|escapejs }}', '{{ dias_max_sol|escapejs }}', '{{ user.perfil.semana }}', '{{ dominio }}')" class="btn btn-primary" id="btnEnviar" {{disabled}}>Enviar solicitud <i class="fa fa-send"></i></button>
+                  </div>
+                </form>
 
-                                        <input class="" type="date" id="fecha_sol" name="fecha_sol" min={{ fecha_anticipacion }} max={{ fecha_vigencia }} value={{ fecha_anticipacion }} required
-                                            {{disabled}} />
-
-                                        <button type="button" id="calendario" onclick="muestra_calendario()" class="btn btn-primary px-2 m-1" {{disabled}}> <i class="fa fa-calendar-check-o"></i>
-                                        </button>
-
-                                    </div>
-
-                                    <div class="col-sm-12 py-3">
-                                        <label class="mx-1">Comentario: </label>
-                                        <textarea id="comentario_solicitud" name="comentario_solicitud" placeholder="Observaciones" cols="40" rows="3" form="form" {{ disabled }}></textarea>
-                                    </div>
-
-                                    <div class="col-sm-12 py-3">
-                                        <button type="button"
-                                            onclick="validaciones('{{ lista_dias_festivos_str|escapejs }}', '{{ lista_nombres_festivos_str|escapejs }}', '{{ dias_max_sol|escapejs }}', '{{ user.perfil.semana }}', '{{ dominio }}')"
-                                            class="btn btn-primary" id="btnEnviar" {{disabled}}> Enviar solicitud <i class="fa fa-send"></i>
-                                        </button>
-                                    </div>
-
-                                </form>
-
-                                <!-- <button onclick="calcula_fecha_final('{{ lista_dias_festivos_str|escapejs }}', '{{ lista_nombres_festivos_str|escapejs }}', '{{ user.perfil.semana }}')">
+                <!-- <button onclick="calcula_fecha_final('{{ lista_dias_festivos_str|escapejs }}', '{{ lista_nombres_festivos_str|escapejs }}', '{{ user.perfil.semana }}')">
                                     Prueba</button> -->
-                            </div>
-
-                        </div>
-
-                        <hr />
-                        <div class="row text-center">
-                            <div class="col-sm-12">
-                                <p class="mb-0 fw-bold fs-5">Asistencia</p>
-                            </div>
-                            <div class="col-md-12 px-3 py-3 text-center">
-                                <a href="asistencia/" class="btn btn-primary m-3">Consultar</a>
-                            </div>
-                            {% if request.user.perfil.rol == "admin" %}
-                            <div class="col-md-12 px-3 py-3 text-center">
-                                <a href="dispositivo/" class="btn btn-primary m-3">Registrar</a>
-                            </div>
-                            {% endif %}
-                        </div>
-
-                    </div>
-                </div>
+              </div>
             </div>
-        </div>
-    </div>
 
-    {% if solicitudes_enviadas_count != 0%}
-    <div class="container pb-4">
-        <div class="col-lg-12">
-            <div class="card mb-8">
-                <div class="col-md-12 px-3 py-3">
-                    <h2 class="py-3 px-3 text-xl-center">Solicitudes Enviadas</h2>
-                    <div class="table-responsive">
-                        <table class="table table-striped">
-                            <thead class="bg-dark">
-                                <tr>
-                                    <th class="campo_corto">#</th>
-                                    <th class="campo">Fecha</th>
-                                    <th class="campo_corto">D&iacute;as</th>
-                                    <th class="campo">Desde</th>
-                                    <th class="campo">Hasta</th>
-                                    <th class="campo">Para</th>
-                                    <th class="campo">Tu Comentario</th>
-                                    <th class="campo">Coment. Jefe</th>
-                                    <th class="campo">Estatus</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for s in solicitudes_enviadas %}
-                                <tr>
-                                    <td class="registro_corto">{{ forloop.counter }}</td>
-                                    <td class="registro">{{ s.fecha |date:'d-M-Y' }}</td>
-                                    <td class="registro_corto">{{ s.dias }}</td>
-                                    <td class="registro">{{ s.fecha_inicio|date:'d-M-Y' }}</td>
-                                    <td class="registro">{{ s.fecha_fin|date:'d-M-Y' }}</td>
-                                    <td class="registro">{{ s.jefe }}</td>
-
-                                    <!-- Tu comentario -->
-                                    {% if s.comentario_solicitud == "-" or s.comentario_solicitud == "" %}
-                                    <td class="registro">-</td>
-                                    {% else %}
-                                    <td class="registro">
-                                        <button class="btn btn-sm btn-block btn-info mx-0 botones" onclick="mostrar_comentario('{{s.comentario_solicitud}}')">Comentario</button>
-                                    </td>
-                                    {% endif %}
-
-                                    <!-- Comentario del jefe -->
-                                    {% if s.comentario_jefe == "-" or s.comentario_jefe == None %}
-                                    <td class="registro">-</td>
-                                    {% else %}
-                                    <td class="registro">
-                                        <button class="btn btn-sm btn-block btn-info mx-0 botones" onclick="mostrar_comentario('{{s.comentario_jefe}}')">Comentario</button>
-                                    </td>
-                                    {% endif %}
-
-                                    <!-- Estado de las solicitudes -->
-                                    {% if s.estado == 'Pendiente' %}
-                                    <td class="registro">
-                                        <button class="btn btn-sm btn-block btn-warning mx-0 botones">{{ s.estado }}</button>
-                                    </td>
-                                    {% elif s.estado == 'Aprobada' %}
-                                    <td class="registro">
-                                        <button class="btn btn-sm btn-block btn-success mx-0 botones">{{ s.estado }}</button>
-                                    </td>
-                                    {% elif s.estado == 'Rechazada' %}
-                                    <td class="registro">
-                                        <button class="btn btn-sm btn-block btn-danger mx-0 botones">{{ s.estado }}</button>
-                                    </td>
-                                    {% elif s.estado == 'Cancelada' %}
-                                    <td class="registro">
-                                        <button class="btn btn-sm btn-block btn-secondary mx-0 botones">{{ s.estado }}</button>
-                                    </td>
-                                    {% endif %}
-
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+            <hr />
+            <div class="row text-center">
+              <div class="col-sm-12">
+                <p class="mb-0 fw-bold fs-5">Asistencia</p>
+              </div>
+              <div class="col-md-12 px-3 py-3 text-center">
+                <a href="asistencia/" class="btn btn-primary m-3">Consultar</a>
+              </div>
+              {% if request.user.perfil.rol == "admin" %}
+              <div class="col-md-12 px-3 py-3 text-center">
+                <a href="dispositivo/" class="btn btn-primary m-3">Registrar</a>
+              </div>
+              {% endif %}
             </div>
+          </div>
         </div>
+      </div>
     </div>
-    {% endif %}
+  </div>
 
+  {% if solicitudes_enviadas_count != 0%}
+  <div class="container pb-4">
+    <div class="col-lg-12">
+      <div class="card mb-8">
+        <div class="col-md-12 px-3 py-3">
+          <h2 class="py-3 px-3 text-xl-center">Solicitudes Enviadas</h2>
+          <div class="table-responsive">
+            <table class="table table-striped">
+              <thead class="bg-dark">
+                <tr>
+                  <th class="campo_corto">#</th>
+                  <th class="campo">Fecha</th>
+                  <th class="campo_corto">D&iacute;as</th>
+                  <th class="campo">Desde</th>
+                  <th class="campo">Hasta</th>
+                  <th class="campo">Para</th>
+                  <th class="campo">Tu Comentario</th>
+                  <th class="campo">Coment. Jefe</th>
+                  <th class="campo">Estatus</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for s in solicitudes_enviadas %}
+                <tr>
+                  <td class="registro_corto">{{ forloop.counter }}</td>
+                  <td class="registro">{{ s.fecha |date:'d-M-Y' }}</td>
+                  <td class="registro_corto">{{ s.dias }}</td>
+                  <td class="registro">{{ s.fecha_inicio|date:'d-M-Y' }}</td>
+                  <td class="registro">{{ s.fecha_fin|date:'d-M-Y' }}</td>
+                  <td class="registro">{{ s.jefe }}</td>
 
-    {% if solicitudes_recibidas_count != 0%}
-    <div class="container pb-4">
-        <div class="col-lg-12">
-            <div class="card mb-8">
-                <div class="col-md-12 px-3 py-3">
-                    <h2 class="py-3 px-3 text-xl-center">Solicitudes Recibidas</h2>
-                    <div class="table-responsive">
-                        <table class="table table-striped">
+                  <!-- Tu comentario -->
+                  {% if s.comentario_solicitud == "-" or s.comentario_solicitud == None %}
+                  <td class="registro">-</td>
+                  {% else %}
+                  <td class="registro">
+                    <button class="btn btn-sm btn-block btn-info mx-0 botones" onclick="mostrar_comentario('{{s.comentario_solicitud}}')">Comentario</button>
+                  </td>
+                  {% endif %}
 
-                            <!-- <thead style="background-color: black;"> -->
-                            <thead class="bg-dark">
-                                <tr>
-                                    <th class="campo_corto">#</th>
-                                    <th class="campo">Fecha</th>
-                                    <th class="campo">De</th>
-                                    <th class="campo_corto">D&iacute;as</th>
-                                    <th class="campo">Desde</th>
-                                    <th class="campo">Hasta</th>
-                                    <th class="campo">Para</th>
-                                    <th class="campo">Coment. Solictante</th>
-                                    <th class="campo">Coment. Jefe</th>
-                                    <th class="campo">Estatus</th>
-                                    <th class="campo_largo">Opcciones</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for s in solicitudes_recibidas %}
-                                <tr>
-                                    <td class="registro_corto">{{ forloop.counter }}</td>
-                                    <td class="registro">{{ s.fecha |date:'d-M-Y' }}</td>
-                                    <td class="registro">{{ s.nombre }}</td>
-                                    <td class="registro_corto">{{ s.dias }}</td>
-                                    <td class="registro">{{ s.fecha_inicio|date:'d-M-Y' }}</td>
-                                    <td class="registro">{{ s.fecha_fin|date:'d-M-Y' }}</td>
-                                    <td class="registro">{{ s.jefe }}</td>
+                  <!-- Comentario del jefe -->
+                  {% if s.comentario_jefe == "-" or s.comentario_jefe == None %}
+                  <td class="registro">-</td>
+                  {% else %}
+                  <td class="registro">
+                    <button class="btn btn-sm btn-block btn-info mx-0 botones" onclick="mostrar_comentario('{{s.comentario_jefe}}')">Comentario</button>
+                  </td>
+                  {% endif %}
 
-                                    <!-- Comenario de la solicitud -->
-                                    {% if s.comentario_solicitud == "-" or s.comentario_solicitud == "" %}
-                                    <td class="registro">-</td>
-                                    {% else %}
-                                    <td class="registro">
-                                        <button class="btn btn-sm btn-block btn-info mx-0 botones" onclick="mostrar_comentario('{{s.comentario_solicitud}}')">Comentario</button>
-                                    </td>
-                                    {% endif %}
-
-                                    <!-- Tu Comenario -->
-                                    {% if s.comentario_jefe == "-" or s.comentario_jefe == None %}
-                                    <td class="registro">-</td>
-                                    {% else %}
-                                    <td class="registro">
-                                        <button class="btn btn-sm btn-block btn-info mx-0 botones" onclick="mostrar_comentario('{{s.comentario_jefe}}')">Comentario</button>
-                                    </td>
-                                    {% endif %}
-
-                                    <!-- Estado de las solicitudes -->
-                                    {% if s.estado == 'Pendiente' %}
-                                    <td class="registro">
-                                        <button class="btn btn-sm btn-block btn-warning mx-0 botones">{{ s.estado }}</button>
-                                    </td>
-                                    {% elif s.estado == 'Aprobada' %}
-                                    <td class="registro">
-                                        <button class="btn btn-sm btn-block btn-success mx-0 botones">{{ s.estado }}</button>
-                                    </td>
-                                    {% elif s.estado == 'Rechazada' %}
-                                    <td class="registro">
-                                        <button class="btn btn-sm btn-block btn-danger mx-0 botones">{{ s.estado }}</button>
-                                    </td>
-                                    {% elif s.estado == 'Cancelada' %}
-                                    <td class="registro">
-                                        <button class="btn btn-sm btn-block btn-secondary mx-0 botones">{{ s.estado }}</button>
-                                    </td>
-                                    {% endif%}
-
-                                    <!-- Opcciones de solicitudes -->
-                                    <td class="opcciones">
-
-                                        {% if s.estado == 'Pendiente' %}
-                                        <!-- <a href="rechazarSolicitud/{{s.id}}" class="btn btn-sm btn-block btn-danger mx-0 botones">Rechazar</a> -->
-                                        <!-- <a href="aprobarSolicitud/{{s.id}}" class="btn btn-sm btn-block btn-success mx-0 botones">Aprobar</a> -->
-
-                                        <button onclick="confirmacionAprobar('{{s.id}}')" class="btn btn-sm btn-block btn-success mx-0 botones">Aprobar</button>
-                                        <button onclick="confirmacionRechazar('{{s.id}}')" class="btn btn-sm btn-block btn-danger mx-0 botones">Rechazar</button>
-                                        {% else %}
-                                        <!-- <a href="rechazarSolicitud/{{s.id}}" class="btn btn-sm btn-block btn-danger mx-0 botones">Rechazar</a> -->
-                                        <!-- <a href="aprobarSolicitud/{{s.id}}" class="btn btn-sm btn-block btn-success mx-0 botones">Aprobar</a> -->
-
-                                        <button disabled class="btn btn-sm btn-block btn-success mx-0 botones">Aprobar</button>
-                                        <button disabled class="btn btn-sm btn-block btn-danger mx-0 botones">Rechazar</button>
-                                        {% endif%}
-                                    </td>
-
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
+                  <!-- Estado de las solicitudes -->
+                  {% if s.estado == 'Pendiente' %}
+                  <td class="registro">
+                    <button class="btn btn-sm btn-block btn-warning mx-0 botones">{{ s.estado }}</button>
+                  </td>
+                  {% elif s.estado == 'Aprobada' %}
+                  <td class="registro">
+                    <button class="btn btn-sm btn-block btn-success mx-0 botones">{{ s.estado }}</button>
+                  </td>
+                  {% elif s.estado == 'Rechazada' %}
+                  <td class="registro">
+                    <button class="btn btn-sm btn-block btn-danger mx-0 botones">{{ s.estado }}</button>
+                  </td>
+                  {% elif s.estado == 'Cancelada' %}
+                  <td class="registro">
+                    <button class="btn btn-sm btn-block btn-secondary mx-0 botones">{{ s.estado }}</button>
+                  </td>
+                  {% endif %}
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
         </div>
+      </div>
     </div>
-    {% endif %}
+  </div>
+  {% endif %} {% if solicitudes_recibidas_count != 0%}
+  <div class="container pb-4">
+    <div class="col-lg-12">
+      <div class="card mb-8">
+        <div class="col-md-12 px-3 py-3">
+          <h2 class="py-3 px-3 text-xl-center">Solicitudes Recibidas</h2>
+          <div class="table-responsive">
+            <table class="table table-striped">
+              <!-- <thead style="background-color: black;"> -->
+              <thead class="bg-dark">
+                <tr>
+                  <th class="campo_corto">#</th>
+                  <th class="campo">Fecha</th>
+                  <th class="campo">De</th>
+                  <th class="campo_corto">D&iacute;as</th>
+                  <th class="campo">Desde</th>
+                  <th class="campo">Hasta</th>
+                  <th class="campo">Para</th>
+                  <th class="campo">Coment. Solictante</th>
+                  <th class="campo">Coment. Jefe</th>
+                  <th class="campo">Estatus</th>
+                  <th class="campo_largo">Opcciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for s in solicitudes_recibidas %}
+                <tr>
+                  <td class="registro_corto">{{ forloop.counter }}</td>
+                  <td class="registro">{{ s.fecha |date:'d-M-Y' }}</td>
+                  <td class="registro">{{ s.nombre }}</td>
+                  <td class="registro_corto">{{ s.dias }}</td>
+                  <td class="registro">{{ s.fecha_inicio|date:'d-M-Y' }}</td>
+                  <td class="registro">{{ s.fecha_fin|date:'d-M-Y' }}</td>
+                  <td class="registro">{{ s.jefe }}</td>
 
-    {% if user.perfil.rol == "admin" or user.perfil.rol == "RH" %}
-    {% if todas_solicitudes_count != 0 %}
-    <div class="container pb-4">
-        <div class="col-lg-12">
-            <div class="card mb-8">
-                <div class="col-md-12 px-3 py-3">
-                    <h2 class="py-3 px-3 text-xl-center"> Todas las Solicitudes</h2>
-                    <div class="table-responsive">
-                        <table class="table table-striped">
+                  <!-- Comenario de la solicitud -->
+                  {% if s.comentario_solicitud == "-" or s.comentario_solicitud == None %}
+                  <td class="registro">-</td>
+                  {% else %}
+                  <td class="registro">
+                    <button class="btn btn-sm btn-block btn-info mx-0 botones" onclick="mostrar_comentario('{{s.comentario_solicitud}}')">Comentario</button>
+                  </td>
+                  {% endif %}
 
-                            <!-- <thead style="background-color: black;"> -->
-                            <thead class="bg-dark">
-                                <tr>
-                                    <th class="campo_corto">#</th>
-                                    <th class="campo">Fecha</th>
-                                    <th class="campo">De</th>
-                                    <th class="campo">Para</th>
-                                    <th class="campo_corto">D&iacute;as</th>
-                                    <th class="campo">Desde</th>
-                                    <th class="campo">Hasta</th>
-                                    <th class="campo">Coment. Solicitante</th>
-                                    <th class="campo">Coment. Jefe</th>
-                                    <th class="campo">Estatus</th>
-                                    <th class="campo_largo">Opcciones</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for s in todas_solicitudes %}
-                                <tr>
-                                    <td class="registro_corto">{{ forloop.counter }}</td>
-                                    <td class="registro">{{ s.fecha |date:'d-M-Y' }}</td>
-                                    <td class="registro">{{ s.nombre }}</td>
-                                    <td class="registro">{{ s.jefe }}</td>
-                                    <td class="registro_corto">{{ s.dias }}</td>
-                                    <td class="registro">{{ s.fecha_inicio|date:'d-M-Y' }}</td>
-                                    <td class="registro">{{ s.fecha_fin|date:'d-M-Y' }}</td>
+                  <!-- Tu Comenario -->
+                  {% if s.comentario_jefe == "-" or s.comentario_jefe == None %}
+                  <td class="registro">-</td>
+                  {% else %}
+                  <td class="registro">
+                    <button class="btn btn-sm btn-block btn-info mx-0 botones" onclick="mostrar_comentario('{{s.comentario_jefe}}')">Comentario</button>
+                  </td>
+                  {% endif %}
 
-                                    <!-- Comenario de la solicitud -->
-                                    {% if s.comentario_solicitud == "-" or s.comentario_solicitud == "" %}
-                                    <td class="registro">-</td>
-                                    {% else %}
-                                    <td class="registro">
-                                        <button class="btn btn-sm btn-block btn-info mx-0 botones" onclick="mostrar_comentario('{{s.comentario_solicitud}}')">Comentario</button>
-                                    </td>
-                                    {% endif %}
+                  <!-- Estado de las solicitudes -->
+                  {% if s.estado == 'Pendiente' %}
+                  <td class="registro">
+                    <button class="btn btn-sm btn-block btn-warning mx-0 botones">{{ s.estado }}</button>
+                  </td>
+                  {% elif s.estado == 'Aprobada' %}
+                  <td class="registro">
+                    <button class="btn btn-sm btn-block btn-success mx-0 botones">{{ s.estado }}</button>
+                  </td>
+                  {% elif s.estado == 'Rechazada' %}
+                  <td class="registro">
+                    <button class="btn btn-sm btn-block btn-danger mx-0 botones">{{ s.estado }}</button>
+                  </td>
+                  {% elif s.estado == 'Cancelada' %}
+                  <td class="registro">
+                    <button class="btn btn-sm btn-block btn-secondary mx-0 botones">{{ s.estado }}</button>
+                  </td>
+                  {% endif%}
 
-                                    <!-- Tu Comenario -->
-                                    {% if s.comentario_jefe == "-" or s.comentario_jefe == "" %}
-                                    <td class="registro">-</td>
-                                    {% else %}
-                                    <td class="registro">
-                                        <button class="btn btn-sm btn-block btn-info mx-0 botones" onclick="mostrar_comentario('{{s.comentario_jefe}}')">Comentario</button>
-                                    </td>
-                                    {% endif %}
+                  <!-- Opcciones de solicitudes -->
+                  <td class="opcciones">
+                    {% if s.estado == 'Pendiente' %}
+                    <!-- <a href="rechazarSolicitud/{{s.id}}" class="btn btn-sm btn-block btn-danger mx-0 botones">Rechazar</a> -->
+                    <!-- <a href="aprobarSolicitud/{{s.id}}" class="btn btn-sm btn-block btn-success mx-0 botones">Aprobar</a> -->
 
-                                    <!-- Estado de las solicitudes -->
-                                    {% if s.estado == 'Pendiente' %}
-                                    <td class="registro">
-                                        <button class="btn btn-sm btn-block btn-warning mx-0 botones">{{ s.estado }}</button>
-                                    </td>
-                                    {% elif s.estado == 'Aprobada' %}
-                                    <td class="registro">
-                                        <button class="btn btn-sm btn-block btn-success mx-0 botones">{{ s.estado }}</button>
-                                    </td>
-                                    {% elif s.estado == 'Rechazada' %}
-                                    <td class="registro">
-                                        <button class="btn btn-sm btn-block btn-danger mx-0 botones">{{ s.estado }}</button>
-                                    </td>
-                                    {% elif s.estado == 'Cancelada' %}
-                                    <td class="registro">
-                                        <button class="btn btn-sm btn-block btn-secondary mx-0 botones">{{ s.estado }}</button>
-                                    </td>
-                                    {% endif%}
+                    <button onclick="confirmacionAprobar('{{s.id}}')" class="btn btn-sm btn-block btn-success mx-0 botones">Aprobar</button>
+                    <button onclick="confirmacionRechazar('{{s.id}}')" class="btn btn-sm btn-block btn-danger mx-0 botones">Rechazar</button>
+                    {% else %}
+                    <!-- <a href="rechazarSolicitud/{{s.id}}" class="btn btn-sm btn-block btn-danger mx-0 botones">Rechazar</a> -->
+                    <!-- <a href="aprobarSolicitud/{{s.id}}" class="btn btn-sm btn-block btn-success mx-0 botones">Aprobar</a> -->
 
-                                    <!-- Opcciones de solicitudes -->
-                                    <td class="opcciones">
-
-                                        {% if s.estado == 'Pendiente' %}
-                                        <!-- <a href="rechazarSolicitud/{{s.id}}" class="btn btn-sm btn-block btn-danger mx-0 botones">Rechazar</a> -->
-                                        <!-- <a href="aprobarSolicitud/{{s.id}}" class="btn btn-sm btn-block btn-success mx-0 botones">Aprobar</a> -->
-
-                                        <button onclick="confirmacionAprobar('{{s.id}}')" class="btn btn-sm btn-block btn-success mx-0 botones">Aprobar</button>
-                                        <button onclick="confirmacionRechazar('{{s.id}}')" class="btn btn-sm btn-block btn-danger mx-0 botones">Rechazar</button>
-                                        {% else %}
-                                        <!-- <a href="rechazarSolicitud/{{s.id}}" class="btn btn-sm btn-block btn-danger mx-0 botones">Rechazar</a> -->
-                                        <!-- <a href="aprobarSolicitud/{{s.id}}" class="btn btn-sm btn-block btn-success mx-0 botones">Aprobar</a> -->
-
-                                        <button disabled class="btn btn-sm btn-block btn-success mx-0 botones">Aprobar</button>
-                                        <button disabled class="btn btn-sm btn-block btn-danger mx-0 botones">Rechazar</button>
-                                        {% endif%}
-                                    </td>
-
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
+                    <button disabled class="btn btn-sm btn-block btn-success mx-0 botones">Aprobar</button>
+                    <button disabled class="btn btn-sm btn-block btn-danger mx-0 botones">Rechazar</button>
+                    {% endif%}
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
         </div>
+      </div>
     </div>
-    {% endif %}
-    {% endif %}
+  </div>
+  {% endif %} {% if user.perfil.rol == "admin" or user.perfil.rol == "RH" %} {% if todas_solicitudes_count != 0 %}
+  <div class="container pb-4">
+    <div class="col-lg-12">
+      <div class="card mb-8">
+        <div class="col-md-12 px-3 py-3">
+          <h2 class="py-3 px-3 text-xl-center">Todas las Solicitudes</h2>
+          <div class="table-responsive">
+            <table class="table table-striped">
+              <!-- <thead style="background-color: black;"> -->
+              <thead class="bg-dark">
+                <tr>
+                  <th class="campo_corto">#</th>
+                  <th class="campo">Fecha</th>
+                  <th class="campo">De</th>
+                  <th class="campo">Para</th>
+                  <th class="campo_corto">D&iacute;as</th>
+                  <th class="campo">Desde</th>
+                  <th class="campo">Hasta</th>
+                  <th class="campo">Coment. Solicitante</th>
+                  <th class="campo">Coment. Jefe</th>
+                  <th class="campo">Estatus</th>
+                  <th class="campo_largo">Opcciones</th>
+                  {% if user.perfil.rol == "admin"%}
+                  <th class="campo_largo">Cancelar</th>
+                  <th class="campo_largo">Notificar</th>
+                  {% endif %}
+                </tr>
+              </thead>
+              <tbody>
+                {% for s in todas_solicitudes %}
+                <tr>
+                  <td class="registro_corto">{{ forloop.counter }}</td>
+                  <td class="registro">{{ s.fecha |date:'d-M-Y' }}</td>
+                  <td class="registro">{{ s.nombre }}</td>
+                  <td class="registro">{{ s.jefe }}</td>
+                  <td class="registro_corto">{{ s.dias }}</td>
+                  <td class="registro">{{ s.fecha_inicio|date:'d-M-Y' }}</td>
+                  <td class="registro">{{ s.fecha_fin|date:'d-M-Y' }}</td>
 
-    {% if request.user.perfil.rol == "admin" or request.user.perfil.rol == "RH" %}
-    <div class="container pb-4">
-        <div class="col-lg-12">
-            <div class="card mb-8">
-                <div class="col-md-12 px-3 py-3 text-center">
-                    <h2 class="py-3 px-3 text-xl-center">Administración</h2>
-                    <hr>
+                  <!-- Comenario de quien solicita -->
+                  {% if s.comentario_solicitud == "-" or s.comentario_solicitud == None %}
+                  <td class="registro">-</td>
+                  {% else %}
+                  <td class="registro">
+                    <button class="btn btn-sm btn-block btn-info mx-0 botones" onclick="mostrar_comentario('{{s.comentario_solicitud}}')">Comentario</button>
+                  </td>
+                  {% endif %}
 
-                    <a href="nuevo_usuario/" class="btn btn-success m-3">Nuevo usuario</a>
-                    <a href="carga_usuarios_excel/" class="btn btn-danger m-3">Cargar Usuarios</a>
-                    <a href="carga_asistencia_excel/" class="btn btn-dark m-3">Cargar Asistencia</a>
-                    <a href="reporte_usuarios/" class="btn btn-primary m-3">Reporte de Usuarios</a>
+                  <!-- Comentario del jefe -->
+                  {% if s.comentario_jefe == "-" or s.comentario_jefe == None %}
+                  <td class="registro">-</td>
+                  {% else %}
+                  <td class="registro">
+                    <button class="btn btn-sm btn-block btn-info mx-0 botones" onclick="mostrar_comentario('{{s.comentario_jefe}}')">Comentario</button>
+                  </td>
+                  {% endif %}
 
-                </div>
-            </div>
+                  <!-- Estado de las solicitudes -->
+                  {% if s.estado == 'Pendiente' %}
+                  <td class="registro">
+                    <button class="btn btn-sm btn-block btn-warning mx-0 botones">{{ s.estado }}</button>
+                  </td>
+                  {% elif s.estado == 'Aprobada' %}
+                  <td class="registro">
+                    <button class="btn btn-sm btn-block btn-success mx-0 botones">{{ s.estado }}</button>
+                  </td>
+                  {% elif s.estado == 'Rechazada' %}
+                  <td class="registro">
+                    <button class="btn btn-sm btn-block btn-danger mx-0 botones">{{ s.estado }}</button>
+                  </td>
+                  {% elif s.estado == 'Cancelada' %}
+                  <td class="registro">
+                    <button class="btn btn-sm btn-block btn-secondary mx-0 botones">{{ s.estado }}</button>
+                  </td>
+                  {% endif%}
+
+                  <!-- Opcciones de solicitudes -->
+                  <td class="opcciones">
+                    {% if s.estado == 'Pendiente' %}
+                    <!-- <a href="rechazarSolicitud/{{s.id}}" class="btn btn-sm btn-block btn-danger mx-0 botones">Rechazar</a> -->
+                    <!-- <a href="aprobarSolicitud/{{s.id}}" class="btn btn-sm btn-block btn-success mx-0 botones">Aprobar</a> -->
+
+                    <button onclick="confirmacionAprobar('{{s.id}}')" class="btn btn-sm btn-block btn-success mx-0 botones">Aprobar</button>
+                    <button onclick="confirmacionRechazar('{{s.id}}')" class="btn btn-sm btn-block btn-danger mx-0 botones">Rechazar</button>
+                    {% else %}
+                    <!-- <a href="rechazarSolicitud/{{s.id}}" class="btn btn-sm btn-block btn-danger mx-0 botones">Rechazar</a> -->
+                    <!-- <a href="aprobarSolicitud/{{s.id}}" class="btn btn-sm btn-block btn-success mx-0 botones">Aprobar</a> -->
+
+                    <button disabled class="btn btn-sm btn-block btn-success mx-0 botones">Aprobar</button>
+                    <button disabled class="btn btn-sm btn-block btn-danger mx-0 botones">Rechazar</button>
+                    {% endif%}
+                  </td>
+
+                  {% if user.perfil.rol == "admin"%}
+                  <td class="opcciones">
+                    {% if s.estado != 'Aprobada' %}
+                    <button disabled class="btn btn-sm btn-block btn-secondary mx-0 botones">Cancelar</button>
+                    {% else %}
+                    <button onclick="cancelarSolicitud('{{s.id}}')" class="btn btn-sm btn-block btn-secondary mx-0 botones">Cancelar</button>
+                    {% endif%}
+                  </td>
+                  <td class="opcciones">
+                    <button onclick="notificarSolicitud('{{s.id}}')" class="btn btn-sm btn-block btn-info mx-0 botones">Notificar</button>
+                  </td>
+                  {% endif %}
+                </tr>
+
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
         </div>
+      </div>
     </div>
-    {% endif %}
+  </div>
+  {% endif %} {% endif %} {% if request.user.perfil.rol == "admin" or request.user.perfil.rol == "RH" %}
+  <div class="container pb-4">
+    <div class="col-lg-12">
+      <div class="card mb-8">
+        <div class="col-md-12 px-3 py-3 text-center">
+          <h2 class="py-3 px-3 text-xl-center">Administración</h2>
+          <hr />
 
+          <a href="nuevo_usuario/" class="btn btn-success m-3">Nuevo usuario</a>
+          <a href="carga_usuarios_excel/" class="btn btn-danger m-3">Cargar Usuarios</a>
+          <a href="carga_asistencia_excel/" class="btn btn-dark m-3">Cargar Asistencia</a>
+          <a href="reporte_usuarios/" class="btn btn-primary m-3">Reporte de Usuarios</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
 </section>
 
 {% load static %}
 <!-- Javascript -->
 <script type="text/javascript" src="{% static 'js/vacaciones.js'%}"></script>
 
-{% endblock %}
-{% endif %}
+{% endblock %} {% endif %}

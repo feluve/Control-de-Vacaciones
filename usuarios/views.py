@@ -21,27 +21,28 @@ from static.py.calculaDiasVacacionesLey import calcula_dias_vacaciones_ley
 from static.py.calculaFechaVigencia import calcula_fecha_vigencia
 from static.py.calculaFechaFinal import calcula_fecha_final
 
+# from django.contrib.auth.views import LoginView
+
 # Create your views here.
 
 # @ user_passes_test(lambda u: u.perfil.rol == 'admin' or u.perfil.rol == 'RH')
 
 
 def master(request):
-
-    return render(request, 'master.html')
+    return render(request, "master.html")
 
 
 @login_required()
 # decorador para verificar si usuario tiene el rol de admin o RH
-@user_passes_test(lambda u: u.perfil.rol == 'admin' or u.perfil.rol == 'RH')
+@user_passes_test(lambda u: u.perfil.rol == "admin" or u.perfil.rol == "RH")
 def carga_usuarios_excel(request):
-    print("Vista: carga_usuarios_excel")
+    print("Vista: carga_usuarios_excel", request.user)
 
     # print(request.FILES)
     # print(request.POST)
 
     if "GET" == request.method:
-        return render(request, 'carga_usuarios_excel.html', {})
+        return render(request, "carga_usuarios_excel.html", {})
     else:
         excel_file = request.FILES["excel_file"]
         # you may put validations here to check extension or file size
@@ -111,21 +112,20 @@ def carga_usuarios_excel(request):
             print("No hay usuarios para guardar en la base de datos")
 
         context = {
-            'excel_data': excel_data,
-            'usuarios_excel': usuarios_excel,
+            "excel_data": excel_data,
+            "usuarios_excel": usuarios_excel,
         }
 
-        return render(request, 'carga_usuarios_excel.html', context)
+        return render(request, "carga_usuarios_excel.html", context)
 
 
 def guardar_usuarios_excel(usuarios_excel, request):
-    print("Funcion: guardar_usuarios_excel")
+    print("Funcion: guardar_usuarios_excel", request.user)
 
     n_usuarios = 0
 
     # cargamos usuarios de excel y los guardamos en la base de datos
     for u in usuarios_excel:
-
         # print("")
         # print("fecha_ingreso: ", u[5])
         # print("fecha_ingreso tipo: ", type(u[5]))
@@ -139,9 +139,9 @@ def guardar_usuarios_excel(usuarios_excel, request):
         correo = u[3].replace(" ", "")
         telefono = u[4].replace(" ", "")
         # convertimos u[5] a un objeto datetime
-        fecha_ingreso = datetime.strptime(u[5], '%Y-%m-%d %H:%M:%S')
+        fecha_ingreso = datetime.strptime(u[5], "%Y-%m-%d %H:%M:%S")
         # convertimos u[6] a un objeto datetime
-        fecha_nacimiento = datetime.strptime(u[6], '%Y-%m-%d %H:%M:%S')
+        fecha_nacimiento = datetime.strptime(u[6], "%Y-%m-%d %H:%M:%S")
         jefe = u[7]
         area = u[8].replace(" ", "")
         rol = u[9].replace(" ", "")
@@ -151,9 +151,15 @@ def guardar_usuarios_excel(usuarios_excel, request):
         id_asistencia = u[12].replace(" ", "")
         id_asistencia = int(id_asistencia)
 
-        print("**************************+***********************************************************************************")
-        print("Usuario nuevo se calcula los dias que le corresponde de vacaciones y la vigencia de los dias de los mismos")
-        print("**************************+***********************************************************************************")
+        print(
+            "**************************+***********************************************************************************"
+        )
+        print(
+            "Usuario nuevo se calcula los dias que le corresponde de vacaciones y la vigencia de los dias de los mismos"
+        )
+        print(
+            "**************************+***********************************************************************************"
+        )
 
         dias_vacaciones_disp = dias_actuales
 
@@ -201,13 +207,29 @@ def guardar_usuarios_excel(usuarios_excel, request):
 
         # crear un nuevo usuario del modelo User
         nuevo_usuario = User.objects.create_user(
-            username=usuario, first_name=nombre, last_name=apellidos, password="neo", email=correo)
+            username=usuario,
+            first_name=nombre,
+            last_name=apellidos,
+            password="neo",
+            email=correo,
+        )
         # imprimir en consola usuario guardado con exito
         print("[+] Usuario guardado con exito")
 
         # actualizamos el perfil del usuario
-        Perfil.objects.filter(usuario=User.objects.get(username=usuario).pk).update(telefono=telefono, fecha_ingreso=fecha_ingreso,
-                                                                                    fecha_nacimiento=fecha_nacimiento, area=area, dias_vacaciones_disp=dias_vacaciones_disp, vigencia_dias_vacaciones=vigencia_dias_vacaciones, rol=rol, jefe=jefe, semana=semana, token=token, id_asistencia=id_asistencia)
+        Perfil.objects.filter(usuario=User.objects.get(username=usuario).pk).update(
+            telefono=telefono,
+            fecha_ingreso=fecha_ingreso,
+            fecha_nacimiento=fecha_nacimiento,
+            area=area,
+            dias_vacaciones_disp=dias_vacaciones_disp,
+            vigencia_dias_vacaciones=vigencia_dias_vacaciones,
+            rol=rol,
+            jefe=jefe,
+            semana=semana,
+            token=token,
+            id_asistencia=id_asistencia,
+        )
         # imprimir en consola perfil guardado con exito
         print("[+] Perfil guardado con exito")
 
@@ -220,15 +242,15 @@ def guardar_usuarios_excel(usuarios_excel, request):
         # notificamos al usuario que se ha creado su cuenta
         # contexto para el correo
         context_correo = {
-            'usuario': usuario,
-            'nombre': f'{nombre} {apellidos}',
-            'area': area,
-            'fecha_ingreso': formato_fecha(str(fecha_ingreso.date())),
-            'jefe': jefe,
-            'semana': semana,
-            'fecha_nacimiento': formato_fecha(str(fecha_nacimiento.date())),
-            'telefono': telefono,
-            'link': link,
+            "usuario": usuario,
+            "nombre": f"{nombre} {apellidos}",
+            "area": area,
+            "fecha_ingreso": formato_fecha(str(fecha_ingreso.date())),
+            "jefe": jefe,
+            "semana": semana,
+            "fecha_nacimiento": formato_fecha(str(fecha_nacimiento.date())),
+            "telefono": telefono,
+            "link": link,
         }
 
         # enviamos correo de notificacion al usuario
@@ -245,12 +267,12 @@ def guardar_usuarios_excel(usuarios_excel, request):
 
 @login_required()
 # decorador para verificar si usuario tiene el rol de admin o RH
-@user_passes_test(lambda u: u.perfil.rol == 'admin' or u.perfil.rol == 'RH')
+@user_passes_test(lambda u: u.perfil.rol == "admin" or u.perfil.rol == "RH")
 def nuevo_usuario(request):
-    print("Vista: nuevo_usuario")
+    print("Vista: nuevo_usuario", request.user)
 
     # obtenemos del modelo User todos los campos username
-    lista_usuarios = User.objects.values_list('username', flat=True)
+    lista_usuarios = User.objects.values_list("username", flat=True)
 
     # convertimos lista_usuarios a lista del tipo string
     lista_usuarios = list(lista_usuarios)
@@ -282,21 +304,21 @@ def nuevo_usuario(request):
         semana.append(s[0])
 
     context = {
-        'lista_usuarios': lista_usuarios,
-        'jefes': jefes,
-        'areas': areas,
-        'roles': roles,
-        'semana': semana,
+        "lista_usuarios": lista_usuarios,
+        "jefes": jefes,
+        "areas": areas,
+        "roles": roles,
+        "semana": semana,
     }
 
     return render(request, "nuevo_usuario.html", context)
 
 
-@ login_required()
+@login_required()
 # decorador para verificar si usuario tiene el rol de admin o RH
-@user_passes_test(lambda u: u.perfil.rol == 'admin' or u.perfil.rol == 'RH')
+@user_passes_test(lambda u: u.perfil.rol == "admin" or u.perfil.rol == "RH")
 def guardar_nuevo_usuario(request):
-    print("Vista: guardar_nuevo_usuario")
+    print("Vista: guardar_nuevo_usuario", request.user)
 
     usuario = request.POST.get("usuario")
     nombre = request.POST.get("nombre")
@@ -317,40 +339,70 @@ def guardar_nuevo_usuario(request):
     # establecemos que la vigencia de los dias de vacaciones es la fecha de ingreso para que el proximo inicio de sesion calcule los dias de vacaciones y la vigencia
     # vigencia_dias_vacaciones = request.POST.get("fecha_ingreso")
 
-    print("**************************+*************************************************************************************")
-    print("Usuario nuevo se calcula los dias que le corresponde de vacaciones y la vigencia de los dias de los mismos")
-    print("**************************+*************************************************************************************")
+    print(
+        "**************************+*************************************************************************************"
+    )
+    print(
+        "Usuario nuevo se calcula los dias que le corresponde de vacaciones y la vigencia de los dias de los mismos"
+    )
+    print(
+        "**************************+*************************************************************************************"
+    )
 
     dias_vacaciones_disp = calcula_dias_vacaciones_ley(fecha_ingreso)
     vigencia_dias_vacaciones = calcula_fecha_vigencia(fecha_ingreso)
 
-    print(
-        f"Ahora tienes {dias_vacaciones_disp} dias de vacaciones")
-    print(
-        f"Con una vigencia de {vigencia_dias_vacaciones}")
+    print(f"Ahora tienes {dias_vacaciones_disp} dias de vacaciones")
+    print(f"Con una vigencia de {vigencia_dias_vacaciones}")
 
     imagen = None
     #  si imagen es diferente de None
     if len(request.FILES) != 0:
-        imagen = request.FILES['imagen']
+        imagen = request.FILES["imagen"]
         fs = FileSystemStorage()
         filename = fs.save(imagen.name, imagen)
         uploaded_file_url = fs.url(filename)
 
     # crear un nuevo usuario del modelo User
     nuevo_usuario = User.objects.create_user(
-        username=usuario, first_name=nombre, last_name=apellidos, password=contrasena, email=correo)
+        username=usuario,
+        first_name=nombre,
+        last_name=apellidos,
+        password=contrasena,
+        email=correo,
+    )
     # imprimir en consola usuario guardado con exito
     print("[+] Usuario guardado con exito")
 
     # actualizamos el perfil del usuario
     # si imagen es diferente de None
     if imagen != None:
-        Perfil.objects.filter(usuario=User.objects.get(username=usuario).pk).update(telefono=telefono, fecha_ingreso=fecha_ingreso,
-                                                                                    fecha_nacimiento=fecha_nacimiento, area=area, dias_vacaciones_disp=dias_vacaciones_disp, vigencia_dias_vacaciones=vigencia_dias_vacaciones, rol=rol, jefe=jefe, semana=semana, id_asistencia=id_asistencia, imagen=imagen.name)
+        Perfil.objects.filter(usuario=User.objects.get(username=usuario).pk).update(
+            telefono=telefono,
+            fecha_ingreso=fecha_ingreso,
+            fecha_nacimiento=fecha_nacimiento,
+            area=area,
+            dias_vacaciones_disp=dias_vacaciones_disp,
+            vigencia_dias_vacaciones=vigencia_dias_vacaciones,
+            rol=rol,
+            jefe=jefe,
+            semana=semana,
+            id_asistencia=id_asistencia,
+            imagen=imagen.name,
+        )
     else:
-        Perfil.objects.filter(usuario=User.objects.get(username=usuario).pk).update(telefono=telefono, fecha_ingreso=fecha_ingreso,
-                                                                                    fecha_nacimiento=fecha_nacimiento, area=area, dias_vacaciones_disp=dias_vacaciones_disp, vigencia_dias_vacaciones=vigencia_dias_vacaciones, rol=rol, jefe=jefe, semana=semana, id_asistencia=id_asistencia)
+        Perfil.objects.filter(usuario=User.objects.get(username=usuario).pk).update(
+            telefono=telefono,
+            fecha_ingreso=fecha_ingreso,
+            fecha_nacimiento=fecha_nacimiento,
+            area=area,
+            dias_vacaciones_disp=dias_vacaciones_disp,
+            vigencia_dias_vacaciones=vigencia_dias_vacaciones,
+            rol=rol,
+            jefe=jefe,
+            semana=semana,
+            id_asistencia=id_asistencia,
+        )
 
     # imprimir en consola perfil guardado con exito
     print("[+] Perfil guardado con exito")
@@ -362,8 +414,9 @@ def guardar_nuevo_usuario(request):
     print(f"Token generado: {token}")
 
     # realiza un update en el modelo perfil para actualizar el campo token
-    Perfil.objects.filter(usuario=User.objects.get(
-        username=usuario).pk).update(token=token)
+    Perfil.objects.filter(usuario=User.objects.get(username=usuario).pk).update(
+        token=token
+    )
 
     # imrpime en consola
     print("[+] Token actualizado con exito")
@@ -376,15 +429,15 @@ def guardar_nuevo_usuario(request):
 
     # contexto para el correo
     context_correo = {
-        'usuario': usuario,
-        'nombre': f'{nombre} {apellidos}',
-        'area': area,
-        'fecha_ingreso': formato_fecha(fecha_ingreso),
-        'jefe': jefe,
-        'semana': semana,
-        'fecha_nacimiento': formato_fecha(fecha_nacimiento),
-        'telefono': telefono,
-        'link': link,
+        "usuario": usuario,
+        "nombre": f"{nombre} {apellidos}",
+        "area": area,
+        "fecha_ingreso": formato_fecha(fecha_ingreso),
+        "jefe": jefe,
+        "semana": semana,
+        "fecha_nacimiento": formato_fecha(fecha_nacimiento),
+        "telefono": telefono,
+        "link": link,
     }
 
     # enviamos correo de notificacion al usuario
@@ -393,25 +446,27 @@ def guardar_nuevo_usuario(request):
     # retonamos al DOMINO mas el path de la vista
     # return redirect('/')
 
-    aviso = 'Usuario registrado con exito.'
+    aviso = "Usuario registrado con exito."
     # remplazar de la variable aviso los espacios por guiones bajos
-    aviso = aviso.replace(' ', '_')
+    aviso = aviso.replace(" ", "_")
 
-    return redirect(f'/aviso/{aviso}')
+    return redirect(f"/aviso/{aviso}")
+
 
 # funcion para enviar correo de notificacion al usuario
 
 
 def notificacion_usuario_registrado(context_correo, correo_usuario, request):
-    print("Funcion: notificacion_usuario_registrado")
+    print("Funcion: notificacion_usuario_registrado", request.user)
 
     to = [correo_usuario]
 
-    cc = [os.environ.get('EMAIL_CC')]
+    cc = [os.environ.get("EMAIL_CC")]
     subject = f"Registo de usuario"
 
     correo_contenido = render_to_string(
-        'correo_registro_usuario.html', context_correo, request=request)
+        "correo_registro_usuario.html", context_correo, request=request
+    )
     enviar_correo_plantilla(correo_contenido, subject, to)
 
     # imprimir en consola
@@ -420,18 +475,16 @@ def notificacion_usuario_registrado(context_correo, correo_usuario, request):
 
 # -----------------------Recupracion de contraseña-----------------------
 
+
 def olvide_contrasena(request):
     print("Vista: olvide_contrasena")
 
     # consulta a la base de datos para obtener todos nombres de usuario
-    usuarios = list(User.objects.all().values_list('username', flat=True))
+    usuarios = list(User.objects.all().values_list("username", flat=True))
 
-    context = {
-        'usuarios': usuarios,
-        'dominio': os.environ.get('DOMINIO')
-    }
+    context = {"usuarios": usuarios, "dominio": os.environ.get("DOMINIO")}
 
-    return render(request, 'olvide_contrasena.html', context)
+    return render(request, "olvide_contrasena.html", context)
 
 
 def link_recuperacion(request, usuario):
@@ -444,14 +497,15 @@ def link_recuperacion(request, usuario):
     print(f"Token: {token}")
 
     # realiza un update en el modelo perfil para actualizar el campo token
-    Perfil.objects.filter(usuario=User.objects.get(
-        username=usuario).pk).update(token=token)
+    Perfil.objects.filter(usuario=User.objects.get(username=usuario).pk).update(
+        token=token
+    )
 
     # imrpime en consola
     print("[+] Token actualizado con exito")
 
     # Obtenermos el nombre completo del usuario
-    nombre = f'{User.objects.get(username=usuario).first_name} {User.objects.get(username=usuario).last_name}'
+    nombre = f"{User.objects.get(username=usuario).first_name} {User.objects.get(username=usuario).last_name}"
 
     # Generamos el link de recuperacion
     link = f'{os.environ.get("DOMINIO")}/contrasena_nueva/{usuario}/{token}'
@@ -460,9 +514,9 @@ def link_recuperacion(request, usuario):
     print(f"Link: {link}")
 
     context_correo = {
-        'nombre': nombre,
-        'link': link,
-        'dominio': os.environ.get('DOMINIO')
+        "nombre": nombre,
+        "link": link,
+        "dominio": os.environ.get("DOMINIO"),
     }
 
     # obtener el nombre de correo del usuario
@@ -474,18 +528,21 @@ def link_recuperacion(request, usuario):
     else:
         to = [correo_usuario]
 
-    cc = [os.environ.get('EMAIL_CC')]
+    cc = [os.environ.get("EMAIL_CC")]
     subject = f"Recuperación de contraseña"
 
     correo_contenido = render_to_string(
-        'correo_recuperacion.html', context_correo, request=request)
+        "correo_recuperacion.html", context_correo, request=request
+    )
     enviar_correo_plantilla(correo_contenido, subject, to)
 
-    aviso = 'Se genero un link de recuperación de contraseña, por favor revisa tu correo'
+    aviso = (
+        "Se genero un link de recuperación de contraseña, por favor revisa tu correo"
+    )
     # remplazar de la variable aviso los espacios por guiones bajos
-    aviso = aviso.replace(' ', '_')
+    aviso = aviso.replace(" ", "_")
 
-    return redirect(f'/aviso/{aviso}')
+    return redirect(f"/aviso/{aviso}")
 
 
 def contrasena_nueva(request, usuario, token):
@@ -496,7 +553,8 @@ def contrasena_nueva(request, usuario, token):
 
     # obtener de el modelo Perfil el token del usuario que se recibe por parametro
     token_usuario = Perfil.objects.get(
-        usuario=User.objects.get(username=usuario).pk).token
+        usuario=User.objects.get(username=usuario).pk
+    ).token
 
     # token del usuario
     # print(f"Token del usuario: {token_usuario}")
@@ -507,21 +565,21 @@ def contrasena_nueva(request, usuario, token):
         print("[+] Token valido")
 
         context = {
-            'usuario': usuario,
-            'token': token,
-            'dominio': os.environ.get('DOMINIO')
+            "usuario": usuario,
+            "token": token,
+            "dominio": os.environ.get("DOMINIO"),
         }
 
-        return render(request, 'contrasena_nueva.html', context)
+        return render(request, "contrasena_nueva.html", context)
     else:
         # token invalido
         print("[-] Token invalido o expirado")
 
-        aviso = 'El link de recuperación de contraseña a expirado, favor de generar uno nuevo.'
+        aviso = "El link de recuperación de contraseña a expirado, favor de generar uno nuevo."
         # remplazar de la variable aviso los espacios por guiones bajos
-        aviso = aviso.replace(' ', '_')
+        aviso = aviso.replace(" ", "_")
 
-        return redirect(f'/aviso/{aviso}')
+        return redirect(f"/aviso/{aviso}")
 
 
 def cambiar_contrasena(request, usuario, token, contrasena):
@@ -541,7 +599,8 @@ def cambiar_contrasena(request, usuario, token, contrasena):
 
     # consultamos del modelo Perfil el token del usuario que se recibe por parametro
     token_usuario = Perfil.objects.get(
-        usuario=User.objects.get(username=usuario).pk).token
+        usuario=User.objects.get(username=usuario).pk
+    ).token
 
     # imprimimos en consola el token del usuario
     print(f"Token del usuario: {token_usuario}")
@@ -564,15 +623,14 @@ def cambiar_contrasena(request, usuario, token, contrasena):
         token_nuevo = generar_token()
 
         # actializamos el modelo Perfil con el nuevo token
-        Perfil.objects.filter(usuario=User.objects.get(
-            username=usuario).pk).update(token=token_nuevo)
+        Perfil.objects.filter(usuario=User.objects.get(username=usuario).pk).update(
+            token=token_nuevo
+        )
 
         # enviamos un correo al usuario indicando que la contraseña fue cambiada con exito
         # creando el contexto del correo
 
-        context_correo = {
-            'nombre': f'{user.first_name} {user.last_name}'
-        }
+        context_correo = {"nombre": f"{user.first_name} {user.last_name}"}
 
         # obtener el nombre de correo del usuario
         correo_usuario = User.objects.get(username=usuario).email
@@ -583,17 +641,16 @@ def cambiar_contrasena(request, usuario, token, contrasena):
         else:
             to = [correo_usuario]
 
-        cc = [os.environ.get('EMAIL_CC')]
+        cc = [os.environ.get("EMAIL_CC")]
         subject = f"Contraseña cambiada"
 
         correo_contenido = render_to_string(
-            'correo_contrasena_cambiada.html', context_correo, request=request)
+            "correo_contrasena_cambiada.html", context_correo, request=request
+        )
         enviar_correo_plantilla(correo_contenido, subject, to)
 
-        context = {
-            'aviso': 'Contraseña generada con exito'
-        }
-        return render(request, 'aviso.html', context)
+        context = {"aviso": "Contraseña generada con exito"}
+        return render(request, "aviso.html", context)
 
     else:
         # token invalido
@@ -601,40 +658,39 @@ def cambiar_contrasena(request, usuario, token, contrasena):
         print("[+] Contraseña no cambiada")
 
         # retorna a la pagina de 404
-        context = {
-            'aviso': 'Ocurrio un error al cambiar la contraseña'
-        }
-        return render(request, 'aviso.html', context)
+        context = {"aviso": "Ocurrio un error al cambiar la contraseña"}
+        return render(request, "aviso.html", context)
+
 
 # vista para generar reportes
 
 
-@ login_required()
+@login_required()
 # decorador para verificar si usuario tiene el rol de admin o RH
-@user_passes_test(lambda u: u.perfil.rol == 'admin' or u.perfil.rol == 'RH')
+@user_passes_test(lambda u: u.perfil.rol == "admin" or u.perfil.rol == "RH")
 def reporte_usuarios(request):
+    print("Vista: reporte_usuarios", request.user)
 
     # realiza una consulta de la tabla User relacionada con la tabla Perfil
     usuarios = User.objects.all() and Perfil.objects.all()
-    usuarios = usuarios.order_by('usuario__username')
+    usuarios = usuarios.order_by("usuario__username")
 
     # print(usuarios.query)
 
     context = {
-        'usuarios': usuarios,
+        "usuarios": usuarios,
     }
 
-    return render(request, 'reporte_usuarios.html', context)
+    return render(request, "reporte_usuarios.html", context)
 
 
 # @login_required()
 def aviso(request, aviso):
-    print("Vista: aviso")
+    print("Vista: aviso", request.user)
 
-    context = {
-        'aviso': aviso
-    }
-    return render(request, 'aviso.html', context)
+    context = {"aviso": aviso}
+    return render(request, "aviso.html", context)
+
 
 # -----------------------Funciones adcionales-----------------------
 
@@ -644,23 +700,29 @@ def aviso(request, aviso):
 def calcular_dias_vacaciones_vigencia(nombre_usuario, fecha_ingreso):
     print("Funcion: calcular_dias_vacaciones_vigencia")
 
-    print("**************************+*******************************************************")
-    print("Usuario nuevo se calcula los dias que le corresponde de vacaciones y la vigencia de los dias de los mismos")
-    print("**************************+*******************************************************")
+    print(
+        "**************************+*******************************************************"
+    )
+    print(
+        "Usuario nuevo se calcula los dias que le corresponde de vacaciones y la vigencia de los dias de los mismos"
+    )
+    print(
+        "**************************+*******************************************************"
+    )
 
     dias_disponibles = calcula_dias_vacaciones_ley(fecha_ingreso)
     fecha_vigencia = calcula_fecha_vigencia(fecha_ingreso)
 
-    print(
-        f"Ahora tienes {dias_disponibles} dias de vacaciones")
-    print(
-        f"Con una vigencia de {fecha_vigencia}")
+    print(f"Ahora tienes {dias_disponibles} dias de vacaciones")
+    print(f"Con una vigencia de {fecha_vigencia}")
 
     # Actulizamos los datos en la BD
     Perfil.objects.filter(usuario=User.objects.get(username=nombre_usuario).pk).update(
-        dias_vacaciones_disp=dias_disponibles, vigencia_dias_vacaciones=fecha_vigencia)
+        dias_vacaciones_disp=dias_disponibles, vigencia_dias_vacaciones=fecha_vigencia
+    )
 
     print("[+] Actualizamos dias disponibles y fecha de vigencia")
+
 
 # funcion que genera una cadena aleatoria de 32 caracteres hexadecimales
 
@@ -670,7 +732,9 @@ def generar_token():
 
     # import secrets
     import secrets
+
     return secrets.token_hex(32)
+
 
 # funcion que desencripta una cadena de texto restandole 3 a cada caracter
 
@@ -693,9 +757,11 @@ def convert_to_date(date):
     print("Funcion: convert_to_date")
 
     import datetime
+
     # convertir la cadena 2022-01-10 a un objeto date
-    date = datetime.datetime.strptime(date, '%Y-%m-%d').date()
+    date = datetime.datetime.strptime(date, "%Y-%m-%d").date()
     return date
+
 
 # funcion recibe como entrada un objeto datetime obtiene el mes y devuelve el nombre del mes a 3 letras en español
 
@@ -707,20 +773,21 @@ def get_month_name(date):
     month = date.month
     # obtener el nombre del mes
     month_name = {
-        1: 'Ene',
-        2: 'Feb',
-        3: 'Mar',
-        4: 'Abr',
-        5: 'May',
-        6: 'Jun',
-        7: 'Jul',
-        8: 'Ago',
-        9: 'Sep',
-        10: 'Oct',
-        11: 'Nov',
-        12: 'Dic',
+        1: "Ene",
+        2: "Feb",
+        3: "Mar",
+        4: "Abr",
+        5: "May",
+        6: "Jun",
+        7: "Jul",
+        8: "Ago",
+        9: "Sep",
+        10: "Oct",
+        11: "Nov",
+        12: "Dic",
     }[month]
     return month_name
+
 
 # funcion que recibe como entrada un string en el formato 2022-01-10 y devuelve en string el dia nombre del mes y año
 
@@ -737,5 +804,5 @@ def formato_fecha(date):
     # obtener el año
     year = date.year
     # concatenar el dia, el nombre del mes y el año
-    date = f'{day}-{month_name}-{year}'
+    date = f"{day}-{month_name}-{year}"
     return date

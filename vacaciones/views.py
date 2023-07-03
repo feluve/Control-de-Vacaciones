@@ -1,4 +1,4 @@
-from django.shortcuts import render,  redirect
+from django.shortcuts import render, redirect
 from datetime import date, timedelta, datetime
 from vacaciones.models import Solicitud_Vacaciones, Perfil, Dias_Festivos_Oficiales
 from django.contrib.auth.decorators import login_required
@@ -20,7 +20,10 @@ import uuid
 
 @login_required()
 def vacaciones(request):
-    print("Vista: vacaciones")
+    print("Vista: vacaciones", request.user)
+
+    # Cambiamos todos los correo de los usuarios
+    # cambiar_correo_usuarios("admin@cegmex.com.mx")
 
     # cursos = Cursos.objects.all()
     # cursos = Cursos.objects.all()[:5]
@@ -35,13 +38,13 @@ def vacaciones(request):
     # cursos = Cursos.objects.all().filter(nombre__startswith="E")
 
     # obtiene el numero minimo de dias de vacaciones por solicitud de la variable de entorno en entero
-    dias_min_sol = int(os.environ.get('DIAS_MIN_SOLICITUD'))
+    dias_min_sol = int(os.environ.get("DIAS_MIN_SOLICITUD"))
 
     # obtiene el numero maximo de dias de vacaciones por solicitud de la variable de entorno en entero
-    dias_max_sol = int(os.environ.get('DIAS_MAX_SOLICITUD'))
+    dias_max_sol = int(os.environ.get("DIAS_MAX_SOLICITUD"))
 
     # obtiene el numero de dias de anticipacion para solicitar vacaciones de la variable de entorno en entero
-    dias_anticipacion = int(os.environ.get('DIAS_ANTICIPACION'))
+    dias_anticipacion = int(os.environ.get("DIAS_ANTICIPACION"))
 
     # Generamos fecha de acticipacion de solicitud de vacaciones
     fecha_anticipacion = str(date.today() + timedelta(days=dias_anticipacion))
@@ -58,35 +61,69 @@ def vacaciones(request):
         fecha_vigencia_actual = request.user.perfil.fecha_ingreso
 
     # Verificamos si la fecha de vigencia ya paso para recalcularle sus dias de vacaciones
-    if (fecha_vigencia_actual < datetime.now().date()):
-        print("**************************+*******************************************************")
+    if fecha_vigencia_actual < datetime.now().date():
         print(
-            "Vencio la fecha de vigencia se recalculan dia de vacaciones y fecha de vigencia")
-        print("**************************+*******************************************************")
-
-        dias_disponibles = calcula_dias_vacaciones_ley(fecha_ingreso)
-        fecha_vigencia = calcula_fecha_vigencia(fecha_ingreso)
-
+            "**************************+*******************************************************"
+        )
         print(
-            f"Ahora tienes {dias_disponibles} dias de vacaciones")
+            "Vencio la fecha de vigencia se recalculan dia de vacaciones y fecha de vigencia"
+        )
         print(
-            f"Con una vigencia de {fecha_vigencia}")
+            "**************************+*******************************************************"
+        )
 
-        # Actulizamos los datos en la BD
-        Perfil.objects.filter(usuario=User.objects.get(username=request.user).pk).update(
-            dias_vacaciones_disp=dias_disponibles, vigencia_dias_vacaciones=fecha_vigencia)
+        # obtenemos del modelo Perfil los dias de vacaciones disponibles
+        dias_actuales = request.user.perfil.dias_vacaciones_disp
+
+        print(f"Los dias actuales son: {dias_actuales}")
+
+        # si los dias actuales son menores a cero o tiene dias negativos
+        if dias_actuales < 0:
+            dias_disponibles = (
+                calcula_dias_vacaciones_ley(fecha_ingreso) + dias_actuales
+            )
+            fecha_vigencia = calcula_fecha_vigencia(fecha_ingreso)
+
+            print(f"Se te descontaran {dias_actuales} dias de vacaciones")
+            print(f"Ahora tienes {dias_disponibles} dias de vacaciones")
+            print(f"Con una vigencia de {fecha_vigencia}")
+
+            # Actulizamos los datos en la BD
+            Perfil.objects.filter(
+                usuario=User.objects.get(username=request.user).pk
+            ).update(
+                dias_vacaciones_disp=dias_disponibles,
+                vigencia_dias_vacaciones=fecha_vigencia,
+            )
+
+        else:
+            dias_disponibles = calcula_dias_vacaciones_ley(fecha_ingreso)
+            fecha_vigencia = calcula_fecha_vigencia(fecha_ingreso)
+
+            print(f"Ahora tienes {dias_disponibles} dias de vacaciones")
+            print(f"Con una vigencia de {fecha_vigencia}")
+
+            # Actulizamos los datos en la BD
+            Perfil.objects.filter(
+                usuario=User.objects.get(username=request.user).pk
+            ).update(
+                dias_vacaciones_disp=dias_disponibles,
+                vigencia_dias_vacaciones=fecha_vigencia,
+            )
 
         print("[+] Actualizamos dias disponibles y fecha de vigencia")
 
     # Obtenemos fecha de vigencia de los dia de vaciones
     # fecha_vigencia_obj = request.user.perfil.vigencia_dias_vacaciones
     fecha_vigencia_obj = Perfil.objects.get(
-        pk=User.objects.get(username=request.user).pk).vigencia_dias_vacaciones
+        pk=User.objects.get(username=request.user).pk
+    ).vigencia_dias_vacaciones
 
     # Obtenemos los dias de vacaciones disponibles
     # dias_disponibles = request.user.perfil.dias_vacaciones_disp
     dias_disponibles = Perfil.objects.get(
-        pk=User.objects.get(username=request.user).pk).dias_vacaciones_disp
+        pk=User.objects.get(username=request.user).pk
+    ).dias_vacaciones_disp
 
     # Calculamos cuantos dias como maximo puede seleccionar en base a los que tiene disponibles y los que le corresponde por ley
     print(
@@ -110,7 +147,8 @@ def vacaciones(request):
 
     # Solicitudes pendientes
     solicitudes_enviadas_pendientes = Solicitud_Vacaciones.objects.filter(
-        estado="Pendiente", usuario=request.user)
+        estado="Pendiente", usuario=request.user
+    )
 
     # Calculamos cuantos dias disponibles tiene el ususario
     # f1 = fecha_vigencia_obj + timedelta(days=-365)
@@ -120,10 +158,11 @@ def vacaciones(request):
     # query_solicitudes_enviadas_aprobadas = Solicitud_Vacaciones.objects.all().values('dias').filter(
     #     estado="Aprobada", usuario=request.user, fecha__gte=f1, fecha__lte=f2)
 
-    # Verificamos si el usuario tiene una solictud pendiente o si sus dias siponibles con 0
-    if (len(solicitudes_enviadas_pendientes) > 0 or dias_disponibles <= 0):
+    # Verificamos si el usuario tiene una solictud pendiente o si sus dias disponibles son menores o iguales a cero
+    if len(solicitudes_enviadas_pendientes) > 0 or dias_disponibles <= 0:
         print(
-            f"[-] {request.user} tienes {len(solicitudes_enviadas_pendientes)} solictude(s) pendiente(s) y {dias_disponibles} dia(s) disponible(s)")
+            f"[-] {request.user} tienes {len(solicitudes_enviadas_pendientes)} solictude(s) pendiente(s) y {dias_disponibles} dia(s) disponible(s)"
+        )
         disabled = "disabled"
     else:
         print("[+] No tienes solicitudes pendientes")
@@ -134,24 +173,27 @@ def vacaciones(request):
     apellido = request.user.last_name.split(" ")[0]
 
     solicitudes_recibidas = Solicitud_Vacaciones.objects.filter(
-        jefe__startswith=f"{request.user.first_name} {apellido}").order_by('-id')
+        jefe__startswith=f"{request.user.first_name} {apellido}"
+    ).order_by("-id")
 
-    print("solictudes recibidas", solicitudes_recibidas)
+    # print("solictudes recibidas", solicitudes_recibidas)
 
     # Dias festivos oficiales
-    lista_dias_festivos = Dias_Festivos_Oficiales.objects.all().order_by('id')
+    lista_dias_festivos = Dias_Festivos_Oficiales.objects.all().order_by("id")
 
     # Lista de Dias o fechas festivas registradas
     lista_dias_festivos_str = []
     for i in range(len(lista_dias_festivos)):
-        lista_dias_festivos_str.append(str(
-            lista_dias_festivos.values('dia_festivo')[i]['dia_festivo']))
+        lista_dias_festivos_str.append(
+            str(lista_dias_festivos.values("dia_festivo")[i]["dia_festivo"])
+        )
 
     # Lista de nombres de la fechas festivas registradas
     lista_nombres_festivos_str = []
     for i in range(len(lista_dias_festivos)):
-        lista_nombres_festivos_str.append(str(
-            lista_dias_festivos.values('nombre')[i]['nombre']))
+        lista_nombres_festivos_str.append(
+            str(lista_dias_festivos.values("nombre")[i]["nombre"])
+        )
 
     context = {
         "fecha_anticipacion": fecha_anticipacion,
@@ -169,7 +211,7 @@ def vacaciones(request):
         "dias_min_sol": dias_min_sol,
         "dias_max_sol": dias_max_sol,
         "dias_disponibles": dias_disponibles,
-        "dominio": os.environ.get("DOMINIO")
+        "dominio": os.environ.get("DOMINIO"),
     }
 
     return render(request, "vacaciones.html", context)
@@ -177,7 +219,7 @@ def vacaciones(request):
 
 @login_required()
 def registra_solicitud(request, dias_solicitados, fecha_solicitud, fecha_final, comentario_solicitud):
-    print("Vista: registra_solicitud")
+    print("Vista: registra_solicitud", request.user)
 
     # fecha_solicitud = request.POST["fecha_sol"]
     # dias_solicitados = int(request.POST["dias_sol"])
@@ -196,14 +238,14 @@ def registra_solicitud(request, dias_solicitados, fecha_solicitud, fecha_final, 
         jefe=request.user.perfil.jefe,
         domingos=domingos,
         dias_festivos=dias_festivos,
-        estado='Pendiente',
-        comentario_solicitud=comentario_solicitud
+        estado="Pendiente",
+        comentario_solicitud=comentario_solicitud,
     )
 
     solicitud.save()
     print(f"[+] Solicitud Registrada para el usuario {request.user.username}")
 
-    id_ultima_solicitud = Solicitud_Vacaciones.objects.latest('id').id
+    id_ultima_solicitud = Solicitud_Vacaciones.objects.latest("id").id
     # print(f"Ultimo id: {id_ultima_solicitud}")
 
     # Consulta cual es el nombre jefe del usuario
@@ -214,30 +256,31 @@ def registra_solicitud(request, dias_solicitados, fecha_solicitud, fecha_final, 
     # print(f"Correo del jefe: {correo_jefe}")
 
     # Notificamos por correo del registro de la solicitud
-    if (os.environ.get('NOTIFICACIONES')):
-
+    if os.environ.get("NOTIFICACIONES"):
         context_correo = {
-            'usuario': request.user.username,
-            'nombre': f"{request.user.first_name} {request.user.last_name}",
-            'dias': dias_solicitados,
-            'fecha_inicio': fecha_str_format(fecha_solicitud),
-            'fecha_fin': fecha_str_format(fecha_final),
-            'jefe': request.user.perfil.jefe,
-            'domingos': domingos,
-            'dias_festivos': dias_festivos,
-            'estado': 'Pendiente',
-            'comentario_solicitud': comentario_solicitud
+            "usuario": request.user.username,
+            "nombre": f"{request.user.first_name} {request.user.last_name}",
+            "dias": dias_solicitados,
+            "fecha_inicio": fecha_str_format(fecha_solicitud),
+            "fecha_fin": fecha_str_format(fecha_final),
+            "jefe": request.user.perfil.jefe,
+            "domingos": domingos,
+            "dias_festivos": dias_festivos,
+            "estado": "Pendiente",
+            "comentario_solicitud": comentario_solicitud,
         }
 
         # correo_jefe = User.objects.get(
         #     first_name=request.user.perfil.jefe.split(' ')[0]).email
 
-        print("**************************+*******************************************************")
+        print(
+            "**************************+*******************************************************"
+        )
         jefe = request.user.perfil.jefe
         print("jefe consulta: ", jefe)
 
         # sepramos por espacios el nombre del jefe
-        j = jefe.split(' ')
+        j = jefe.split(" ")
 
         # si el tamaño de d es mas de 3 es porque tiene mas de un nombre
         if len(j) == 3:
@@ -250,8 +293,7 @@ def registra_solicitud(request, dias_solicitados, fecha_solicitud, fecha_final, 
 
         print("jefe: ", jefe)
 
-        correo_jefe = User.objects.get(
-            first_name=jefe).email
+        correo_jefe = User.objects.get(first_name=jefe).email
 
         print("correo_jefe: ", correo_jefe)
         print("**************************+*******************************************************")
@@ -265,54 +307,55 @@ def registra_solicitud(request, dias_solicitados, fecha_solicitud, fecha_final, 
         subject = f"Registro de solicitud # {id_ultima_solicitud}"
 
         correo_contenido = render_to_string(
-            'correo_resgitro_solicitud.html', context_correo, request=request)
+            "correo_resgitro_solicitud.html", context_correo, request=request
+        )
         enviar_correo_plantilla(correo_contenido, subject, to, cc_flag=True)
 
-    aviso = 'Solicitud registrada con exito.'
+    aviso = "Solicitud registrada con exito."
     # remplazar de la variable aviso los espacios por guiones bajos
-    aviso = aviso.replace(' ', '_')
+    aviso = aviso.replace(" ", "_")
 
-    return redirect(f'/aviso/{aviso}')
+    return redirect(f"/aviso/{aviso}")
 
 
 @login_required()
 def aprobarSolicitud(request, id, comentario):
-    print("Vista: aprobarSolicitud")
+    print("Vista: aprobarSolicitud", request.user)
 
     # Obtenemos solicitud a aprobar
     solicitud = Solicitud_Vacaciones.objects.get(id=id)
 
     # si la solicitud esta pendiente
     if solicitud.estado == "Pendiente":
-
         dias_aprobados = solicitud.dias
         usuario = solicitud.usuario
 
         dias_actuales = Perfil.objects.get(
-            usuario=User.objects.get(username=usuario).pk).dias_vacaciones_disp
+            usuario=User.objects.get(username=usuario).pk
+        ).dias_vacaciones_disp
 
         dias_actuales = dias_actuales - dias_aprobados
 
         # Actualizamos dias disponibles
         Perfil.objects.filter(usuario=User.objects.get(username=usuario).pk).update(
-            dias_vacaciones_disp=dias_actuales)
+            dias_vacaciones_disp=dias_actuales
+        )
 
         solicitud.estado = "Aprobada"
         solicitud.comentario_jefe = comentario
         solicitud.save()
 
         # Notificamos por correo de la aprobacion de la solicitud
-        if (os.environ.get('NOTIFICACIONES')):
-
+        if os.environ.get("NOTIFICACIONES"):
             context_correo = {
-                'nombre': solicitud.nombre,
-                'dias': solicitud.dias,
-                'fecha_inicio': fecha_obj_str_format(solicitud.fecha_inicio),
-                'fecha_fin': fecha_obj_str_format(solicitud.fecha_fin),
+                "nombre": solicitud.nombre,
+                "dias": solicitud.dias,
+                "fecha_inicio": fecha_obj_str_format(solicitud.fecha_inicio),
+                "fecha_fin": fecha_obj_str_format(solicitud.fecha_fin),
                 # 'jefe': solicitud.jefe,
-                'jefe': request.user.first_name + " " + request.user.last_name,
-                'comentario_jefe': solicitud.comentario_jefe,
-                'estado': solicitud.estado
+                "jefe": request.user.first_name + " " + request.user.last_name,
+                "comentario_jefe": solicitud.comentario_jefe,
+                "estado": solicitud.estado,
             }
 
             # obtenemos del modelo User el correo de la persona que realizo la solicitud
@@ -327,52 +370,51 @@ def aprobarSolicitud(request, id, comentario):
             subject = f"Solicitud # {solicitud.id} {solicitud.estado}"
 
             correo_contenido = render_to_string(
-                'correo_estado_solicitud.html', context_correo, request=request)
+                "correo_estado_solicitud.html", context_correo, request=request
+            )
             enviar_correo_plantilla(
                 correo_contenido, subject, to, cc_flag=True)
 
-        aviso = 'Solicitud aprobada con exito.'
+        aviso = "Solicitud aprobada con exito."
         # remplazar de la variable aviso los espacios por guiones bajos
-        aviso = aviso.replace(' ', '_')
+        aviso = aviso.replace(" ", "_")
 
-        return redirect(f'/aviso/{aviso}')
+        return redirect(f"/aviso/{aviso}")
 
     else:
         # solicitud ya aprobada o rechazada
 
-        aviso = 'Esta solicitud ya fue aprobada o rechazada.'
+        aviso = "Esta solicitud ya fue aprobada o rechazada."
         # remplazar de la variable aviso los espacios por guiones bajos
-        aviso = aviso.replace(' ', '_')
+        aviso = aviso.replace(" ", "_")
 
-        return redirect(f'/aviso/{aviso}')
+        return redirect(f"/aviso/{aviso}")
 
 
 @login_required()
 def rechazarSolicitud(request, id, comentario):
-    print("Vista: rechazarSolicitud")
+    print("Vista: rechazarSolicitud", request.user)
 
     # Obtenemos solicitud
     solicitud = Solicitud_Vacaciones.objects.get(id=id)
 
     # si la solicitud esta pendiente
     if solicitud.estado == "Pendiente":
-
         solicitud.estado = "Rechazada"
         solicitud.comentario_jefe = comentario
         solicitud.save()
 
         # Notificamos por correo de la aprobacion de la solicitud
-        if (os.environ.get('NOTIFICACIONES')):
-
+        if os.environ.get("NOTIFICACIONES"):
             context_correo = {
-                'nombre': solicitud.nombre,
-                'dias': solicitud.dias,
-                'fecha_inicio': fecha_obj_str_format(solicitud.fecha_inicio),
-                'fecha_fin': fecha_obj_str_format(solicitud.fecha_fin),
+                "nombre": solicitud.nombre,
+                "dias": solicitud.dias,
+                "fecha_inicio": fecha_obj_str_format(solicitud.fecha_inicio),
+                "fecha_fin": fecha_obj_str_format(solicitud.fecha_fin),
                 # 'jefe': solicitud.jefe,
-                'jefe': request.user.first_name + " " + request.user.last_name,
-                'comentario_jefe': solicitud.comentario_jefe,
-                'estado': solicitud.estado
+                "jefe": request.user.first_name + " " + request.user.last_name,
+                "comentario_jefe": solicitud.comentario_jefe,
+                "estado": solicitud.estado,
             }
 
             # obtenemos del modelo User el correo de la persona que realizo la solicitud
@@ -388,29 +430,139 @@ def rechazarSolicitud(request, id, comentario):
             else:
                 to = [request.user.email]
 
-            cc = [os.environ.get('EMAIL_CC')]
+            cc = [os.environ.get("EMAIL_CC")]
             subject = f"Solicitud # {solicitud.id} {solicitud.estado}"
 
             correo_contenido = render_to_string(
-                'correo_estado_solicitud.html', context_correo, request=request)
+                "correo_estado_solicitud.html", context_correo, request=request
+            )
             enviar_correo_plantilla(
                 correo_contenido, subject, to, cc_flag=True)
 
-        aviso = 'Solicitud rechazada con exito.'
+        aviso = "Solicitud rechazada con exito."
         # remplazar de la variable aviso los espacios por guiones bajos
-        aviso = aviso.replace(' ', '_')
+        aviso = aviso.replace(" ", "_")
 
-        return redirect(f'/aviso/{aviso}')
+        return redirect(f"/aviso/{aviso}")
 
     else:
-
         # solicitud ya aprobada o rechazada
 
-        aviso = 'Esta solicitud ya fue aprobada o rechazada.'
+        aviso = "Esta solicitud ya fue aprobada o rechazada."
         # remplazar de la variable aviso los espacios por guiones bajos
-        aviso = aviso.replace(' ', '_')
+        aviso = aviso.replace(" ", "_")
 
-        return redirect(f'/aviso/{aviso}')
+        return redirect(f"/aviso/{aviso}")
+
+
+def cancelarSolicitud(request, id, comentario):
+    print("Vista: cancelarSolicitud", request.user)
+
+    # obtener el usuario que realizo la solicitud
+    usuario = Solicitud_Vacaciones.objects.get(id=id).usuario
+    print("usuario:", usuario)
+
+    # obtener el numero de dias de la solicitud a cancelar
+    dias_solicitud = Solicitud_Vacaciones.objects.get(id=id).dias
+    print("dias_solicitud:", dias_solicitud)
+
+    # obtener de la tabla Perfil los dias disponibles del usuario
+    dias_actuales = Perfil.objects.get(usuario=User.objects.get(
+        username=usuario).pk).dias_vacaciones_disp
+    print("dias_actuales:", dias_actuales)
+
+    # cambiar estado el comentario de la solicitud
+    Solicitud_Vacaciones.objects.filter(id=id).update(
+        estado="Cancelada", comentario_jefe=comentario.replace("-", " "))
+
+    # le reponemos los dias al usuario de la solicitud cancelada
+    Perfil.objects.filter(usuario=User.objects.get(username=usuario).pk).update(
+        dias_vacaciones_disp=dias_actuales + dias_solicitud)
+
+    # obtenemos los dias disponibles del usuario
+    dias = Perfil.objects.get(usuario=User.objects.get(
+        username=usuario).pk).dias_vacaciones_disp
+    print("dias disponibles:", dias)
+
+    # obtener la solicitud con el id
+    solicitud = Solicitud_Vacaciones.objects.get(id=id)
+
+    # Notificamos por correo de la aprobacion de la solicitud
+    if os.environ.get("NOTIFICACIONES"):
+        context_correo = {
+            "nombre": solicitud.nombre,
+            "dias": solicitud.dias,
+            "fecha_inicio": fecha_obj_str_format(solicitud.fecha_inicio),
+            "fecha_fin": fecha_obj_str_format(solicitud.fecha_fin),
+            "jefe": solicitud.jefe,
+            "comentario_jefe": solicitud.comentario_jefe,
+            "estado": solicitud.estado,
+        }
+
+        # obtenemos del modelo User el correo de la persona que realizo la solicitud
+        correo_usuario = User.objects.get(username=solicitud.usuario).email
+
+        to = []
+        if correo_usuario != None:
+            to = [request.user.email, correo_usuario]
+        else:
+            to = [request.user.email]
+
+        subject = f"Solicitud # {solicitud.id} {solicitud.estado}"
+
+        correo_contenido = render_to_string(
+            "correo_estado_solicitud.html", context_correo, request=request
+        )
+        enviar_correo_plantilla(
+            correo_contenido, subject, to, cc_flag=True)
+
+    aviso = "Solicitud cancela con exito."
+    # remplazar de la variable aviso los espacios por guiones bajos
+    aviso = aviso.replace(" ", "_")
+
+    return redirect(f"/aviso/{aviso}")
+
+
+def notificarSolicitud(request, id):
+    print("Vista: notificarSolicitud", request.user)
+
+    # obtener la solicitud con el id
+    solicitud = Solicitud_Vacaciones.objects.get(id=id)
+
+    # Notificamos por correo de la aprobacion de la solicitud
+    if os.environ.get("NOTIFICACIONES"):
+        context_correo = {
+            "nombre": solicitud.nombre,
+            "dias": solicitud.dias,
+            "fecha_inicio": fecha_obj_str_format(solicitud.fecha_inicio),
+            "fecha_fin": fecha_obj_str_format(solicitud.fecha_fin),
+            "jefe": solicitud.jefe,
+            "comentario_jefe": solicitud.comentario_jefe,
+            "estado": solicitud.estado,
+        }
+
+        # obtenemos del modelo User el correo de la persona que realizo la solicitud
+        correo_usuario = User.objects.get(username=solicitud.usuario).email
+
+        to = []
+        if correo_usuario != None:
+            to = [request.user.email, correo_usuario]
+        else:
+            to = [request.user.email]
+
+        subject = f"Solicitud # {solicitud.id} {solicitud.estado}"
+
+        correo_contenido = render_to_string(
+            "correo_estado_solicitud.html", context_correo, request=request
+        )
+        enviar_correo_plantilla(
+            correo_contenido, subject, to, cc_flag=True)
+
+    aviso = "Notificacion envida con exito."
+    # remplazar de la variable aviso los espacios por guiones bajos
+    aviso = aviso.replace(" ", "_")
+
+    return redirect(f"/aviso/{aviso}")
 
 
 def salir(request):
@@ -418,10 +570,23 @@ def salir(request):
 
     logout(request)
 
-    return redirect('/')
+    return redirect("/")
+
 
 # -------------------------------------------------------------------------------------
 # Funciones adicionales
+
+# funcion que cambio el nombre del correo de todos los usuarios
+
+def cambiar_correo_usuarios(nuevo_correo):
+    usuarios = User.objects.all()
+
+    for usuario in usuarios:
+        usuario.email = nuevo_correo
+        usuario.save()
+        print(
+            f"usuario {usuario.username} correo actualizado a {usuario.email}")
+
 
 # funcion que recibe el numero del mes y lo convierte en nombre del mes
 
@@ -441,9 +606,10 @@ def mes_formato(mes):
         9: "Septiembre",
         10: "Octubre",
         11: "Noviembre",
-        12: "Diciembre"
+        12: "Diciembre",
     }
     return meses[mes]
+
 
 # funcion que reciba un fecha en cadena y la conveirte en formato dias mes año
 
@@ -451,9 +617,10 @@ def mes_formato(mes):
 def fecha_str_format(fecha):
     print("Funcion: fecha_str_format")
 
-    fecha_obj = datetime.strptime(fecha, '%Y-%m-%d').date()
+    fecha_obj = datetime.strptime(fecha, "%Y-%m-%d").date()
     fecha_srt = f"{fecha_obj.day}-{mes_formato(fecha_obj.month)[:3]}-{fecha_obj.year}"
     return fecha_srt
+
 
 # funcion que recibe una fecha en objeto date y la convierte en cadena en el formato dias nombre mes año
 

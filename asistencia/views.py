@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from asistencia.models import Asistencia
 
-from datetime import datetime
+from datetime import datetime, timedelta
 import time
 import openpyxl
 
@@ -12,7 +12,7 @@ import os
 
 
 def asistencia(request):
-    print("Vista: Asistencia")
+    print("Vista: Asistencia", request.user)
 
     id_asistencia = request.user.perfil.id_asistencia
 
@@ -21,11 +21,11 @@ def asistencia(request):
     busqueda_salida = list()
 
     if "POST" == request.method:
-        fecha = request.POST.get('fecha')
+        fecha = request.POST.get("fecha")
         print("fecha: ", fecha)
 
         # convertimos la fecha a formato datetime
-        fecha = datetime.strptime(fecha, '%Y-%m-%d')
+        fecha = datetime.strptime(fecha, "%Y-%m-%d")
         hora_llegada_minima = datetime(2023, 1, 1, 0, 0, 0).time()
         hora_llegada_maxima = datetime(2023, 1, 1, 11, 0, 0).time()
         hora_salida_minima = datetime(2023, 1, 1, 11, 0, 1).time()
@@ -34,23 +34,38 @@ def asistencia(request):
         # unir fecha y hora
         # consultar del modelo Asistencia los registros con el idUser = id_asistencia y la fecha_hora mayor o igual a 2023-01-01 00:00:00
         asistencias = Asistencia.objects.filter(
-            idUsuario=id_asistencia, fecha_hora__gte=datetime(2023, 1, 1, 0, 0, 0))
+            idUsuario=id_asistencia, fecha_hora__gte=datetime(
+                2023, 1, 1, 0, 0, 0)
+        )
 
         # busqueda llegada
         busqueda_llegada = Asistencia.objects.filter(
-            idUsuario=id_asistencia, fecha_hora__range=[datetime.combine(fecha, hora_llegada_minima), datetime.combine(fecha, hora_llegada_maxima)])
-        busqueda_llegada = busqueda_llegada.order_by(
-            'fecha_hora').values_list('fecha_hora', flat=True)
+            idUsuario=id_asistencia,
+            fecha_hora__range=[
+                datetime.combine(fecha, hora_llegada_minima),
+                datetime.combine(fecha, hora_llegada_maxima),
+            ],
+        )
+        busqueda_llegada = busqueda_llegada.order_by("fecha_hora").values_list(
+            "fecha_hora", flat=True
+        )
 
         # busqueda salida
-        busqueda_salida = Asistencia.objects.filter(idUsuario=id_asistencia, fecha_hora__range=[
-            datetime.combine(fecha, hora_salida_minima), datetime.combine(fecha, hora_salida_maxima)])
-        busqueda_salida = busqueda_salida.order_by(
-            'fecha_hora').values_list('fecha_hora', flat=True)
+        busqueda_salida = Asistencia.objects.filter(
+            idUsuario=id_asistencia,
+            fecha_hora__range=[
+                datetime.combine(fecha, hora_salida_minima),
+                datetime.combine(fecha, hora_salida_maxima),
+            ],
+        )
+        busqueda_salida = busqueda_salida.order_by("fecha_hora").values_list(
+            "fecha_hora", flat=True
+        )
 
     # consultar del modelo Asistencia los registros con el idUser = id_asistencia
-    asistencias = Asistencia.objects.filter(
-        idUsuario=id_asistencia).order_by('-fecha_hora')
+    asistencias = Asistencia.objects.filter(idUsuario=id_asistencia).order_by(
+        "-fecha_hora"
+    )
 
     # llegadas_semana = obtener_llegadas(id_asistencia, fecha_lunes_pasado())
     # salidas_semana = obtener_salidas(id_asistencia, fecha_lunes_pasado())
@@ -58,7 +73,7 @@ def asistencia(request):
     llegadas_semana = obtener_llegadas(id_asistencia, fecha_lunes())
     salidas_semana = obtener_salidas(id_asistencia, fecha_lunes())
 
-    tolerancia_entrada = int(os.environ.get('TOLERANCIA_ENTRADA'))
+    tolerancia_entrada = int(os.environ.get("TOLERANCIA_ENTRADA"))
 
     print("")
     print("llegadas_semana: ", llegadas_semana)
@@ -67,26 +82,26 @@ def asistencia(request):
     print("")
 
     context = {
-        'asistencias': asistencias,
-        'busqueda_llegada': busqueda_llegada,
-        'busqueda_salida': busqueda_salida,
-        'llegadas_semana': llegadas_semana,
-        'salidas_semana': salidas_semana,
-        'tolerancia_entrada': tolerancia_entrada,
-        'fecha_lunes_pasado': fecha_lunes()
+        "asistencias": asistencias,
+        "busqueda_llegada": busqueda_llegada,
+        "busqueda_salida": busqueda_salida,
+        "llegadas_semana": llegadas_semana,
+        "salidas_semana": salidas_semana,
+        "tolerancia_entrada": tolerancia_entrada,
+        "fecha_lunes_pasado": fecha_lunes(),
     }
 
-    return render(request, 'asistencia.html', context)
+    return render(request, "asistencia.html", context)
 
 
 def carga_asistencia_excel(request):
-    print("Vista: Cargar Asistencia Excel")
+    print("Vista: Cargar Asistencia Excel", request.user)
 
     n_asistencia = 0
     n_asistencia_existente = 0
 
     if "GET" == request.method:
-        return render(request, 'carga_asistencia_excel.html', {})
+        return render(request, "carga_asistencia_excel.html", {})
     else:
         excel_file = request.FILES["excel_file"]
         # you may put validations here to check extension or file size
@@ -151,30 +166,30 @@ def carga_asistencia_excel(request):
 
             print("Guardando asistencia en la base de datos")
             n_asistencia, n_asistencia_existente = guardar_asistencia_excel(
-                asistencia_excel, request)
+                asistencia_excel, request
+            )
         else:
             print("[-] No hay asistencias para guardar en la base de datos")
 
         context = {
-            'excel_data': excel_data,
-            'asistencia_excel': asistencia_excel,
-            'n_asistencia': n_asistencia,
-            'n_asistencia_existente': n_asistencia_existente
+            "excel_data": excel_data,
+            "asistencia_excel": asistencia_excel,
+            "n_asistencia": n_asistencia,
+            "n_asistencia_existente": n_asistencia_existente,
         }
 
         # print(asistencia_excel)
 
-        return render(request, 'carga_asistencia_excel.html', context)
+        return render(request, "carga_asistencia_excel.html", context)
 
 
 def guardar_asistencia_excel(asistencia_excel, request):
-    print("Funcion: Guardar Asistencia Excel")
+    print("Funcion: Guardar Asistencia Excel", request.user)
 
     n_asistencia = 0
     n_asistencia_existente = 0
 
     for u in asistencia_excel:
-
         # idUsuario = u[0].replace(" ", "")
         # nombre = u[1]
         # fecha_hora = u[2]
@@ -189,7 +204,7 @@ def guardar_asistencia_excel(asistencia_excel, request):
         print("")
 
         # convertir fecha a formato datetime
-        fecha_hora = datetime.strptime(fecha_hora, '%Y-%m-%d %H:%M:%S')
+        fecha_hora = datetime.strptime(fecha_hora, "%Y-%m-%d %H:%M:%S")
 
         # antes de guardar en la base de datos, verificar si fecha_hora ya existe en la base de datos
         if Asistencia.objects.filter(fecha_hora=fecha_hora).exists():
@@ -217,6 +232,7 @@ def guardar_asistencia_excel(asistencia_excel, request):
 
 # ****************************************************************************************************
 
+
 # funcion para obtener las llegadas de la semana anterior
 def obtener_llegadas(id_asistencia, fecha):
     print("Funcion: obtener_llegadas")
@@ -224,8 +240,17 @@ def obtener_llegadas(id_asistencia, fecha):
     llegadas_semana = list()
     # ciclo de 6 dias
     for d in range(0, 6):
+        fecha = fecha + timedelta(days=d)
+        print("FECHA: ", fecha)
+
         consulata = Asistencia.objects.filter(
-            idUsuario=id_asistencia, fecha_hora__range=[datetime(fecha.year, fecha.month, fecha.day + d, 0, 0, 0), datetime(fecha.year, fecha.month, fecha.day + d, 11, 0, 0)]).order_by('fecha_hora')
+            idUsuario=id_asistencia,
+            fecha_hora__range=[
+                datetime(fecha.year, fecha.month, fecha.day, 0, 0, 0),
+                datetime(fecha.year, fecha.month,
+                         fecha.day, 11, 0, 0),
+            ],
+        ).order_by("fecha_hora")
 
         # si el tamaño de la consulta es 0
         if len(consulata) == 0:
@@ -234,11 +259,12 @@ def obtener_llegadas(id_asistencia, fecha):
         else:
             # agregar a la lista
             llegadas_semana.append(consulata.values(
-                'fecha_hora')[0]['fecha_hora'])
+                "fecha_hora")[0]["fecha_hora"])
 
     # print(llegadas_semana)
 
     return llegadas_semana
+
 
 # funcion para obtener las salidas de la semana anterior
 
@@ -249,8 +275,16 @@ def obtener_salidas(id_asistencia, fecha):
     salidas_semana = list()
     # ciclo de 6 dias
     for d in range(0, 6):
-        consulata = Asistencia.objects.filter(idUsuario=id_asistencia, fecha_hora__range=[
-                                              datetime(fecha.year, fecha.month, fecha.day + d, 11, 0, 1), datetime(fecha.year, fecha.month, fecha.day + d, 23, 59, 59)]).order_by('-fecha_hora')
+        fecha = fecha + timedelta(days=d)
+        print("FECHA: ", fecha)
+
+        consulata = Asistencia.objects.filter(
+            idUsuario=id_asistencia,
+            fecha_hora__range=[
+                datetime(fecha.year, fecha.month, fecha.day, 11, 0, 1),
+                datetime(fecha.year, fecha.month, fecha.day, 23, 59, 59),
+            ],
+        ).order_by("-fecha_hora")
 
         # si el tamaño de la consulta es 0
         if len(consulata) == 0:
@@ -259,11 +293,12 @@ def obtener_salidas(id_asistencia, fecha):
         else:
             # agregar a la lista
             salidas_semana.append(consulata.values(
-                'fecha_hora')[0]['fecha_hora'])
+                "fecha_hora")[0]["fecha_hora"])
 
     # print(salidas_semana)
 
     return salidas_semana
+
 
 # realiza un funcion que obtenga la fecha del pasado lunes
 
@@ -289,6 +324,7 @@ def fecha_lunes_pasado():
 
 
 # realiza una funcion que obtenga la fecha del lunes de la semana actual
+
 
 def fecha_lunes():
     print("Funcion: fecha_lunes")

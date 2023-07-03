@@ -3,6 +3,14 @@ window.addEventListener("load", (event) => {
 
 });
 
+// crear un listener para el campo de texto con id "usuario" para convertir el texto en minusculas
+document.getElementById("usuario").addEventListener("keyup", function(event) {
+
+    // colocar el texto en minusculas
+    event.target.value = event.target.value.toLowerCase();
+
+});
+
 function buscar_usuario(usuarios, dominio){
 
     console.log("Buscando usuario");

@@ -417,50 +417,144 @@ swal({
 
 }
 
+function cancelarSolicitud(id){
+    
+    let comentario = "";
+
+    swal({
+        title: 'Por que se cancela?',
+        icon: 'info',
+        content: {
+            element: "input",
+            attributes: {
+            placeholder: "Deja un comentario",
+            },
+        },
+    })
+
+    .then((value) => {
+
+    if (value  == "") {
+        value = "-";
+    } else {
+        // de la cadena value reemaplazamos los espacios en blanco por guiones medios
+        value = value.replace(/ /g, "-");
+    }
+
+    console.log(value);
+
+    const url = "cancelarSolicitud/" + id.toString() + "/" + value.toString();
+    // console.log(url);
+
+    swal({
+        title: 'Confirmación',
+        text: 'Esta seguro de Cancelar la solicitud?',
+        icon: 'success',
+
+        buttons: {
+            No: "No",
+            Si: "Si"
+        },
+    })
+
+    .then((value) => {
+        switch (value) {
+
+            case "Si":
+                window.location.href = url;
+                break;
+
+            case "No":
+                break;
+        }
+    })
+
+});
+
+}
+
+function notificarSolicitud(id){
+
+    console.log("Notificando solicitud...");
+    
+    let comentario = "";
+
+    const url = "notificarSolicitud/" + id.toString();
+    // console.log(url);
+
+    swal({
+        title: 'Confirmación',
+        text: 'Esta seguro de enviar la notificación de esta solicitud seleccionada?',
+        icon: 'success',
+
+        buttons: {
+            No: "No",
+            Si: "Si"
+        },
+    })
+
+    .then((value) => {
+        switch (value) {
+
+            case "Si":
+                window.location.href = url;
+                console.log('Se confirmo la notficacion de la solictud ' + id);
+
+                break;
+
+            case "No":
+                // console.log('No se confirmo la notificacion de la solicitud ' + id);
+                break;
+        }
+    })
+
+}
+
+
 // Funcion para formatear fecha
 function format_fecha(fecha_srt) {
 
-    const s = fecha_srt.split('-');
-    const meses = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+const s = fecha_srt.split('-');
+const meses = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
 
-    const fecha_formateada = s[2] + "-" + meses[parseInt(s[1]) - 1] + "-" + s[0]
-    // console.log(fecha_formateada)
+const fecha_formateada = s[2] + "-" + meses[parseInt(s[1]) - 1] + "-" + s[0]
+// console.log(fecha_formateada)
 
-    return fecha_formateada
+return fecha_formateada
 
 }
 
 // Funcion para calcular la diferencia de dias entre dos fechas
 function diferencia_dias(fecha1_str, fecha2_str){
 
-    const fecha1_obj = new Date(fecha1_str);
-    const fecha2_obj = new Date(fecha2_str);
-    // const date_obj = document.getElementById("fecha_sol");
-    // const fecha_vigencia_obj = new Date (date_obj.getAttribute('max'));
-    const diffTime = fecha1_obj - fecha2_obj;
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+const fecha1_obj = new Date(fecha1_str);
+const fecha2_obj = new Date(fecha2_str);
+// const date_obj = document.getElementById("fecha_sol");
+// const fecha_vigencia_obj = new Date (date_obj.getAttribute('max'));
+const diffTime = fecha1_obj - fecha2_obj;
+const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
 
-    console.log("Diferencia dias: " + diffDays)
-    return diffDays
+console.log("Diferencia dias: " + diffDays)
+return diffDays
 }
 
 // Funcion que muestra el comentario de la solicitud
 function mostrar_comentario(comentario){
 
-    // console.log("Mostrando comentario...")
-    // console.log(comentario)
+// console.log("Mostrando comentario...")
+// console.log(comentario)
 
-    // const comentario = document.getElementById('comentario').getAttribute('data-comentario')
+// const comentario = document.getElementById('comentario').getAttribute('data-comentario')
 
-    swal({
-        title: 'Comentario',
-        text: comentario,
-        icon: 'info',
+swal({
+    title: 'Comentario',
+    text: comentario,
+    icon: 'info',
 
-        buttons: {
-            OK: "OK"
-        },
-    })
+    buttons: {
+        OK: "OK"
+    },
+})
 
 }
 

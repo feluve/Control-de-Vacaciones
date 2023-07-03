@@ -2,8 +2,7 @@
 
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
+  <head>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -13,88 +12,111 @@
     <!-- Mi estilo css -->
     <link rel="stylesheet" href={% static 'css/estilo.css' %}>
     <!-- Funete de Google -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600&display=swap" rel="stylesheet" />
+    <!-- Iconos de boxicons -->
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
 
     <link rel="icon" type="image/x-icon" href={% static 'img/logo1.png' %}>
 
     <style>
-        .divider:after,
-        .divider:before {
-            content: "";
-            flex: 1;
-            height: 1px;
-            background: #eee;
-        }
+      .divider:after,
+      .divider:before {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: #eee;
+      }
 
+      .h-custom {
+        height: calc(100% - 73px);
+      }
+
+      @media (max-width: 450px) {
         .h-custom {
-            height: calc(100% - 73px);
+          height: 100%;
         }
-
-        @media (max-width: 450px) {
-            .h-custom {
-                height: 100%;
-            }
-        }
+      }
     </style>
 
     <title>Iniciar sesion</title>
-</head>
+  </head>
 
-<body>
+  <body>
     <section class="vh-100">
-        <div class="container-fluid h-custom">
-            <div class="row d-flex justify-content-center align-items-center h-100">
-                <div class="col-md-9 col-lg-6 col-xl-5">
-                    <!-- <img src="templeates/registration/adminVacaciones.jpeg" class="img-fluid" alt="Sample image" /> -->
-                    <img src={% static 'img/adminVacaciones.jpeg' %} class="img-fluid" alt="Sample image" />
-                </div>
-                <div class="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
-                    <form method="post">{% csrf_token %}
+      <div class="container-fluid h-custom">
+        <div class="row d-flex justify-content-center align-items-center h-100">
+          <div class="col-md-9 col-lg-6 col-xl-5">
+            <!-- <img src="templeates/registration/adminVacaciones.jpeg" class="img-fluid" alt="Sample image" /> -->
+            <img src={% static 'img/adminVacaciones.jpeg' %} class="img-fluid" alt="Sample image" />
+          </div>
+          <div class="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
+            <form method="post">
+              {% csrf_token %}
 
-                        <div class="divider d-flex align-items-center my-4">
-                            <p class="text-center fw-bold mx-3 mb-0">Iniciar sesión</p>
-                        </div>
+              <div class="divider d-flex align-items-center my-4">
+                <p class="text-center fw-bold mx-3 mb-0">Iniciar sesión</p>
+              </div>
 
-                        <!-- User input -->
-                        <div class="form-outline mb-4">
-                            <input type="text" name="username" id="form3Example3" class="form-control form-control-lg" placeholder="Usuario" />
-                            <label class="form-label" for="form3Example3">Nombre de usuario</label>
-                        </div>
+              <!-- User input -->
+              <div class="form-outline mb-3">
+                <input type="text" name="username" id="form3Example3" class="form-control form-control-lg" placeholder="Usuario" />
+                <label class="form-label" for="form3Example3">Nombre de usuario</label>
+              </div>
 
-                        <!-- Password input -->
-                        <div class="form-outline mb-3">
-                            <input type="password" name="password" id="form3Example4" class="form-control form-control-lg" placeholder="Contraseña" />
-                            <label class="form-label" for="form3Example4">Introduce Contraseña</label>
-                        </div>
+              <!-- Password input -->
+              <!-- <div class="form-outline mb-3"> -->
+              <div class="" style="display: flex; align-items: center">
+                <input type="password" name="password" id="form3Example4" class="form-control form-control-lg" placeholder="Contraseña" />
+                <i id="icon" class="bx bx-show" style="font-size: 35px; cursor: pointer; padding-left: 5px"></i>
+              </div>
 
-                        <!-- Submit -->
-                        <div class="text-center text-lg-start mt-4 pt-2">
-                            <button type="submit" class="btn btn-primary btn-lg" style="padding-left: 5.5rem; padding-right: 5.5rem">
-                                Acceder
-                            </button>
-                            <br>
-                            <br>
-                            <!-- Olvide contraseña -->
-                            <a href="/olvide_contrasena">Olvide mi contraseña</a>
-                        </div>
-                    </form>
-                </div>
-            </div>
+              <label class="form-label" for="form3Example4">Introduce Contraseña</label>
+
+              <!-- Submit -->
+              <div class="text-center mt-4 pt-2">
+                <button type="submit" class="btn btn-primary btn-lg" style="width: 60%">Acceder</button>
+              </div>
+
+              <div class="divider d-flex align-items-center my-4">
+                <p class="text-center fw-bold mx-3 mb-0"></p>
+              </div>
+              <!-- Olvide contraseña -->
+              <div class="text-center mt-2">
+                <a href="/olvide_contrasena">Olvide mi contraseña</a>
+              </div>
+            </form>
+          </div>
         </div>
-
+      </div>
     </section>
 
-    <footer class="bg-black justify-content-between py-1" style="position: fixed; bottom: 0px; width: 100%; height: 25px;">
-        <!-- <div class="d-flex flex-column flex-md-row text-center text-md-start justify-content-between py-4 px-4 px-xl-5 "> -->
-        <!-- Copyright -->
-        <div class="text-center text-white" style="font-size: 10px;">
-            CEGMEX Copyright © 2023. All rights reserved.
-        </div>
-        <!-- </div> -->
+    <footer class="bg-black justify-content-between py-1" style="position: fixed; bottom: 0px; width: 100%; height: 25px">
+      <!-- <div class="d-flex flex-column flex-md-row text-center text-md-start justify-content-between py-4 px-4 px-xl-5 "> -->
+      <!-- Copyright -->
+      <div class="text-center text-white" style="font-size: 10px">CEGMEX Copyright © 2023. All rights reserved.</div>
+      <!-- </div> -->
     </footer>
 
-</body>
+    <script>
+      // crear un listener para el campo de texto con id "form3Example3" para convertir el texto en minusculas
+      document.getElementById("form3Example3").addEventListener("keyup", function (event) {
+        // colocar el texto en minusculas
+        event.target.value = event.target.value.toLowerCase();
+      });
 
+      // listener click en el icono
+      // cambiar el tipo de input de password a text y viceversa y cambiar el icono
+      document.getElementById("icon").addEventListener("click", function () {
+        if (document.getElementById("form3Example4").type === "password") {
+          document.getElementById("form3Example4").type = "text";
+          document.getElementById("icon").className = "bx bx-hide";
+        } else {
+          document.getElementById("form3Example4").type = "password";
+          document.getElementById("icon").className = "bx bx-show";
+        }
+      });
+    </script>
+  </body>
 </html>

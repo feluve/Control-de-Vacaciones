@@ -7,6 +7,8 @@ from django.template.loader import render_to_string
 import os
 import environ
 
+import time
+
 
 def enviar_correo_simple(subject, msg, to):
     try:
@@ -38,6 +40,8 @@ def enviar_correo_simple(subject, msg, to):
 
 def enviar_correo_plantilla(correo_contenido, subject, to, cc_flag=False):
     print("Funcion: enviar_correo_plantilla")
+
+    inicio = time.time()
 
     try:
         print("[py<] Enviando correo...")
@@ -77,17 +81,22 @@ def enviar_correo_plantilla(correo_contenido, subject, to, cc_flag=False):
         print("to: ", to)
         print("cc: ", cc)
         print("bcc: ", bcc)
-        print("sunject: ", subject)
+        print("subject: ", subject)
         print("")
 
         # contenido = render_to_string('send_email.html')
         mensaje.attach(MIMEText(correo_contenido, 'html'))
 
-        mailServer.sendmail(os.environ.get("EMAIL_USERNAME"),
-                            to + cc + bcc, mensaje.as_string())
+        mailServer.sendmail(os.environ.get("EMAIL_USERNAME"), to + cc + bcc, mensaje.as_string())
 
+        fin = time.time()
+        tiempo_transcurrido = fin - inicio
+        # convertir timepo_transcurrido a segundos
+        tiempo_transcurrido = round(tiempo_transcurrido, 2)
+
+        print(f"Tiempo transcurrido para enviar correo: {tiempo_transcurrido} s")
         print("[>py][+] Notificación por correo enviado correctamente")
 
     except Exception as e:
-        print("[>py][+]Ocurrio un excepccion")
+        print("[>py][-]Ocurrio un excepccion")
         print(e)
