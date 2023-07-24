@@ -178,14 +178,6 @@ def vacaciones(request):
 
     # print("solictudes recibidas", solicitudes_recibidas)
 
-    # Obtenemos las solicitudes recibidas que estan pendientes
-    solicitudes_recibidas_pendientes = Solicitud_Vacaciones.objects.filter(
-        estado="Pendiente", jefe__startswith=f"{request.user.first_name} {apellido}"
-    )
-
-    print("solicitudes_recibidas_pendientes",
-          solicitudes_recibidas_pendientes)
-
     # Dias festivos oficiales
     lista_dias_festivos = Dias_Festivos_Oficiales.objects.all().order_by("id")
 
@@ -202,13 +194,14 @@ def vacaciones(request):
         lista_nombres_festivos_str.append(
             str(lista_dias_festivos.values("nombre")[i]["nombre"])
         )
-
+        
     # Tipo de semana del usuario
     semana = request.user.perfil.semana
     if semana == "Lunes-Viernes":
         semana = "Inglesa"
     else:
         semana = "Normal"
+    
 
     context = {
         "fecha_anticipacion": fecha_anticipacion,
@@ -220,7 +213,6 @@ def vacaciones(request):
         "todas_solicitudes_count": len(todas_solicitudes),
         "solicitudes_enviadas_count": len(solicitudes_enviadas),
         "solicitudes_recibidas_count": len(solicitudes_recibidas),
-        "solicitudes_recibidas_pendientes_count": len(solicitudes_recibidas_pendientes),
         "disabled": disabled,
         "lista_nombres_festivos_str": lista_nombres_festivos_str,
         "lista_dias_festivos_str": lista_dias_festivos_str,
@@ -570,7 +562,7 @@ def notificarSolicitud(request, id):
         subject = f"Solicitud # {solicitud.id} {solicitud.estado}"
 
         correo_contenido = render_to_string(
-            "correo_estado_solicitud_notificacion.html", context_correo, request=request
+            "correo_estado_solicitud.html", context_correo, request=request
         )
         enviar_correo_plantilla(
             correo_contenido, subject, to, cc_flag=True)

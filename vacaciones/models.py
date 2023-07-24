@@ -60,10 +60,10 @@ SEMANA = [
     ('Lunes-Viernes', 'Lunes-Viernes')
 ]
 
-DISPOSITIVO = [
-    ('No registrado', 'No registrado'),
-    ('Registrado', 'Registrado')
-]
+# DISPOSITIVO = [
+#     ('No registrado', 'No registrado'),
+#     ('Registrado', 'Registrado')
+# ]
 
 
 class Perfil(models.Model):
@@ -88,8 +88,8 @@ class Perfil(models.Model):
                               blank=True, choices=SEMANA, default="Lunes-Sabado")
     token = models.CharField(max_length=100, null=True, blank=True)
     id_asistencia = models.PositiveSmallIntegerField(null=True, blank=True)
-    dispositivo = models.CharField(
-        max_length=50, choices=DISPOSITIVO, default="No registrado")
+    # dispositivo = models.CharField(
+    #     max_length=50, choices=DISPOSITIVO, default="No registrado")
 
     def __str__(self):
         return self.rol
@@ -97,7 +97,7 @@ class Perfil(models.Model):
     class Meta:
         verbose_name = 'Perfil'
         verbose_name_plural = 'Perfiles'
-        ordering = ['-id']
+        # ordering = ['-usuario']
 
 
 def crear_perfil_usuario(sender, instance, created, **kwargs):

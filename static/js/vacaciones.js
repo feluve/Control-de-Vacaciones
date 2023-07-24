@@ -2,6 +2,17 @@ window.addEventListener("load", (event) => {
     console.log("Pagina vacaciones cargada completamente.");
 
     document.getElementById("num_dias_sol").value = document.getElementById('-').getAttribute('data-dias_min_sol');
+
+    // Obtenemos cuantas solucitudes estan pendientes para el usuario
+    // obtener data-pemdiemtes del modal id="myModal" y convertirlo a entero
+    let data_pendientes = parseInt(document.getElementById("myModal").getAttribute("data-pendientes"))
+
+    // si data_pendientes es mayor a 0
+    if (data_pendientes > 0) {
+    // mostrar myModal
+    document.getElementById("myModal").style.display = "block";
+    }
+
 });
 
 // ****************************************************************************************
@@ -58,6 +69,7 @@ function suma_dias(){
 function validaciones(dias_festivos_str, nombres_festivos_str, dias_max_sol, semana, dominio){
 
     console.log("Realizando validaciones...");
+    console.log(semana);
 
     // console.log(dias_festivos_str)
     // console.log(nombres_festivos_str)

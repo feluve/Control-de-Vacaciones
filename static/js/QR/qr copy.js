@@ -12385,7 +12385,7 @@ window.addEventListener('load', function() {
               a.appendChild(b);
             var c = document.createElement("span"),
               d = document.createElement("a");
-            (d.innerHTML = ""), (d.href = "https://github.com/mebjas/html5-qrcode"), c.appendChild(d), b.appendChild(c);
+            (d.innerHTML = "Code Scanner"), (d.href = "https://github.com/mebjas/html5-qrcode"), c.appendChild(d), b.appendChild(c);
             var e = document.createElement("span");
             (e.id = this.__getStatusSpanId()),
               (e.style.float = "right"),
@@ -12395,7 +12395,7 @@ window.addEventListener('load', function() {
               (e.style.border = "1px solid #00000000"),
               (e.style.color = "rgb(17, 17, 17)"),
               b.appendChild(e),
-              this.__setStatus("");
+              this.__setStatus("IDLE");
             var f = document.createElement("div");
             (f.id = this.__getHeaderMessageContainerId()),
               (f.style.display = "none"),
@@ -12425,11 +12425,11 @@ window.addEventListener('load', function() {
             var f = document.createElement("div");
             f.style.textAlign = "center";
             var g = document.createElement("button");
-            (g.innerHTML = "Camara"),
+            (g.innerHTML = "Request Camera Permissions"),
               g.addEventListener("click", function () {
                 (g.disabled = !0),
-                  b.__setStatus("Permiso"),
-                  b.__setHeaderMessage("Accesando a camara..."),
+                  b.__setStatus("PERMISSION"),
+                  b.__setHeaderMessage("Requesting camera permissions..."),
                   Html5Qrcode.getCameras()
                     .then(function (c) {
                       b.__setStatus("IDLE"), b.__resetHeaderMessage(), c && 0 != c.length ? (e.removeChild(f), b.__renderCameraSelection(c)) : b.__setStatus("No Cameras", a.STATUS_WARNING);
@@ -12470,12 +12470,12 @@ window.addEventListener('load', function() {
               d = document.getElementById(this.__getDashboardSectionCameraScanRegionId());
             d.style.textAlign = "center";
             var e = document.createElement("span");
-            (e.innerHTML = "Selecciona camara (".concat(b.length, ") &nbsp;")), (e.style.marginRight = "10px");
+            (e.innerHTML = "Select Camera (".concat(b.length, ") &nbsp;")), (e.style.marginRight = "10px");
             var f = document.createElement("select");
             f.id = this.__getCameraSelectionId();
             for (var g = 0; g < b.length; g++) {
               var h = b[g],
-                j = h.id, 
+                j = h.id,
                 k = null == h.label ? j : h.label,
                 l = document.createElement("option");
               (l.value = j), (l.innerHTML = k), f.appendChild(l);
@@ -12483,7 +12483,7 @@ window.addEventListener('load', function() {
             e.appendChild(f), d.appendChild(e);
             var m = document.createElement("span"),
               n = document.createElement("button");
-            (n.innerHTML = "Escanear"), m.appendChild(n);
+            (n.innerHTML = "Start Scanning"), m.appendChild(n);
             var o = document.createElement("button");
             (o.innerHTML = "Stop Scanning"),
               (o.style.display = "none"),
@@ -12526,7 +12526,7 @@ window.addEventListener('load', function() {
           key: "__createSectionSwap",
           value: function () {
             var b = this,
-              c = "",
+              c = "Scan an Image File",
               d = "Scan using camera directly",
               e = document.getElementById(this.__getDashboardSectionId()),
               f = document.createElement("div");

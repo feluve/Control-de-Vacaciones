@@ -66,9 +66,10 @@ def enviar_correo_plantilla(correo_contenido, subject, to, cc_flag=False):
 
         # Si el flag de cc es verdadero
         if cc_flag:
-            cc = [os.environ.get("EMAIL_CC")]
+            cc = os.environ.get("EMAIL_CC").split(',')
         else:
             cc = []
+            
 
         mensaje = MIMEMultipart()
         mensaje['From'] = os.environ.get("EMAIL_USERNAME")

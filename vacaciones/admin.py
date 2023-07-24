@@ -28,11 +28,11 @@ from import_export.admin import ImportExportModelAdmin
 class AdminSolicitudVaciones(admin.ModelAdmin):
     list_display = ('id', 'usuario', 'nombre', 'dias', 'fecha',
                     'fecha_inicio', 'fecha_fin', 'jefe', 'estado', 'comentario_solicitud', 'comentario_jefe')
-    # ordering = ('fecha',)
+    ordering = ('-id',)
     search_fields = ('nombre', 'jefe', 'estado')
     list_editable = ('dias', 'jefe', 'estado')
     # list_display_links = ('nombre',)
-    # list_filter = ('nombre',)
+    list_filter = ('estado',)
     list_per_page = 20
     # exclude = ('dias',)
 
@@ -41,12 +41,12 @@ class AdminSolicitudVaciones(admin.ModelAdmin):
 class AdminPerfil(ImportExportModelAdmin, admin.ModelAdmin):
     list_display = ('usuario', 'fecha_ingreso', 'dias_vacaciones_disp',
                     'vigencia_dias_vacaciones', 'jefe', 'area', 'fecha_nacimiento', 'rol', 'id_asistencia')
-    ordering = ('id',)
+    ordering = ('usuario',)
     search_fields = ('usuario',)
     list_editable = ('fecha_ingreso', 'vigencia_dias_vacaciones', 'jefe', 'area',
                      'dias_vacaciones_disp', 'fecha_nacimiento', 'rol', 'id_asistencia')
-    # list_display_links = ('usuario',)
-    list_filter = ('usuario', 'jefe', 'rol', 'area')
+    list_display_links = ('usuario',)
+    list_filter = ('jefe', 'rol', 'area')
     list_per_page = 50
     # exclude = ('dias',)
 

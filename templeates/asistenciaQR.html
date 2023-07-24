@@ -1,44 +1,19 @@
-{% load static %}
-
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Escaner QR</title>
-</head>
-
-<body>
-    <style>
-        .result {
-            background-color: green;
-            color: #fff;
-            padding: 20px;
-        }
-
-        .row {
-            display: flex;
-        }
-    </style>
-
-    <div class="row">
-        <div class="col">
-            <div style="width: 500px" id="reader"></div>
-        </div>
-        <div class="col" style="padding: 30px">
-            <h4>Resultado de Rscaneo</h4>
-            <div>
-                <h4 id="resultado" data-dominio="{{ dominio }}">hola</h4>
-            </div>
-        </div>
+{% extends "master.html" %} {% block title %} Asistencia QR {% endblock %} {% block content %} {% if request.user.is_authenticated %}
+<section style="background-color: #eeee">
+  <div class="row" data-usuario="{{user}}" id="div">
+    <div class="col">
+      <div style="width: 500px" id="reader"></div>
     </div>
-
-    <!-- Metadatos de dispositivo -->
-    <script type="text/javascript" src="{% static 'js/QR/qr.js'%}"></script>
-    <script type="text/javascript" src="{% static 'js/QR/acciones.js'%}"></script>
-
-</body>
-
-</html>
+    <div class="col" style="padding: 30px">
+      <!-- <h4>Resultado de Escaneo</h4> -->
+      <div>
+        <!-- <h4 id="resultado">hola</h4> -->
+      </div>
+    </div>
+  </div>
+</section>
+{% endif %} {% load static %}
+<!-- JavaScript -->
+<script type="text/javascript" src="{% static 'js/QR/qr.js'%}"></script>
+<script type="text/javascript" src="{% static 'js/QR/escanearQR.js'%}"></script>
+{% endblock %}

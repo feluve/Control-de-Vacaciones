@@ -145,7 +145,7 @@
                   </div>
 
                   <div class="col-sm-12 py-3">
-                    <button type="button" onclick="validaciones('{{ lista_dias_festivos_str|escapejs }}', '{{ lista_nombres_festivos_str|escapejs }}', '{{ dias_max_sol|escapejs }}', '{{ user.perfil.semana }}', '{{ dominio }}')" class="btn btn-primary" id="btnEnviar" {{disabled}}>Enviar solicitud <i class="fa fa-send"></i></button>
+                    <button type="button" onclick="validaciones('{{ lista_dias_festivos_str|escapejs }}', '{{ lista_nombres_festivos_str|escapejs }}', '{{ dias_max_sol|escapejs }}', '{{ semana|escapejs }}', '{{ dominio }}')" class="btn btn-primary" id="btnEnviar" {{disabled}}>Enviar solicitud <i class="fa fa-send"></i></button>
                   </div>
                 </form>
 
@@ -159,14 +159,18 @@
               <div class="col-sm-12">
                 <p class="mb-0 fw-bold fs-5">Asistencia</p>
               </div>
-              <div class="col-md-12 px-3 py-3 text-center">
+              <div class="col-md-12 pt-2 text-center">
                 <a href="asistencia/" class="btn btn-primary m-3">Consultar</a>
               </div>
-              {% if request.user.perfil.rol == "admin" %}
-              <div class="col-md-12 px-3 py-3 text-center">
-                <a href="dispositivo/" class="btn btn-primary m-3">Registrar</a>
+              {% if request.user.perfil.rol == "admin" or request.user.perfil.rol == "Empleado" %}
+              <div class="col-md-12 py-1 text-center">
+                <a href="dispositivo/" class="btn btn-primary m-3" id="btn_reg_asistencia" data-usuario="{{user}}">Registrar asistencia</a>
+                <!-- <button class="btn btn-primary m-3" id="btn_reg_asistencia" data-usuario="{{user}}" onclick="registrarAsistencia();">Registrar asistencia</button> -->
               </div>
               {% endif %}
+              <!-- <div class="col-md-12 px-3 py-3 text-center">
+                <button class="btn btn-primary m-3" onclick="alert(localStorage.getItem('usuarioR'))">Huella</button>
+              </div> -->
             </div>
           </div>
         </div>
@@ -226,19 +230,23 @@
                   <!-- Estado de las solicitudes -->
                   {% if s.estado == 'Pendiente' %}
                   <td class="registro">
-                    <button class="btn btn-sm btn-block btn-warning mx-0 botones">{{ s.estado }}</button>
+                    <!-- <button class="btn btn-sm btn-block btn-warning mx-0 botones">{{ s.estado }}</button> -->
+                    <span class="badge bg-warning" style="color: black">{{ s.estado }}</span>
                   </td>
                   {% elif s.estado == 'Aprobada' %}
                   <td class="registro">
-                    <button class="btn btn-sm btn-block btn-success mx-0 botones">{{ s.estado }}</button>
+                    <!-- <button class="btn btn-sm btn-block btn-success mx-0 botones">{{ s.estado }}</button> -->
+                    <span class="badge bg-success" style="color: black">{{ s.estado }}</span>
                   </td>
                   {% elif s.estado == 'Rechazada' %}
                   <td class="registro">
-                    <button class="btn btn-sm btn-block btn-danger mx-0 botones">{{ s.estado }}</button>
+                    <!-- <button class="btn btn-sm btn-block btn-danger mx-0 botones">{{ s.estado }}</button> -->
+                    <span class="badge bg-danger" style="color: black">{{ s.estado }}</span>
                   </td>
                   {% elif s.estado == 'Cancelada' %}
                   <td class="registro">
-                    <button class="btn btn-sm btn-block btn-secondary mx-0 botones">{{ s.estado }}</button>
+                    <!-- <button class="btn btn-sm btn-block btn-secondary mx-0 botones">{{ s.estado }}</button> -->
+                    <span class="badge bg-secondary" style="color: black">{{ s.estado }}</span>
                   </td>
                   {% endif %}
                 </tr>
@@ -306,19 +314,23 @@
                   <!-- Estado de las solicitudes -->
                   {% if s.estado == 'Pendiente' %}
                   <td class="registro">
-                    <button class="btn btn-sm btn-block btn-warning mx-0 botones">{{ s.estado }}</button>
+                    <!-- <button class="btn btn-sm btn-block btn-warning mx-0 botones">{{ s.estado }}</button> -->
+                    <span class="badge bg-warning" style="color: black">{{ s.estado }}</span>
                   </td>
                   {% elif s.estado == 'Aprobada' %}
                   <td class="registro">
-                    <button class="btn btn-sm btn-block btn-success mx-0 botones">{{ s.estado }}</button>
+                    <!-- <button class="btn btn-sm btn-block btn-success mx-0 botones">{{ s.estado }}</button> -->
+                    <span class="badge bg-success" style="color: black">{{ s.estado }}</span>
                   </td>
                   {% elif s.estado == 'Rechazada' %}
                   <td class="registro">
-                    <button class="btn btn-sm btn-block btn-danger mx-0 botones">{{ s.estado }}</button>
+                    <!-- <button class="btn btn-sm btn-block btn-danger mx-0 botones">{{ s.estado }}</button> -->
+                    <span class="badge bg-danger" style="color: black">{{ s.estado }}</span>
                   </td>
                   {% elif s.estado == 'Cancelada' %}
                   <td class="registro">
-                    <button class="btn btn-sm btn-block btn-secondary mx-0 botones">{{ s.estado }}</button>
+                    <!-- <button class="btn btn-sm btn-block btn-secondary mx-0 botones">{{ s.estado }}</button> -->
+                    <span class="badge bg-secondary" style="color: black">{{ s.estado }}</span>
                   </td>
                   {% endif%}
 
@@ -328,14 +340,18 @@
                     <!-- <a href="rechazarSolicitud/{{s.id}}" class="btn btn-sm btn-block btn-danger mx-0 botones">Rechazar</a> -->
                     <!-- <a href="aprobarSolicitud/{{s.id}}" class="btn btn-sm btn-block btn-success mx-0 botones">Aprobar</a> -->
 
-                    <button onclick="confirmacionAprobar('{{s.id}}')" class="btn btn-sm btn-block btn-success mx-0 botones">Aprobar</button>
-                    <button onclick="confirmacionRechazar('{{s.id}}')" class="btn btn-sm btn-block btn-danger mx-0 botones">Rechazar</button>
+                    <div class="btn-group">
+                      <button onclick="confirmacionAprobar('{{s.id}}')" class="btn btn-sm btn-block btn-success mx-0 botones">Aprobar</button>
+                      <button onclick="confirmacionRechazar('{{s.id}}')" class="btn btn-sm btn-block btn-danger mx-0 botones">Rechazar</button>
+                    </div>
+
                     {% else %}
                     <!-- <a href="rechazarSolicitud/{{s.id}}" class="btn btn-sm btn-block btn-danger mx-0 botones">Rechazar</a> -->
                     <!-- <a href="aprobarSolicitud/{{s.id}}" class="btn btn-sm btn-block btn-success mx-0 botones">Aprobar</a> -->
-
-                    <button disabled class="btn btn-sm btn-block btn-success mx-0 botones">Aprobar</button>
-                    <button disabled class="btn btn-sm btn-block btn-danger mx-0 botones">Rechazar</button>
+                    <div class="btn-group">
+                      <button disabled class="btn btn-sm btn-block btn-success mx-0 botones">Aprobar</button>
+                      <button disabled class="btn btn-sm btn-block btn-danger mx-0 botones">Rechazar</button>
+                    </div>
                     {% endif%}
                   </td>
                 </tr>
@@ -407,19 +423,23 @@
                   <!-- Estado de las solicitudes -->
                   {% if s.estado == 'Pendiente' %}
                   <td class="registro">
-                    <button class="btn btn-sm btn-block btn-warning mx-0 botones">{{ s.estado }}</button>
+                    <!-- <button class="btn btn-sm btn-block btn-warning mx-0 botones">{{ s.estado }}</button> -->
+                    <span class="badge bg-warning" style="color: black">{{ s.estado }}</span>
                   </td>
                   {% elif s.estado == 'Aprobada' %}
                   <td class="registro">
-                    <button class="btn btn-sm btn-block btn-success mx-0 botones">{{ s.estado }}</button>
+                    <!-- <button class="btn btn-sm btn-block btn-success mx-0 botones">{{ s.estado }}</button> -->
+                    <span class="badge bg-success" style="color: black">{{ s.estado }}</span>
                   </td>
                   {% elif s.estado == 'Rechazada' %}
                   <td class="registro">
-                    <button class="btn btn-sm btn-block btn-danger mx-0 botones">{{ s.estado }}</button>
+                    <!-- <button class="btn btn-sm btn-block btn-danger mx-0 botones">{{ s.estado }}</button> -->
+                    <span class="badge bg-danger" style="color: black">{{ s.estado }}</span>
                   </td>
                   {% elif s.estado == 'Cancelada' %}
                   <td class="registro">
-                    <button class="btn btn-sm btn-block btn-secondary mx-0 botones">{{ s.estado }}</button>
+                    <!-- <button class="btn btn-sm btn-block btn-secondary mx-0 botones">{{ s.estado }}</button> -->
+                    <span class="badge bg-secondary" style="color: black">{{ s.estado }}</span>
                   </td>
                   {% endif%}
 
@@ -429,14 +449,17 @@
                     <!-- <a href="rechazarSolicitud/{{s.id}}" class="btn btn-sm btn-block btn-danger mx-0 botones">Rechazar</a> -->
                     <!-- <a href="aprobarSolicitud/{{s.id}}" class="btn btn-sm btn-block btn-success mx-0 botones">Aprobar</a> -->
 
-                    <button onclick="confirmacionAprobar('{{s.id}}')" class="btn btn-sm btn-block btn-success mx-0 botones">Aprobar</button>
-                    <button onclick="confirmacionRechazar('{{s.id}}')" class="btn btn-sm btn-block btn-danger mx-0 botones">Rechazar</button>
+                    <div class="btn-group">
+                      <button onclick="confirmacionAprobar('{{s.id}}')" class="btn btn-sm btn-block btn-success mx-0 botones">Aprobar</button>
+                      <button onclick="confirmacionRechazar('{{s.id}}')" class="btn btn-sm btn-block btn-danger mx-0 botones">Rechazar</button>
+                    </div>
                     {% else %}
                     <!-- <a href="rechazarSolicitud/{{s.id}}" class="btn btn-sm btn-block btn-danger mx-0 botones">Rechazar</a> -->
                     <!-- <a href="aprobarSolicitud/{{s.id}}" class="btn btn-sm btn-block btn-success mx-0 botones">Aprobar</a> -->
-
-                    <button disabled class="btn btn-sm btn-block btn-success mx-0 botones">Aprobar</button>
-                    <button disabled class="btn btn-sm btn-block btn-danger mx-0 botones">Rechazar</button>
+                    <div class="btn-group">
+                      <button disabled class="btn btn-sm btn-block btn-success mx-0 botones">Aprobar</button>
+                      <button disabled class="btn btn-sm btn-block btn-danger mx-0 botones">Rechazar</button>
+                    </div>
                     {% endif%}
                   </td>
 
@@ -474,6 +497,30 @@
           <a href="carga_usuarios_excel/" class="btn btn-danger m-3">Cargar Usuarios</a>
           <a href="carga_asistencia_excel/" class="btn btn-dark m-3">Cargar Asistencia</a>
           <a href="reporte_usuarios/" class="btn btn-primary m-3">Reporte de Usuarios</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- si solicitudes_enviadas_pendientes es mayor a 1 -->
+  {% if solicitudes_recibidas_pendientes_count != 0 %}
+  <!-- The Modal -->
+  <div class="modal" id="myModal" data-pendientes="{{ solicitudes_recibidas_pendientes_count|escapejs}}">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h4 class="modal-title">Notificación</h4>
+          <!-- <button type="button" class="btn-close" data-bs-dismiss="modal"></button> -->
+        </div>
+
+        <!-- Modal body -->
+        <div class="modal-body">Solicitudes pendientes <span class="badge bg-warning" style="color: black">{{ solicitudes_recibidas_pendientes_count }}</span></div>
+
+        <!-- Modal footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick='document.getElementById("myModal").style.display = "none";'>Enterado</button>
         </div>
       </div>
     </div>

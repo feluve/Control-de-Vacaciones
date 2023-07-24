@@ -1,9 +1,29 @@
 
 // listener wind
 window.addEventListener('load', function() {
-    console.log("Cargando acciones QR...");
+    console.log("Cargando acciones QR..");
 
-    obtenerDatosDigitales();
+    // obtenerDatosDigitales();
+
+    // obtenemos el data-user del div con id div
+    const usuario = document.getElementById("div").dataset.usuario;
+    const usuarioR = localStorage.getItem("usuarioR");
+
+    // si el usuarioR es null o es diferente al usuario
+    if ((usuarioR == null) || (usuarioR != usuario)) {
+        console.log("Dispositivo corrupto");
+
+        this.alert("Dispositivo corrupto");
+
+        // redireccionamos al inicio
+        window.location.href = "/";
+    }
+
+    // si el usuarioR es igual a usuario
+    if (usuarioR == user) {
+        
+        window.location.href = "/asistenciaQR";
+    }
 
 });
 
@@ -80,19 +100,16 @@ function obtenerDatosDigitales() {
 
 };
 
-// obtenemos el data-dominio de id resultado
-var dominio = document.getElementById("resultado").dataset.dominio;
-
 function onScanSuccess(qrCodeMessage) {
     
     // colocar en el input el valor del QR
-    document.getElementById("resultado").innerHTML = qrCodeMessage;
+    // document.getElementById("resultado").innerHTML = qrCodeMessage;
 
     console.log(qrCodeMessage);
 
     // registramos asistencia
     // nos vamos a la url 
-    window.location.href = dominio + "/registroAsistenciaQR/" + qrCodeMessage;
+    window.location.href = "/registroAsistenciaQR/" + qrCodeMessage;
 
 }
 
